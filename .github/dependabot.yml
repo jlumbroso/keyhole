@@ -1,0 +1,33 @@
+# The same updates as porthole, offered on the same day: the twins share a toolchain and an engines floor,
+# so a pin that protects one protects the other. Weekly, development dependencies grouped into one pull
+# request, GitHub Actions updated too (they are pinned to commit SHAs, which only a bot keeps current).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      dev-dependencies:
+        dependency-type: development
+    ignore:
+      # Pinned to the engines.vscode floor on purpose: vsce refuses to package when @types/vscode is
+      # newer than engines.vscode, and a newer type would let the code call an API older VS Code versions
+      # do not have. Raise it with the floor, by decision (as porthole does: jlumbroso/porthole, ADR-0002).
+      - dependency-name: "@types/vscode"
+      # Matched to the Node.js inside VS Code at the engines floor, for the same reason: VS Code 1.134.0
+      # runs Node 24, and types for a newer Node would let the code call APIs users do not have. Raise it
+      # with the floor, by decision (jlumbroso/porthole, ADR-0002).
+      - dependency-name: "@types/node"
+        versions: [">=25"]
+      # TypeScript 7 is the new, Go-based compiler. Adopted by decision, in both twins together, and not by
+      # bot: the question is still open in porthole (jlumbroso/porthole, ADR-0002, where a bot's pull request
+      # for it was closed on 2026-10-18), and the twins should not drift onto different compilers. (Unlike
+      # porthole's tsconfig, keyhole's uses moduleResolution "bundler", so the compiler's removal of "node"
+      # resolution is not what holds this back here.)
+      - dependency-name: "typescript"
+        versions: [">=7"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
