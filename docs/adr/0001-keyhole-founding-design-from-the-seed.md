@@ -9,8 +9,8 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # Keyhole: founding design from the seed
 
 - **Date**: 2026-10-20
-- **Iteration**: 1
-- **Status**: Draft
+- **Iteration**: 2
+- **Status**: Accepted
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5); the naming review for every user-facing name
 
 **TL;DR**: Keyhole is a small VS Code extension through which a person types a secret into a masked box and it lands in the project's `.env` (and optionally Claude Code's `settings.local.json`), so a model can ask for a secret by name and steer a novice through getting one without the secret ever entering the conversation; this record carries the seed's design and asks the three questions the build needs first.
@@ -130,9 +130,37 @@ Option A (on request) and Option B (a setting, off by default, with allowlist an
 
 ---
 
+### QST-FINGERPRINT: How does keyhole's log show which key it wrote, without any of the key entering the conversation?
+- Status: unanswered
+- Why asking: Jérémie's answer to QST-COLLISION asks for a log of every probe and change, readable by models and humans, with a way to recognize a key, for instance `<OBKEY:a****4/>` (the first and last characters, starred between). The log is exactly what a model reads to learn the outcome, so whatever the log shows of a key enters the conversation; the first law says none of the secret should. The question is what lets a person or a model tell "is this the same key as before?" without giving away a character of it.
+- Need: pick a letter (or override — any shape answers)
+
+Options:
+- **A — first and last characters**: `<OBKEY:a****4/>`. Easy to compare by eye against the service's page, which often shows the last four characters. Two characters of the secret enter the log, and so the conversation.
+- **B — the public prefix and a short hash**: `<OBKEY:ghp_…#3fa7a3c1/>`. The prefix (`ghp_`, `github_pat_`, `sk-ant-`) is the same for every token of that kind, so it is not secret, and comes from the service card; the eight characters after `#` are the start of a SHA-256 of the value, which identifies the key without revealing any of it. Comparing with the service's page needs keyhole (a "check this key" action), not the eye.
+- **C — the length only**: `<OBKEY:len=40/>`. Reveals nothing; distinguishes keys only when their lengths differ.
+
+**Recommendation**: (by Glazier 5.5, Claude Opus 5.5, 2026-10-20)
+**B — the public prefix and a short hash.** *Rationale*: it keeps what A is for (recognizing the same key across log lines, and across rotations: a new hash means a new key) while honoring the first law to the character; the prefix also tells a novice and a model which service the key belongs to. Thirty-two bits of a hash of a forty-character random token reveal nothing usable about it. *Confidence*: 0.75 — because matching against a service's "ends in …4f2a" display is a real convenience A gives and B does not. *If wrong*: if the person mostly needs to match keys against the service's page, A with the last four characters only, shown to the person in VS Code and never written to the log.
+
+**ANS:** (by Jérémie Lumbroso)
+[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+
+---
+
 ## Decision
 
-### Chosen: pending the three answers
+### Chosen (2026-10-20, from Jérémie's answers): the person's path first, every part modular; probe, log, append; `settings.local.json` on request or by a vetted list
+
+- **Build order (QST-BUILD-ORDER, A)**: the person's path first, then the link, the cards and the harness targets, one release each; *"Everything should be modularly designed."*
+- **An existing value (QST-COLLISION, A by default)**, with four principles from his answer:
+  1. **Keyhole probes, because it can.** It checks what a model cannot: is the variable in the environment already, in `.env`, under `env` in `settings.local.json`, in each target; before and after every change.
+  2. **A log of every probe and change**, for both models and humans to read, so what happened when is never guessed. How a key is identified in it is QST-FINGERPRINT.
+  3. **Edits are additive.** Append where the format allows; where it does not, a format-preserving editor (for JSON, VS Code's own `jsonc-parser` `modify`, which keeps comments and layout); each change carries a standard comment: written by keyhole and its version, when, why, and whether it overrides an earlier value. In `.env`, where an appended line overrides an earlier one, keyhole says so in its comment and does not comment out the old line (it notes that this could be done), so concurrent writers never undo each other.
+  4. **More automation is a setting**, off by default.
+- **`settings.local.json` (QST-SETTINGS-LOCAL, A and B)**: on request per variable, and a setting, off by default, with an allowlist and/or blocklist of variable names. His scenario: a project such as the human-AI collaboration template vets a set of MCP servers and their tokens and ships that list, so a novice's setup is streamlined and nothing outside the list reaches the harness's environment.
+
+**The harness targets, after Surveyor's reading** (`docs/reviews/2026-10-20-other-harnesses-environment-files.md`): there is no common file. Gemini CLI auto-loads the project `.env`; Codex CLI reads a TOML `[shell_environment_policy] set` table from the project's `.codex/config.toml`; xAI's Grok Build reads that table only from `~/.grok/config.toml`, in the home folder, outside git. A plain `.env` reaches a model's commands only under Gemini; under Codex and Grok only programs that load it themselves see it, which the README must say. Every harness can strip token-named variables from the commands it runs, by a setting the person may have on, so a target reports "written, but this harness strips it" when it can tell. Every harness ignores project files until the folder is trusted, so the result line distinguishes *written* from *in effect*. Three quoting dialects (JSON, TOML, shell); a target module records the harness version it was read against.
 
 Settled regardless, from the Thread: the first law (never through the conversation, stated as such); no read-back of a value by any route; refused dangerous names; git's own checks, failing closed; atomic `.env` writes with mode `0600`; the outcome observable without the value; every user-facing name through the naming review before release; the manual teaches the permission rules that stop accidental reads.
 
@@ -140,7 +168,10 @@ Settled regardless, from the Thread: the first law (never through the conversati
 
 ## Action Items
 
-- [ ] Answer QST-BUILD-ORDER, QST-COLLISION, QST-SETTINGS-LOCAL — Owner: Jérémie
+- [x] Answer QST-BUILD-ORDER, QST-COLLISION, QST-SETTINGS-LOCAL — Owner: Jérémie (2026-10-20: A; A with four principles; A and B)
+- [ ] Answer QST-FINGERPRINT — Owner: Jérémie
+- [ ] Read how the common `.env` loaders treat a name that appears twice (Node `dotenv`, `python-dotenv`, Docker Compose `env_file`, direnv and `source`, Gemini CLI's loader): which line wins, and which warn or refuse; this decides whether appending is safe as the default — Owner: Surveyor 5.1, read only
+- [ ] Read whether Claude Code accepts comments in `settings.local.json`; if not, keyhole's standard comment lives in its log only — Owner: Surveyor 5.1, read only
 - [ ] The full collision check on `keyhole` before the Marketplace ID is minted — Owner: the naming review
 - [ ] The manual's chapter on keeping a model from reading `.env` by accident (permission rules per harness, starting with Claude Code's `permissions.deny`) — Owner: Sounder 6 (Jérémie, 2026-10-20)
 - [x] Read the environment-file conventions of the next harnesses (OpenAI Codex, Google Gemini CLI, xAI Grok) in their own documentation: which file, in the project or the home folder, what shape, how a change takes effect — Owner: Surveyor 5.1, read only (done early, 2026-10-20: `docs/reviews/2026-10-20-other-harnesses-environment-files.md`; Gemini has no harness file and auto-loads `.env`, Codex takes `[shell_environment_policy] set` in the project, Grok Build takes it in the home folder only; the order of building stays Jérémie's)
@@ -155,6 +186,12 @@ Settled regardless, from the Thread: the first law (never through the conversati
 - Contributors: Jérémie Lumbroso; Grok 3.7; the naming review; the template lane; Glazier 5.5 (Claude Opus 5.5)
 - Changes: initial draft
 - Outcome: `Draft`
+
+### Iteration 2 (2026-10-20)
+- Trigger: Jérémie answered the three questions; Surveyor 5.1 read the other harnesses' environment files
+- Contributors: Jérémie Lumbroso, Surveyor 5.1, Glazier 5.5 (Claude Opus 5.5)
+- Changes: Decision filled; QST-FINGERPRINT added (the log's key identifier against the first law); two reading items for Surveyor
+- Outcome: `Draft → Accepted`; one question open
 
 ---
 

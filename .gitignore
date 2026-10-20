@@ -13,3 +13,5 @@
 # Python temporary files
 __pycache__/
 *.py[cod]
+# pneumatic's machine-local state (as in porthole): never substrate
+.pneumatic/
