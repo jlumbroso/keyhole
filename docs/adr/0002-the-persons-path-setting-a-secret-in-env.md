@@ -50,7 +50,7 @@ Every step is logged; no log line, notice or question carries the value (a test 
 ## Questions
 
 ### QST-NAME-PERSON-PATH: Are the words of the person's path right?
-- Status: unanswered — routed to the naming review, then Jérémie; blocks the first release
+- Status: answered
 - Why asking: Every word below is something a person reads, and the command's id is permanent once published. As built, all provisional:
   - the command: **Keyhole: Set a Secret in .env…** (`keyhole.setSecret`)
   - the name box: "Name of the variable to set (for example NEON_API_KEY)"; its refusals: "use capital letters, digits and underscores, starting with a letter (for example NEON_API_KEY)" and "{NAME} changes how programs run, so a value for it could run code in every later session; keyhole does not write it"
@@ -83,7 +83,11 @@ Options:
 *Confidence*: 0.8. *If wrong*: all words here are release-mutable except `keyhole.setSecret` (confirmed) and the marker form in logs people may parse — and `keyprint` is the one to get right now, which is why it got the full race.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Approving Option B with the naming review's recommendation and explicit catch, gratefully — thank you to the naming review! Also confirming the deployed pilot works as described, and I made my first test, with led to the following in the `.env`:
+```
+# Keyhole 0.0.1 · 2026-10-20T16:56:07.269Z · set NEON_API_KEY
+NEON_API_KEY=test_neon_api_key
+```
 
 ---
 
