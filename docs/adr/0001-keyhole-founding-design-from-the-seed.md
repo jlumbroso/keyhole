@@ -9,7 +9,7 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # Keyhole: founding design from the seed
 
 - **Date**: 2026-10-20
-- **Iteration**: 2
+- **Iteration**: 3
 - **Status**: Accepted
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5); the naming review for every user-facing name
 
@@ -158,6 +158,8 @@ Yes, Option B is a great idea. And just to clarify, `<OBKEY:.../>` is a "format"
   2. **A log of every probe and change**, for both models and humans to read, so what happened when is never guessed. How a key is identified in it is QST-FINGERPRINT.
   3. **Edits are additive.** Append where the format allows; where it does not, a format-preserving editor (for JSON, VS Code's own `jsonc-parser` `modify`, which keeps comments and layout); each change carries a standard comment: written by keyhole and its version, when, why, and whether it overrides an earlier value. In `.env`, where an appended line overrides an earlier one, keyhole says so in its comment and does not comment out the old line (it notes that this could be done), so concurrent writers never undo each other.
   4. **More automation is a setting**, off by default.
+- **The key in the log (QST-FINGERPRINT, B)**: the token's public prefix, from its service card, and the first eight characters of a SHA-256 of the value, provisionally `<OBKEY:ghp_…#3fa7a3c1/>`; no character of the secret is written anywhere a model reads. The marker obfuscates the *value*, never the variable's name, which the log shows in full. Its name waits for the naming review.
+- **Two facts that settle the edit rules (Surveyor 5.1, read and run, 2026-10-20)**: appending to `.env` is safe as the default, since in all five common loaders the last line wins and none warns about a repeated name; and a comment in `settings.local.json` makes Claude Code treat the whole file as invalid (shown with `claude doctor`), so keyhole's standard comment goes in `.env` as a `#` line and, for JSON targets, in keyhole's log only.
 - **`settings.local.json` (QST-SETTINGS-LOCAL, A and B)**: on request per variable, and a setting, off by default, with an allowlist and/or blocklist of variable names. His scenario: a project such as the human-AI collaboration template vets a set of MCP servers and their tokens and ships that list, so a novice's setup is streamlined and nothing outside the list reaches the harness's environment.
 
 **The harness targets, after Surveyor's reading** (`docs/reviews/2026-10-20-other-harnesses-environment-files.md`): there is no common file. Gemini CLI auto-loads the project `.env`; Codex CLI reads a TOML `[shell_environment_policy] set` table from the project's `.codex/config.toml`; xAI's Grok Build reads that table only from `~/.grok/config.toml`, in the home folder, outside git. A plain `.env` reaches a model's commands only under Gemini; under Codex and Grok only programs that load it themselves see it, which the README must say. Every harness can strip token-named variables from the commands it runs, by a setting the person may have on, so a target reports "written, but this harness strips it" when it can tell. Every harness ignores project files until the folder is trusted, so the result line distinguishes *written* from *in effect*. Three quoting dialects (JSON, TOML, shell); a target module records the harness version it was read against.
@@ -169,7 +171,8 @@ Settled regardless, from the Thread: the first law (never through the conversati
 ## Action Items
 
 - [x] Answer QST-BUILD-ORDER, QST-COLLISION, QST-SETTINGS-LOCAL — Owner: Jérémie (2026-10-20: A; A with four principles; A and B)
-- [ ] Answer QST-FINGERPRINT — Owner: Jérémie
+- [x] Answer QST-FINGERPRINT — Owner: Jérémie (2026-10-20: B; `<OBKEY:…/>` obfuscates the value, not the name; the term is provisional)
+- [ ] Name the log's value marker (provisionally `<OBKEY:…/>`) and the log's other user-facing words before the first release — Owner: the naming review
 - [x] Read how the common `.env` loaders treat a name that appears twice (Node `dotenv`, `python-dotenv`, Docker Compose `env_file`, direnv and `source`, Gemini CLI's loader): which line wins, and which warn or refuse; this decides whether appending is safe as the default — Owner: Surveyor 5.1, read only (2026-10-20: all five take the last line, none warns; the real collision is a name already in the process environment, which three of the five prefer to the file; `docs/reviews/2026-10-20-env-loaders-duplicates-and-settings-comments.md`)
 - [x] Read whether Claude Code accepts comments in `settings.local.json`; if not, keyhole's standard comment lives in its log only — Owner: Surveyor 5.1, read only (2026-10-20: no; "strict JSON", and Claude Code 2.1.304 marks a commented file "Invalid or malformed JSON", after which the whole file is out of effect; the comment lives in the log; same report)
 - [ ] The full collision check on `keyhole` before the Marketplace ID is minted — Owner: the naming review
@@ -192,6 +195,12 @@ Settled regardless, from the Thread: the first law (never through the conversati
 - Contributors: Jérémie Lumbroso, Surveyor 5.1, Glazier 5.5 (Claude Opus 5.5)
 - Changes: Decision filled; QST-FINGERPRINT added (the log's key identifier against the first law); two reading items for Surveyor
 - Outcome: `Draft → Accepted`; one question open
+
+### Iteration 3 (2026-10-20)
+- Trigger: Jérémie answered QST-FINGERPRINT (B); Surveyor 5.1 read the `.env` loaders and tested comments in `settings.local.json`
+- Contributors: Jérémie Lumbroso, Surveyor 5.1, Glazier 5.5 (Claude Opus 5.5)
+- Changes: the log's key marker decided; the edit rules settled by the two findings; the marker's name sent to the naming review
+- Outcome: stays `Accepted`; no question open; the scaffold is next
 
 ---
 
