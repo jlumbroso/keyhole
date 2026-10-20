@@ -1,6 +1,12 @@
 # macOS metadata
 .DS_Store
 
+# Secrets live here, typed with a plain editor and never committed. keyhole is a tool for exactly
+# this, so the rule is in from the start (porthole's, added there after its own first scan; Purser 5.5, 2026-10-20)
+.env
+.env.*
+!.env.example
+
 # Temporary files
 ~*
 
