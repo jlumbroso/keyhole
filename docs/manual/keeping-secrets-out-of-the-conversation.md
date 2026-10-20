@@ -140,9 +140,15 @@ paths for files deeper than the chosen scan.
 
 This governs sandboxed commands, not every connector or external tool.
 On Linux, WSL, and supported native Windows sandboxes, glob matches are
-collected when each sandboxed process starts. A running process may miss
-matching files created afterward. Restart those processes after adding
-secret files. [OpenAI permission profiles](https://learn.chatgpt.com/docs/permissions)
+collected when each sandboxed process starts. An already-running shell,
+script, watcher, or development server may miss matching files created
+afterward. Restart those processes after adding secret files.
+[OpenAI permission profiles](https://learn.chatgpt.com/docs/permissions)
+
+On macOS, Seatbelt checks the denied paths when they are accessed, so matching
+files created after the sandbox starts are covered too. This follows the
+[Codex 0.163.0 implementation](https://github.com/openai/codex/blob/rust-v0.163.0/codex-rs/sandboxing/src/seatbelt.rs#L624-L662);
+we have not run that check here.
 
 For variables the assistant's commands do not need, merge this separate
 setting into the same configuration:
@@ -202,9 +208,9 @@ these settings into `.gemini/settings.json`:
 }
 ```
 
-The first section enables ignore-file handling. `ignoreLocalEnv` disables
-generic project `.env` loading; redaction makes a best-effort attempt to filter
-sensitive environment variables passed to tools. It does not identify every
+The first section enables ignore-file handling. `ignoreLocalEnv` skips generic
+`.env` files except the one in your home folder; redaction makes a best-effort
+attempt to filter sensitive environment variables passed to tools. It does not identify every
 credential. Existing `allowed` and `blocked` lists affect the result.
 Restart afterward. Project settings require trust
 and can be overridden by system settings. These changes can leave development
@@ -216,11 +222,14 @@ defaults it to `false`, despite prose elsewhere calling it automatic.
 The nested JSON above follows that
 [settings schema](https://github.com/google-gemini/gemini-cli/blob/main/packages/cli/src/config/settingsSchema.ts).
 
-`ignoreLocalEnv` does **not** disable `.gemini/.env`, home-folder `.env`, or
-variables inherited from the launching shell. File exclusions and environment
-loading are separate. This limit comes from reading the
-[environment loader](https://github.com/google-gemini/gemini-cli/blob/main/packages/cli/src/config/settings.ts);
-it has not been tested here against the installed release.
+`ignoreLocalEnv` still permits `.gemini/.env` in trusted folders, including
+`~/.gemini/.env`, and does not remove variables inherited from the launching
+shell. Gemini CLI 0.64.0 searches upward as far as the filesystem root,
+stopping at the first eligible file; a `.git` folder does not stop the search.
+With `ignoreLocalEnv` off, a stray `.env` in a parent folder can therefore be
+loaded. File exclusions and environment loading are separate. These details
+come from the [0.64.0 environment loader](https://github.com/google-gemini/gemini-cli/blob/v0.64.0/packages/cli/src/config/settings.ts#L561-L598),
+not a walkthrough of the installed release.
 
 **Checkpoint:** `read_file` should report that the practice file is ignored.
 Current [read-file source](https://github.com/google-gemini/gemini-cli/blob/main/packages/core/src/tools/read-file.ts)
@@ -279,18 +288,21 @@ detect every secret. Explicit `set` values are applied after exclusions.
 [Grok configuration scope](https://docs.x.ai/build/settings),
 [environment-policy source](https://github.com/xai-org/grok-build/blob/2bdd1d6a6369de0e8c68132ea4539e9abd9e14a8/crates/codegen/xai-grok-tools/src/util/shell_env_policy.rs)
 
-Grok can also load `.envrc`, a file containing shell instructions:
-`session.load_envrc` is documented as enabled by default. If you do not use
-that feature, set `load_envrc = false` under `[session]` in the same personal
-config. Restart afterward. Shell startup files remain another way variables
+Grok can also load `.envrc`, a file containing shell instructions.
+`session.load_envrc` is enabled by default in the documentation and published
+source; that source permits loading only in a folder Grok trusts.
+[Published trust check](https://github.com/xai-org/grok-build/blob/2bdd1d6a6369de0e8c68132ea4539e9abd9e14a8/crates/codegen/xai-grok-workspace/src/envrc.rs#L45-L60)
+
+If you do not use that feature, set `load_envrc = false` under `[session]` in
+the same personal config. Restart afterward. Shell startup files remain another way variables
 can enter a command's environment.
 [Grok settings reference](https://docs.x.ai/build/settings/reference),
 [sandbox source guide](https://github.com/xai-org/grok-build/blob/2bdd1d6a6369de0e8c68132ea4539e9abd9e14a8/crates/codegen/xai-grok-pager/docs/user-guide/18-sandbox.md)
 
 **Checkpoint:** both file-tool and shell/script reads should be denied.
 This is a documentation-based recipe, not a tested native-Windows procedure.
-The public source snapshot predates the currently distributed binary, making
-the harmless check particularly important.
+The public source snapshot predates Grok Build 1.0.62, whose behavior has not
+been exercised here, making the harmless check particularly important.
 
 ## Check with a harmless value
 
