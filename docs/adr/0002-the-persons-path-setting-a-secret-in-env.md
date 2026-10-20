@@ -9,11 +9,11 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # The person's path: setting a secret in `.env`
 
 - **Date**: 2026-10-20
-- **Iteration**: 1
+- **Iteration**: 2
 - **Status**: Partially Implemented
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5); Surveyor 5.1 (the git route); the naming review (every word)
 
-**TL;DR**: The first feature, built and tested against a mocked VS Code and installed locally: a command takes a variable's name, checks with git that `.env` stays out of commits, takes the value in a masked box, appends it after a comment, and verifies it; git is asked through VS Code's own Git extension, so keyhole starts no process; it waits on the naming review's words and a hand check.
+**TL;DR**: The first feature, built and tested against a mocked VS Code and installed locally: a command takes a variable's name, checks with git that `.env` stays out of commits, takes the value in a masked box, appends it after a comment, and verifies it; git is asked through VS Code's own Git extension, so keyhole starts no process; its words are the naming review's (approved 2026-10-20), and it waits on one hand check.
 
 ---
 
@@ -31,7 +31,7 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 1. Picks the workspace folder (asks which, when there are several).
 2. Asks for the variable's name, refusing names that would run code or that harnesses drop (`src/names.ts`: `NODE_OPTIONS`, `PATH`, `LD_PRELOAD`, `DYLD_*`, `HOME`, `XDG_*`, …).
 3. Asks git about `.env`: tracked → refuses and says how to stop tracking it; not ignored → offers to add `.env` to `.gitignore`, then asks git again; no repository → writes, and says so in the log; git cannot be asked → refuses, naming why.
-4. Probes `.env` for the name: if it is set, shows its fingerprint and length and asks before replacing it (QST-COLLISION, A: an explicit ask, never silent).
+4. Probes `.env` for the name: if it is set, shows its keyprint and length and asks before setting a new value; the old line stays (QST-COLLISION, A: an explicit ask, never silent).
 5. Takes the value in a **masked box that stays open while the person is away** minting the token (`password: true`, `ignoreFocusOut: true`).
 6. Quotes it so every common loader reads it back unchanged, or refuses (a value on several lines; one that cannot be written safely on one line).
 7. **Appends** it after a `#` comment (keyhole's version, the time, what it replaces), atomically, in a new file readable by its owner only (`src/targets/dotenv.ts`).
@@ -93,7 +93,7 @@ NEON_API_KEY=test_neon_api_key
 
 ### QST-CHECK-PERSON-PATH: Does setting a secret work in a real VS Code, with git, and does the box survive you leaving it?
 - Status: unanswered
-- Why asking: **What this finds out.** The path passes 30 tests against a mocked VS Code, but four links have never run: that VS Code's Git extension answers "not ignored" and then "protected" for a real repository through the API; that the masked box stays open while you switch to another app; that the file lands as designed (a comment line, then the value, readable by you only); and that a second run finds the value and asks before replacing it. Only a real VS Code shows these. **Safe**: it runs in a throwaway repository staged for this check, with a value that is not a secret; **never paste a real token in a check.** Keyhole 0.0.1 is installed in your VS Code, not published.
+- Why asking: **What this finds out.** The path passes 30 tests against a mocked VS Code, but four links have never run: that VS Code's Git extension answers "not ignored" and then "protected" for a real repository through the API; that the masked box stays open while you switch to another app; that the file lands as designed (a comment line, then the value, readable by you only); and that a second run finds the value and asks before setting a new one. Only a real VS Code shows these. **Safe**: it runs in a throwaway repository staged for this check, with a value that is not a secret; **never paste a real token in a check.** Keyhole 0.0.1 is installed in your VS Code, not published.
 - Need: pick a letter (or override — any shape answers). About four minutes.
 
 **Where to do this.** A new VS Code window on the throwaway repository. Open it from any terminal with:
@@ -107,7 +107,7 @@ Its title bar ends with `keyhole-check`. It holds a `README.md` and a `.gitignor
 3. **Leave, then come back.** A masked box asks for the value of `KEYHOLE_CHECK_VALUE`. Before typing, switch to another app (Cmd+Tab) for a few seconds, then come back. **The box should still be open.**
 4. **Type a value that is not a secret.** Type `not-a-real-token-123` (it shows as dots) and press **Enter**. A notice should say **"Keyhole set KEYHOLE_CHECK_VALUE in keyhole-check/.env (20 characters)."**
 5. **Look at the files.** In the Explorer (**Shift+Cmd+E**), open `.gitignore`: its last lines should be a comment `# Secrets stay out of git (added by Keyhole 0.0.1)` and `.env`. Open `.env`: a comment line beginning `# Keyhole 0.0.1 ·` and then `KEYHOLE_CHECK_VALUE=not-a-real-token-123`. Its icon or name in the Explorer should look dimmed (git ignores it).
-6. **Run it again, same name.** Repeat step 1 with `KEYHOLE_CHECK_VALUE`. A question should say it **is already set** (with a marker like `<OBKEY:…#1a2b3c4d/>` and "20 characters") and offer **Replace It**. Click **Cancel**. `.env` should be unchanged.
+6. **Run it again, same name.** Repeat step 1 with `KEYHOLE_CHECK_VALUE`. A question should say it **is already set** (with a marker like `<keyprint:…#1a2b3c4d/>` and "20 characters") and ask **"Set a new value?"**, offering **Set New Value**. Click **Cancel**. `.env` should be unchanged. *(Step updated 2026-10-20 for the naming review's words, now in the installed build; reload any VS Code window opened before 6:12 PM, or open the window fresh.)*
 7. **Tidy up.** Close the window. I delete the folder afterwards, and read Keyhole's log myself.
 
 Options:
@@ -127,9 +127,13 @@ Options:
 
 ## Decision
 
-### Chosen: as built, pending the two questions
+### Chosen: as built, in the naming review's words; pending the hand check
 
 The git route is decided (above): VS Code's Git extension API, no process of keyhole's own.
+
+**The words (QST-NAME-PERSON-PATH, B; Jérémie, 2026-10-20)**: the naming review's ruling, line by line, built in `d7291b0`. `keyhole.setSecret` and "Set" stay. A value already set asks "Set a new value?" with **Set New Value**, and the detail "The old line stays in the file (loaders use the last); Keyhole marks it superseded.", because Keyhole destroys nothing and "Replace It" claimed it did. The `.env` comment ends "(supersedes line L)". The log names a value by its **keyprint**, `<keyprint:{prefix}…#{hash}/>` (after the SSH key fingerprint: identifies, reveals nothing); `OBKEY` retires. "Keyhole" is capitalized in prose. Blessed as built, to keep verbatim: "It is written to {folder}/.env and nowhere else."
+
+His first use, with the installed pilot before the new words, wrote `.env` as designed: a comment line `# Keyhole 0.0.1 · {time} · set NEON_API_KEY`, then the value. That is one run of a first set, not the check (no git question, no leaving the box, no second run), so QST-CHECK-PERSON-PATH stays open.
 
 ---
 
@@ -138,7 +142,8 @@ The git route is decided (above): VS Code's Git extension API, no process of key
 - [x] Build the person's path, with tests — Owner: Glazier (2026-10-20, `1c6f528`, `a89cec5`)
 - [x] Read the git route in source — Owner: Surveyor 5.1 (2026-10-20)
 - [x] CI — Owner: Purser 5.5 (2026-10-20, `a57ba55`)
-- [ ] Rule on the words (QST-NAME-PERSON-PATH) — Owner: the naming review, then Jérémie
+- [x] Rule on the words (QST-NAME-PERSON-PATH) — Owner: the naming review, then Jérémie (2026-10-20: B)
+- [x] Build the ruled words, reinstall locally, bring the check's step 6 to them — Owner: Glazier (2026-10-20, `d7291b0`)
 - [ ] Run the check (QST-CHECK-PERSON-PATH) — Owner: Jérémie
 - [ ] Delete the throwaway check folder afterwards — Owner: Glazier
 
@@ -151,6 +156,12 @@ The git route is decided (above): VS Code's Git extension API, no process of key
 - Contributors: Glazier 5.5 (Claude Opus 5.5), Surveyor 5.1, Purser 5.5
 - Changes: built, tested, installed locally
 - Outcome: `Partially Implemented`
+
+### Iteration 2 (2026-10-20)
+- Trigger: the naming review's ruling and Jérémie's answer to QST-NAME-PERSON-PATH (B)
+- Contributors: the naming review, Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
+- Changes: the ruled words in the code and tests (the three tests that pin them failed first, then were updated); `keyprint` named in ADR-0001; the check's step 6 updated; reinstalled locally
+- Outcome: `Partially Implemented` (the hand check remains)
 
 ---
 
