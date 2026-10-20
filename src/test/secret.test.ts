@@ -59,7 +59,9 @@ describe('the boundary', () => {
   // Only the code that writes a file may unwrap a secret (ADR-0001, the note on
   // Simon: the value path is sealed behind one narrow interface). Listed here,
   // so widening the boundary is a visible change in review, never an accident.
-  const MAY_REVEAL: string[] = [];
+  const MAY_REVEAL: string[] = [
+    'targets/dotenv.ts', // the first target: quotes and writes the value into .env (2026-10-20)
+  ];
 
   it('lets no module outside the file writers call reveal()', () => {
     const src = resolve(__dirname, '..');
