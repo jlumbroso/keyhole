@@ -92,7 +92,7 @@ NEON_API_KEY=test_neon_api_key
 ---
 
 ### QST-CHECK-PERSON-PATH: Does setting a secret work in a real VS Code, with git, and does the box survive you leaving it?
-- Status: unanswered
+- Status: answered
 - Why asking: **What this finds out.** The path passes 30 tests against a mocked VS Code, but four links have never run: that VS Code's Git extension answers "not ignored" and then "protected" for a real repository through the API; that the masked box stays open while you switch to another app; that the file lands as designed (a comment line, then the value, readable by you only); and that a second run finds the value and asks before setting a new one. Only a real VS Code shows these. **Safe**: it runs in a throwaway repository staged for this check, with a value that is not a secret; **never paste a real token in a check.** Keyhole 0.0.1 is installed in your VS Code, not published.
 - Need: pick a letter (or override — any shape answers). About four minutes.
 
@@ -121,7 +121,28 @@ Options:
 **A** (a prediction). *Rationale*: the Git extension's members are read in source at both tags, and the order and failure codes are pinned by tests; `ignoreFocusOut` is read in VS Code's source as the only thing the box's blur handler consults (Surveyor, ADR-0001); the file format is tested on real folders. *Confidence*: 0.65 — because the Git extension has never been driven by keyhole in a real window, and step 2's "ask git again" depends on the extension seeing the new `.gitignore` line at once. *If wrong*: B means the API is reached differently in a real install (the log will say which step); C would contradict the source reading of `ignoreFocusOut`; D means the target writes differently from its tests (a regression test first); a "still not ignored" after step 2 means the Git extension caches ignore rules, and keyhole should wait for its repository state to change before asking again.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Option A.
+
+Remarks:
+- The question modal (and our modals in general) should follow an ORRCF-like flavor. Imagine that the audience may not know about `.gitignore` or may not know why you would add `.env` in `.gitignore`, or if they do, they may know you wouldn't want to commit it, but they may not know why. So we need to use every opportunity at our disposal to provide agency to our user. Let's follow moral contractualism. So here, the message should, (a) say what is recommended, and (b) why.
+- I wonder if there's a way for the password ask to have a toggle for visible or not visible — this is better, for accessibility reasons.
+- Thinking about accessibility, since entry of these is *all* we do, I wonder if we should research accessibility compliance so we are comprehensive, and to start, I think we should create a mode where instead of palette entry, we do a full tab that allows for entry, and maybe has some bells and whistles, like mass entry, for instance from copy-paste, et.c
+- Sorry for thinking out loud, but this testing is generative!
+- The keyprint thing is not very legible, I want something a bit more useful and closer to the original value such that if the person knew original value, they'd be like "ah, yes, this is obviously derived from my value"
+
+Screenshots:
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 6.53.26 PM.png`
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 6.53.42 PM.png`
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 6.53.52 PM.png`
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 6.54.03 PM.png`
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 6.54.46 PM.png`
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 6.58.59 PM.png`
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 6.59.15 PM.png`
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 6.59.47 PM.png`
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 6.59.54 PM.png`
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 7.02.06 PM.png`
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 7.02.22 PM.png`
+- See: `docs/adr/attachments/screenshots/2026-10-20-testing/Screenshot 2026-10-20 at 7.02.32 PM.png`
 
 ---
 
