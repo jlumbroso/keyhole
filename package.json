@@ -18,7 +18,15 @@
   ],
   "main": "./dist/extension.js",
   "activationEvents": [],
-  "contributes": {},
+  "contributes": {
+    "commands": [
+      {
+        "command": "keyhole.setSecret",
+        "title": "Set a Secret in .env…",
+        "category": "Keyhole"
+      }
+    ]
+  },
   "scripts": {
     "build": "vite build",
     "build:watch": "vite build --watch",

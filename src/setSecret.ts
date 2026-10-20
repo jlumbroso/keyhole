@@ -37,6 +37,11 @@ async function pickFolder(): Promise<vscode.WorkspaceFolder | undefined> {
 async function protect(git: GitFacts, folder: vscode.WorkspaceFolder): Promise<boolean> {
   const place = `${folder.name}/${DOTENV}`;
   let state = await git.protection(folder.uri.fsPath, DOTENV);
+  if (typeof state === 'object') {
+    log(`stopped: git cannot be asked about ${place}: ${state.unavailable}`);
+    void vscode.window.showWarningMessage(`Keyhole did not write ${place}: it could not ask git whether the file is kept out of commits (${state.unavailable}).`);
+    return false;
+  }
   log(`probe: git says ${place} is ${state}`);
   if (state === 'tracked') {
     void vscode.window.showWarningMessage(`Keyhole did not write ${place}: git tracks it, so a secret written there would go into the next commit. Stop tracking it first (git rm --cached ${DOTENV}), then add it to .gitignore.`);
@@ -53,9 +58,10 @@ async function protect(git: GitFacts, folder: vscode.WorkspaceFolder): Promise<b
     try { current = await readFile(gitignore, 'utf8'); } catch { /* no .gitignore yet */ }
     await appendFile(gitignore, `${current === '' || current.endsWith('\n') ? '' : '\n'}\n# Secrets stay out of git (added by Keyhole ${version})\n${DOTENV}\n`);
     state = await git.protection(folder.uri.fsPath, DOTENV);
-    log(`probe: after adding ${DOTENV} to .gitignore, git says ${place} is ${state}`);
+    const shown = typeof state === 'object' ? state.unavailable : state;
+    log(`probe: after adding ${DOTENV} to .gitignore, git says ${place} is ${shown}`);
     if (state !== 'protected') {
-      void vscode.window.showWarningMessage(`Keyhole added ${DOTENV} to .gitignore, but git still does not ignore ${place} (${state}); nothing was written.`);
+      void vscode.window.showWarningMessage(`Keyhole added ${DOTENV} to .gitignore, but git still does not ignore ${place} (${shown}); nothing was written.`);
       return false;
     }
   }

@@ -66,4 +66,26 @@ export const workspace = {
   get workspaceFolders() { return workspaceFolders; },
 };
 
+const registered = new Map<string, (...args: unknown[]) => unknown>();
+export const commands = {
+  registerCommand(id: string, handler: (...args: unknown[]) => unknown) {
+    registered.set(id, handler);
+    return { dispose: () => { registered.delete(id); } };
+  },
+};
+/** The handler the extension registered for a command id. */
+export const registeredCommand = (id: string) => registered.get(id);
+
+let extensionsById = new Map<string, unknown>();
+export const extensions = {
+  getExtension: (id: string) => extensionsById.get(id),
+};
+/** What `vscode.extensions.getExtension(id)` returns (undefined: the extension is disabled). */
+export function setExtension(id: string, extension: unknown): void { extensionsById.set(id, extension); }
+export function resetExtensions(): void { extensionsById = new Map(); }
+
+export const Uri = {
+  file: (fsPath: string) => ({ scheme: 'file', fsPath, path: fsPath, toString: () => `file://${fsPath}` }),
+};
+
 resetVscodeMock();
