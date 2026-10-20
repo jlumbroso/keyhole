@@ -3,7 +3,8 @@
 - **Author:** Sounder 6 (GPT-6 Astra), 2026-10-20
 - **For:** [ADR-0003](../adr/0003-accessible-entry-showing-the-value-conformance-and-a-tab-for-many-secrets.md), QST-A11Y-TARGET
 - **Inspected:** Keyhole `8230de297ce6156f8ba00dc8efde61b1cf60d060`, especially [setSecret.ts](../../src/setSecret.ts); [ADR-0002](../adr/0002-the-persons-path-setting-a-secret-in-env.md), iteration 3; ADR-0003, iteration 1.
-- **Evidence:** vendor documentation and Keyhole source inspection. No VoiceOver, keyboard, contrast, zoom, or other live accessibility test was performed. The earlier functional hand check is not an accessibility assessment.
+- **Source integration:** Surveyor's review at `021b530` and ADR-0003 iteration 2, read later the same evening; source findings sharpen the checks without changing the assessment target.
+- **Evidence:** vendor documentation, Keyhole source inspection, and Surveyor's version-pinned VS Code source review (linked below). No VoiceOver, keyboard, contrast, zoom, or other live accessibility test was performed. The earlier functional hand check is not an accessibility assessment.
 
 ## Recommended target and its limits
 
@@ -43,11 +44,16 @@ experience still needs checking on the supported versions.
 | Reveal control | Proposed in ADR-0003; not implemented in the inspected revision | If chosen: meaningful name/state, deliberate activation, preserved input and focus |
 | Single/batch entry tab | Proposed webview; not implemented | HTML semantics, layout, focus, errors, review, theme integration and lifecycle |
 
-Surveyor owns the version-pinned VS Code source questions: password toggling,
-accessibility attributes, editor backups and webview exposure/lifetime. The
-[parallel brief](../inbox/2026-10-20-2324-glazier-to-surveyor-accessible-entry-source-reads.md)
-is a dependency, **not a result**. Add its completed review as evidence when it
-lands; do not infer what VoiceOver speaks from a password attribute alone.
+Surveyor's completed [VS Code source review](2026-10-20-accessible-entry-source-reads.md)
+covers tags **1.134.0 and 1.141.0**. It reports a live `password` setter and
+eye-button API at both versions; an input accessible name composed from
+`placeholder` and `title`, falling back to `input`; validation-message
+announcements; and destruction of a hidden webview's iframe when
+`retainContextWhenHidden` is false. Its editor-backup findings also support
+excluding editable text documents as secret-entry surfaces. These are source
+findings, not runtime observations. Caret/value preservation, actual speech
+and the complete interruption/recovery flow still need hand checks; do not
+infer what VoiceOver speaks from a password attribute alone.
 
 ### What the VS Code documentation provides
 
@@ -149,8 +155,19 @@ lands; do not infer what VoiceOver speaks from a password attribute alone.
 discusses both, but a reveal toggle is not an unconditional AA requirement.
 Its absence alone does not prove a failure. It remains a useful improvement
 for checking a long pasted value. If chosen, the toggle must itself be
-operable and named; its state and the destination must be clear. Whether the
-palette API can do this at VS Code 1.134.0 is Surveyor's pending evidence.
+operable and named; its state and the destination must be clear.
+[Surveyor's section 1](2026-10-20-accessible-entry-source-reads.md#1-flipping-password-on-an-open-box-buttons-ignorefocusout)
+supports implementing it in the palette at the 1.134.0 floor. Test the value,
+caret, focus and announcements across the flip before treating it as usable.
+The source review also recommends automatic re-masking. A short timer is a
+design proposal, not a WCAG requirement: assess any time-limited opportunity
+to inspect the value under 2.2.1, including its adjustments or justified
+exception. Preserve the value and an operable reveal control; do not assume
+that being able to reveal again alone settles the criterion.
+Define blur at the intended boundary: moving focus from the input to its
+reveal button or explanatory text must remain usable. Do not move focus
+unexpectedly to shorten exposure. If live length/keyprint text is added,
+test whether its announcements interrupt typing or obscure other guidance.
 
 **Hidden-tab clearing needs a deliberate recovery design.** The proposed
 “no retained hidden context” rule protects the value path, but can also erase
@@ -158,7 +175,12 @@ work when someone switches to a provider page or another editor tab. Do not
 resolve that tension by automatically persisting secrets or by requiring
 unexplained repeated entry. Define the lifecycle, warn before deliberate
 clearing where possible, retain harmless names/destinations where appropriate,
-and test the recovery. The exact host lifecycle is Surveyor's source question.
+and test the recovery. [Surveyor's section 4](2026-10-20-accessible-entry-source-reads.md#4-what-a-webviews-content-is-visible-to)
+reports that without `retainContextWhenHidden` the iframe is destroyed on
+hide; retaining it keeps the live iframe in memory. Hiding an editor tab and
+switching to another application need separate checks. This source finding
+narrows the design choice; it does not authorize retaining or serializing
+secret values to avoid re-entry.
 [Redundant-entry guidance](https://www.w3.org/WAI/WCAG22/Understanding/redundant-entry.html)
 allows specific exceptions; it does not exempt the entire form because one
 field contains a secret.
@@ -209,8 +231,14 @@ after changes to controls, wording, focus, layout or supported host versions.
 1. **Make purpose and destination unambiguous** (1.3.1, 2.4.2/6, 3.3.2,
    4.1.2). Audit prompts, step identity and same-basename folder choices. The
    present folder picker uses only `folder.name`; check the ambiguity and add
-   nonsecret distinguishing context if needed. Missing `title` alone is not
-   a demonstrated failure.
+   nonsecret distinguishing context if needed. Both current input boxes
+   supply a `prompt` but neither `title` nor `placeHolder`.
+   [Surveyor's section 2](2026-10-20-accessible-entry-source-reads.md#2-what-a-screen-reader-hears-in-a-password-box)
+   finds that the input's `aria-label` uses the latter metadata, falling back
+   to `input`; the visible prompt is not proof of a useful accessible name.
+   Supply a meaningful name through the supported API and verify the field's
+   purpose and destination with VoiceOver. This source-level gap prioritizes
+   the check; it is not a recorded live conformance failure.
 2. **Design correction and review paths** (3.3.1/3/4/7). Identify the bad
    field and safe correction without reproducing its value; preserve valid
    work during the same activity where appropriate. Decide batch partial-write
@@ -218,8 +246,9 @@ after changes to controls, wording, focus, layout or supported host versions.
    an accessible undo without a usable route.
 3. **Finish the keyboard and focus contract** (2.1.1/2, 2.4.3/7/11,
    2.5.2/3/8, 4.1.2). The proposed reveal and row actions need names, state,
-   keyboard activation, appropriate targets and focus recovery. Choose the
-   palette implementation after Surveyor's version evidence.
+   keyboard activation, appropriate targets and focus recovery. Surveyor's
+   version evidence supports a palette implementation if that design is
+   chosen; the complete interaction still needs the hand checks above.
 4. **Make outcomes perceivable and recoverable** (4.1.3; 2.2.1 if timing
    applies). State whether nothing was written, saving succeeded, or a write
    happened but verification failed. Ensure the result can be found after a
