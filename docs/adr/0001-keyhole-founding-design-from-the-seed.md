@@ -62,7 +62,7 @@ NOT: **Other harnesses, by design** (Jérémie, 2026-10-20: *"maybe we can exten
 ## Questions
 
 ### QST-BUILD-ORDER: What does the first build contain?
-- Status: unanswered
+- Status: answered
 - Why asking: This decides what can be tried first, and what risk arrives when. The design has four parts: the person's own path (a command, the masked box, the two git checks, writing `.env`), the model's link, the service cards, and `settings.local.json`. Each can be used alone once the first exists.
 - Need: pick a letter (or override — any shape answers)
 
@@ -75,12 +75,12 @@ Options:
 **A — the person's path first.** *Rationale*: porthole's releases worked best when each added one thing a hand check could cover in a few minutes (0.2.1, 0.3.0, 0.4.0), and the link is where a mistake costs most, since it lets anything local ask for a secret by a name it chooses. *Confidence*: 0.7 — because the model path is the reason keyhole exists, so waiting for it has a cost. *If wrong*: if seats are already asking for this, B.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+OK, agreed with Option A. Everything should be modularly designed.
 
 ---
 
 ### QST-COLLISION: When the variable already has a value, what happens?
-- Status: unanswered
+- Status: answered
 - Why asking: People re-paste rotated tokens often, and models retry requests. The policy is a promise about never losing a working token by accident, and it is hard to change once people rely on it.
 - Need: pick a letter (or override — any shape answers)
 
@@ -93,12 +93,27 @@ Options:
 **A — report and stop, unless replacing is asked for.** *Rationale*: it makes the request idempotent, so a model can send it twice without bothering the person (the naming review's install-skill rule in porthole, ADR-0016 there); rotation stays one explicit step with a confirmation (the template lane's update-with-confirmation, applied only when asked). B asks every time a model retries; C sends novices back to hand-editing, the thing keyhole exists to remove. *Confidence*: 0.75 — because how often rotation happens through a model, rather than by the person, is unknown. *If wrong*: if most replacements turn out to be rotations the person starts, B for the person's own command and A for links.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+There are a few of ideas/principles that come to mind:
+
+1. The extension itself can do a lot of investation/probing/checking work that the model can't do. It can check: "Is the environment already configured?" and "Is .env already set?" and "Is 'env' key configured in .claude/settings.local.json?" and so on. It can have a mechanism to measure this before/after modifications, etc.
+
+2. The extension should have a log, and it should log all its pre/post tests, so that there is perfect traceability. Maybe we should also determine some way of detection keys? Like the "first and last char, with '*' in between? or "<OBKEY:[first]****[last]/>", like "<OBKEY:a****4/>" maybe? The log would help models and humans figure out what happened when.
+
+3. When Keyhole makes modifications to these files, a few principles:
+   - As much as possible they should be **append-only**.
+   - When they cannot be append-only, they should use a format-preserving tool like `json-source-edit` or equivalent.
+   - When possible they should include a standardized comment which explains:
+     - the modification was made by Keyhole (and version number)
+     - why? and at what time?
+     - whether we detected this is overriding/replacing a previous setting
+   - In a .env where just appending will override, we should say so and not try to comment out the previous setting (though note in the file that this could be done, maybe?); the idea is to create rules that are additive to prevent the worst of race conditions
+
+By default Option A is fine, but the above machinery prepares some level of automation, and this can be mediated by a setting.
 
 ---
 
 ### QST-SETTINGS-LOCAL: When does keyhole write to Claude Code's `.claude/settings.local.json`?
-- Status: unanswered
+- Status: answered
 - Why asking: A variable there is handed to every command the model's tools run, which is what makes it useful (an MCP server or a script can use it without the person exporting it) and also what makes it the easiest place for a model to read it by accident. `.env` is read only by what loads it.
 - Need: pick a letter (or override — any shape answers)
 
@@ -111,7 +126,7 @@ Options:
 **A — per variable, when asked.** *Rationale*: the threat model is about the conversation, and `settings.local.json` is the one target that puts a value within a model's reach on every command; choosing it should be visible at the moment the person types, for that one variable. B hides the choice in a setting nobody revisits; C spreads every secret to the most exposed place. *Confidence*: 0.7 — because some services (MCP servers) need the value in the harness's environment, and A makes those a little more work. *If wrong*: if most requests turn out to need the harness's environment, B with the masked box still naming the target.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Option A (on request) and Option B (a setting, off by default, with allowlist and/or blocklist). The scenario is, for instance, the human-AI collaboration template A would probably want to vet a broad range of MCP servers with specific tokens, etc., and pre-vet the configuration of these for streamlined purposes, maybe?
 
 ---
 
