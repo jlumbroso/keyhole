@@ -8,7 +8,8 @@
   },
   "_colors_in_use": {
     "_comment": "Optional but recommended: track seat colors to avoid collisions. Claude Code's /color command accepts: red, blue, green, yellow, purple, orange, pink, cyan, default.",
-    "cyan": "glazier"
+    "cyan": "glazier",
+    "purple": "purser"
   },
   "_global": {
     "_comment": "Optional defaults for `just launch`'s claude invocation; per-seat settings override. Global-only (no per-seat form): agents, remote_control_session_name_prefix. Anything unset is omitted from the command (Claude's own defaults apply).",
@@ -20,7 +21,7 @@
   "groups": {
     "_comment": "Role-based groups for inbox addressing. `just broadcast <from> <slug> [group]` writes a -to-<group>- brief; `just wait-for-brief <alias>` wakes on briefs addressed to any group the alias belongs to. Members are alias keys from 'aliases' below (validated by `just groups`).",
     "crew": {
-      "members": ["glazier"],
+      "members": ["glazier", "purser"],
       "description": "All active participants. Broadcasts addressed to 'crew' wake every seat. Add alias keys to 'members' as seats register."
     }
   },
@@ -47,6 +48,30 @@
         "docs/inbox/ONBOARDING.md",
         "docs/inbox/CONVENTIONS.md",
         "docs/adr/0001-keyhole-founding-design-from-the-seed.md"
+      ]
+    },
+    "purser": {
+      "uuid": "0943f681-7d7f-4f9e-af19-9a7b62bfc37a",
+      "role": "Purser — release seat of keyhole, as of porthole: the pre-publication privacy pass before the repository goes public, the listing (copy, screenshots, README, changelog), and the release itself through porthole's idempotent `just release`. For a tool that handles secrets the privacy pass is the first job. Publishes once a release is decided; no new user-facing name ships without the naming review. Proposes; does not delete.",
+      "display_name": "Purser 5.5",
+      "name_note": "Named at porthole's founding (2026-10-13): the purser keeps the ship's papers, and makes sure that what leaves port is what was declared. Carried here unchanged, because a seat belongs to its model across the projects it works in.",
+      "color": "purple",
+      "color_note": "The same muted violet (#8A63B8) as in porthole, clear of cyan.",
+      "model": "claude-sonnet-5-5",
+      "model_note": "Seat founded 2026-10-13 in porthole by claude-sonnet-5-5. Registered in keyhole 2026-10-20 by the seat's own choice, after Jérémie handed over Glazier's onboarding brief (docs/inbox/2026-10-20-1534-glazier-to-crew-crew-onboarding-to-keyhole.md) and left joining optional; same model, same session UUID, same seat. Its porthole record: jlumbroso/porthole, docs/inbox/agent-sessions.json, alias purser.",
+      "registered": "2026-10-20",
+      "twin_project": "jlumbroso/porthole (alias purser there)",
+      "founded_by": "glazier (in porthole)",
+      "founded": "2026-10-13",
+      "settings": {
+        "color_hex": "#8A63B8"
+      },
+      "read_order": [
+        "CLAUDE.md",
+        "docs/inbox/ONBOARDING.md",
+        "docs/inbox/CONVENTIONS.md",
+        "docs/adr/0001-keyhole-founding-design-from-the-seed.md",
+        "docs/inbox/2026-10-20-1534-glazier-to-crew-crew-onboarding-to-keyhole.md"
       ]
     },
     "_example_seat": {
