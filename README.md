@@ -10,14 +10,16 @@ that git ignores the file and does not track it. The assistant learns only that
 the variable is now set. It can still walk a newcomer through getting the
 token, step by step, without the token passing through the chat.
 
-**What it promises, and what it does not.** The value never travels through
-the conversation: not through the chat, a prompt, a link or a log. That is the
-whole promise. An assistant with access to your files and shell could still
-read `.env` itself; keyhole's guide explains the permission rules that stop it
-from doing so by accident.
+**Scope of the protection.** Keyhole's input and result path is designed to
+keep the value out of chat, prompts, links, and logs.
+An assistant with access to your files and shell could still
+read `.env` itself; the guide to
+[keeping secrets out of the conversation](docs/manual/keeping-secrets-out-of-the-conversation.md)
+explains each harness's protections and their limits.
 
-**Status**: founding, nothing built yet. The design and its open questions are
-in [ADR-0001](docs/adr/0001-keyhole-founding-design-from-the-seed.md).
+**Status**: under development. The scaffold and verification gate are in
+place; the founding design is accepted in
+[ADR-0001](docs/adr/0001-keyhole-founding-design-from-the-seed.md).
 
 **Twin project**: [Porthole](https://github.com/jlumbroso/porthole), which
 shows a page in a floating window above your work; the two share their crew
