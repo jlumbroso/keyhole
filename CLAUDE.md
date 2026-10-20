@@ -92,7 +92,7 @@ Before serving any change:
 2. Fix any failures before committing
 3. Never serve changes with a failing gate
 
-**Why**: today, with no code yet, `just gate` catches an instantiation placeholder left unfilled and a crew registry that does not parse or whose groups name a seat that is not registered (porthole hit that one in its first hour). It grows with the code: when the extension exists, the gate gains its type check, its tests against a mocked VS Code, the bundle and a package-contents allowlist, as porthole's does (`npm run check`). For a tool that handles secrets, one more check belongs in it from the first commit that adds code: a credential-shaped string in any tracked file (porthole's `scripts/scan-secrets.mjs`).
+**Why**: `just gate` catches, in order: an instantiation placeholder left unfilled; a crew registry that does not parse, or whose groups name an unregistered seat (porthole hit that in its first hour); **a credential-shaped string in any tracked file** (`scripts/scan-secrets.mjs`, from porthole: a tool for secrets must never hold one); then `npm run check`: a type error, a test failing against a mocked VS Code, a bundle that does not build, and a package that would ship anything beyond its allowlisted files or makes a network or process call. Two of the tests guard the first law itself (`src/test/secret.test.ts`): a `Secret` must print as `[redacted]` by every route a string is made and refuse to serialize, and no module outside the file writers may call `reveal()`. What the gate cannot catch: anything only a real VS Code shows (the masked box, the git checks on a real repository); those are hand checks, as in porthole.
 
 **Process**:
 ```bash
@@ -251,7 +251,7 @@ If the script was successfully used, append as comments how, and what the outcom
 **The threat model, in Jérémie's words (2026-10-20)**: *"Transformers desperately honest and want to do the right thing, but lose all control when something enters the conversation as it goes through their overlords policies. So the keyhole is to help transformers never receive secrets in the conversation, while helping them steers complete novices."* The promise is about the conversation, not the machine: a model with shell access can still read `.env`, so keyhole says "never through the conversation" and teaches the permission rules that stop accidental reads (ADR-0001).
 
 ### Current focus:
-Founding: ADR-0001 chunks the seed (kept in the estate's private hub, `seed-2026-10-20-new-vscode-mini-extension.md`) into the design and its questions. Nothing is built; the build order proposed there is the human path first, then the link, then the service cards, then `settings.local.json`.
+ADR-0001 is accepted (the design, from the seed kept in the estate's private hub). The scaffold is built: the gate, the extension's build and tests, and the `Secret` type (`src/secret.ts`) that makes the first law a checked fact. Next, per ADR-0001's build order: the person's own path (a command, the masked box, git's two checks, appending to `.env`, the log), its names through the naming review first.
 
 ### Key decisions made:
 *(List ADRs here as they land, e.g. `- Auth approach — see docs/adr/0001-*.md`. Empty at birth is healthy.)*

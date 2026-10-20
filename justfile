@@ -515,8 +515,12 @@ gate:
     set -euo pipefail
     just instantiate-check
     python3 scripts/groups-lookup.py --validate
-    # ADD YOUR PROJECT'S OWN GATE HERE when it exists (test suite, build, linter)
-    echo "✅ gate green (day-one checks; project gate slot above)"
+    # keyhole's own gate: no credential-shaped string in any tracked file (a tool
+    # for secrets must never hold one), then the extension's check: types, tests
+    # against a mocked VS Code, the bundle, and what the package would ship.
+    node scripts/scan-secrets.mjs
+    npm run check
+    echo "✅ gate green"
 
 # Is this instance fully instantiated? Greps for remaining ⟦SIGIL⟧ placeholders
 # (the closed registry: docs/adr/templates/placeholders.yaml) and warns on

@@ -1,0 +1,11 @@
+# Allowlist, not deny-list: everything is excluded, then the few files the
+# extension needs are let back in (porthole's rule, after the house's other
+# extensions shipped working files from deny-lists that fell behind).
+# `npm run check:package` verifies the real package contents.
+# LICENSE is not let in yet: the project's own license is still to be chosen
+# (the LICENSE file at the root is the template's).
+**
+!package.json
+!README.md
+!CHANGELOG.md
+!dist/extension.js

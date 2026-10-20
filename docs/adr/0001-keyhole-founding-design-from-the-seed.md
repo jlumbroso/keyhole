@@ -178,7 +178,8 @@ Settled regardless, from the Thread: the first law (never through the conversati
 - [ ] The full collision check on `keyhole` before the Marketplace ID is minted — Owner: the naming review
 - [ ] The manual's chapter on keeping a model from reading `.env` by accident (permission rules per harness, starting with Claude Code's `permissions.deny`) — Owner: Sounder 6 (Jérémie, 2026-10-20)
 - [x] Read the environment-file conventions of the next harnesses (OpenAI Codex, Google Gemini CLI, xAI Grok) in their own documentation: which file, in the project or the home folder, what shape, how a change takes effect — Owner: Surveyor 5.1, read only (done early, 2026-10-20: `docs/reviews/2026-10-20-other-harnesses-environment-files.md`; Gemini has no harness file and auto-loads `.env`, Codex takes `[shell_environment_policy] set` in the project, Grok Build takes it in the home folder only; the order of building stays Jérémie's)
-- [ ] Scaffold the extension from porthole's (Vite, Vitest with a mocked `vscode`, the gate's checks including the secret scan) once QST-BUILD-ORDER is answered — Owner: Glazier
+- [x] Scaffold the extension from porthole's (Vite, Vitest with a mocked `vscode`, the gate's checks including the secret scan) once QST-BUILD-ORDER is answered — Owner: Glazier (2026-10-20: built, with the `Secret` type and its boundary test; gate green, 8 tests, each guard caught by a deliberate break)
+- [ ] Decide how keyhole asks git (VS Code's Git extension API, or running `git` itself, which lifts the package check's ban on `child_process` for git alone) — Owner: Glazier, as a question with the first feature
 
 ---
 
