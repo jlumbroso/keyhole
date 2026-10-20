@@ -12,8 +12,9 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // Grows file by file, each addition named in the commit that ships it (copied from porthole, 2026-10-20).
-const ALLOWED = new Set(['package.json', 'README.md', 'CHANGELOG.md', 'LICENSE', 'LICENSE.txt', 'dist/extension.js']);
-const REQUIRED = ['package.json', 'dist/extension.js'];
+const ALLOWED = new Set(['package.json', 'README.md', 'CHANGELOG.md', 'LICENSE', 'LICENSE.txt', 'NOTICE', 'dist/extension.js']);
+// Apache-2.0 (Jérémie, 2026-10-20): the package must carry the license and its NOTICE.
+const REQUIRED = ['package.json', 'dist/extension.js', 'LICENSE', 'NOTICE'];
 
 const vsce = resolve(root, 'node_modules', '.bin', 'vsce');
 const listed = execFileSync(vsce, ['ls'], { cwd: root, encoding: 'utf8' })

@@ -23,6 +23,10 @@ in [ADR-0001](docs/adr/0001-keyhole-founding-design-from-the-seed.md).
 shows a page in a floating window above your work; the two share their crew
 and their way of receiving a request from a terminal (a `vscode://` link).
 
+## License
+
+[Apache License 2.0](LICENSE); see [NOTICE](NOTICE).
+
 ## How this is built
 
 With the human-AI collaboration template

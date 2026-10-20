@@ -2,10 +2,12 @@
 # extension needs are let back in (porthole's rule, after the house's other
 # extensions shipped working files from deny-lists that fell behind).
 # `npm run check:package` verifies the real package contents.
-# LICENSE is not let in yet: the project's own license is still to be chosen
-# (the LICENSE file at the root is the template's).
+# Keyhole is Apache-2.0 (Jérémie, 2026-10-20), so LICENSE and NOTICE ship with it:
+# the license asks that the NOTICE travel with the work.
 **
 !package.json
 !README.md
 !CHANGELOG.md
+!LICENSE
+!NOTICE
 !dist/extension.js
