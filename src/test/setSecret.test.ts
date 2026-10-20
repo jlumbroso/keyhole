@@ -187,3 +187,20 @@ describe('the first law', () => {
     expect(readdirSync(folder).filter(name => name.includes('keyhole'))).toEqual([]);
   });
 });
+
+describe('Regression tests', () => {
+  it('gives both boxes a name a screen reader can announce, not just "input"', async () => {
+    // Bug: both boxes passed only a prompt. VS Code labels the quick input's
+    // field from its title and placeholder, so a screen reader announced the
+    // name box and the masked box alike as "input" (Surveyor's source reading,
+    // docs/reviews/2026-10-20-accessible-entry-source-reads.md; caught by
+    // Sounder's WCAG 4.1.2 row, ADR-0003). The title is the command's own,
+    // already ruled by the naming review, so no new words.
+    typeIntoNextInputBox('GITHUB_TOKEN');
+    typeIntoNextInputBox(FAKE);
+
+    await setSecret(git);
+
+    expect(shownInputBoxes().map(box => box.title)).toEqual(['Keyhole: Set a Secret in .env', 'Keyhole: Set a Secret in .env']);
+  });
+});

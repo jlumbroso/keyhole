@@ -8,7 +8,7 @@ let logged: string[] = [];
 let messages: Array<{ kind: 'info' | 'warning'; text: string; modal: boolean; detail?: string }> = [];
 let modalAnswers: Answer[] = [];
 let inputAnswers: Answer[] = [];
-let inputBoxes: Array<{ prompt?: string; password?: boolean; ignoreFocusOut?: boolean }> = [];
+let inputBoxes: Array<{ title?: string; prompt?: string; password?: boolean; ignoreFocusOut?: boolean }> = [];
 let workspaceFolders: Array<{ name: string; uri: { scheme: string; fsPath: string }; index: number }> | undefined;
 
 export function resetVscodeMock(): void {
@@ -52,8 +52,8 @@ export const window = {
   },
   showInformationMessage: (text: string, ...rest: unknown[]) => show('info', text, rest),
   showWarningMessage: (text: string, ...rest: unknown[]) => show('warning', text, rest),
-  async showInputBox(options: { prompt?: string; password?: boolean; ignoreFocusOut?: boolean; validateInput?: (text: string) => unknown }) {
-    inputBoxes.push({ prompt: options.prompt, password: options.password, ignoreFocusOut: options.ignoreFocusOut });
+  async showInputBox(options: { title?: string; prompt?: string; password?: boolean; ignoreFocusOut?: boolean; validateInput?: (text: string) => unknown }) {
+    inputBoxes.push({ title: options.title, prompt: options.prompt, password: options.password, ignoreFocusOut: options.ignoreFocusOut });
     const answer = inputAnswers.shift();
     // VS Code will not accept a value its validator rejects; the person would have to fix it or press Escape.
     if (answer !== undefined && options.validateInput && options.validateInput(answer)) { return undefined; }

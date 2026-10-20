@@ -15,6 +15,8 @@ import { append, DOTENV, probe, quote } from './targets/dotenv';
 
 export const ADD_TO_GITIGNORE = 'Add to .gitignore';
 export const SET_NEW_VALUE = 'Set New Value';
+/** Both boxes' title: VS Code names the field from it, so a screen reader says more than "input" (ADR-0003). */
+const BOX_TITLE = 'Keyhole: Set a Secret in .env';
 
 let version = '0.0.0';
 
@@ -75,6 +77,7 @@ export async function setSecret(git: GitFacts): Promise<void> {
   const folder = await pickFolder();
   if (!folder) { return; }
   const name = await vscode.window.showInputBox({
+    title: BOX_TITLE,
     prompt: 'Name of the variable to set (for example NEON_API_KEY)',
     ignoreFocusOut: true,
     validateInput: text => { const check = checkName(text); return check.ok ? undefined : check.reason; },
@@ -100,6 +103,7 @@ export async function setSecret(git: GitFacts): Promise<void> {
 
   // The masked box: the value goes from the person to the file, and nowhere else.
   const typed = await vscode.window.showInputBox({
+    title: BOX_TITLE,
     prompt: `Paste the value of ${name}. It is written to ${place} and nowhere else.`,
     password: true,
     ignoreFocusOut: true,
