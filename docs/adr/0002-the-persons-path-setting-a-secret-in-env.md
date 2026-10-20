@@ -70,6 +70,18 @@ Options:
 **Recommendation**: (by Glazier 5.5, Claude Opus 5.5, 2026-10-20)
 **B — the review's words.** *Rationale*: by the house's rule that a key or a verb asserts states, "Set" may be right (the command ensures a value is set), but "Replace It" over a value the person already has names an act on their property, the review's own concern in porthole's "has local edits" ruling; and `OBKEY` was always a placeholder. *Confidence*: 0.7 — because these are words. *If wrong*: A, if the review finds them right.
 
+**Recommendation**: (by the naming review, 2026-10-20 — hub ledger №109)
+
+**B — with one real catch, one strike, and the rest blessed as built.**
+
+1. **"Set" is CONFIRMED — Glazier's doubt resolves in its favor.** It is the env-var register's own verb (`export`/`set`), it asserts a destination, and the command's second-run behavior (find, ask, never silently overwrite) is exactly what a careful "set" means. `keyhole.setSecret` ships.
+2. **The catch: "Replace It" borrowed the wrong sibling's verb.** Porthole's Replace It *discards* an edited file — there, the verb is true and the cost line was the fix. Keyhole's mechanics are the opposite: *the old value stays in the file; loaders use the last* — nothing is destroyed. So the detail line refuses the button's own verb, which is the betrayal pattern on a two-line surface. Ruled wording — question: *"{NAME} is already set in {folder}/.env ({marker}, N characters). **Set a new value?** The old line stays in the file (loaders use the last); Keyhole marks it superseded."* Button: **Set New Value** — it repeats the command's own verb, names the act truly, and dissolves the property concern at the root: nothing of the person's is removed, and now the words say so. The `.env` comment follows: "…set {NAME} **(supersedes line L)**" — *supersede* is the precise verb for shadow-without-removal; *replaces* claims a deletion that never happens.
+3. **The marker is struck: `keyprint`** — form `<keyprint:{prefix}…#{hash}/>`, lowercase (an inline tag, not a shout). The register already owns the concept: an SSH *key fingerprint* is exactly a prefix-plus-hash non-revealing identifier, and `keyprint` compounds the product and the register in one self-evident word — a stranger in a log reads "a fingerprint of a key" on sight. `OBKEY` retires as the placeholder it was.
+4. **Blessed as built, by name**: *"It is written to {folder}/.env and nowhere else"* — the whole product in three words; keep it verbatim forever. The dangerous-variable refusal (mechanism + consequence + the tool's firm "does not write it") is the best-worded guard in either sibling. The tracked-file refusal teaches its exact remedy (`git rm --cached`), porthole's zero-teaching-debt standard upheld. The done notice's "(N characters)" confirms without echoing — quietly excellent.
+5. One consistency grain: "keyhole does not write it" → **"Keyhole does not write it"** — the product capitalizes in prose everywhere else.
+
+*Confidence*: 0.8. *If wrong*: all words here are release-mutable except `keyhole.setSecret` (confirmed) and the marker form in logs people may parse — and `keyprint` is the one to get right now, which is why it got the full race.
+
 **ANS:** (by Jérémie Lumbroso)
 [Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
 
