@@ -113,7 +113,7 @@ Not yet: research first (Action Items).
 ## Action Items
 
 - [ ] Read in VS Code's source at 1.134.0 and 1.141.0: whether an open `InputBox`'s `password` can be flipped in place, what a screen reader announces in a password box, whether hot exit backs up untitled editors to disk, and what a webview's content is visible to — Owner: Surveyor 5.1
-- [ ] Research WCAG 2.2 AA against Keyhole's surfaces, with VS Code's guarantees for extensions, as a table of criterion, who satisfies it, and its check — Owner: Sounder 6
+- [x] Research WCAG 2.2 AA against Keyhole's surfaces, with VS Code's guarantees for extensions, as a table of criterion, who satisfies it, and its check — Owner: Sounder 6 (2026-10-20: [55-criterion assessment plan](../reviews/2026-10-20-accessible-entry-wcag-22-aa.md); host mechanisms distinguished from verified outcomes, WCAG2ICT software interpretation, Keyhole-owned actions and pending hand checks. Research only; no conformance claim or live accessibility test.)
 - [ ] Answer QST-SHOW-VALUE, QST-A11Y-TARGET, QST-ENTRY-TAB with the findings — Owner: Jérémie
 
 ---
