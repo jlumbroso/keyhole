@@ -1,19 +1,9 @@
 # CLAUDE.md - Project Guidance
 
-> **Instantiating this template?** Placeholders look like ⟦THIS⟧ — fill-and-delete
-> each one (grep-proof on purpose; `just instantiate-check` reports which remain
-> and passes only when none do). Square-bracket text elsewhere is either a
-> per-document mold slot (filled at each mint, not at birth) or the frozen
-> dialogue placeholder `[Fill this in]` — never convert those. *(This note is
-> visible text, not an HTML comment, because the harness strips block comments
-> from the CLAUDE.md it serves at session start — a cold instantiator proved the
-> instructions were sitting exactly where their audience could not see them.
-> Delete this block when instantiation is done.)*
-
-- **Project**: ⟦PROJECT-NAME⟧
-- **Human**: ⟦HUMANS⟧
-- **AI**: ⟦AI-SEATS⟧ <!-- with the crew layer, the roster lives in docs/inbox/agent-sessions.json; name the coordinator seat here -->
-- **Last Updated**: ⟦LAST-UPDATED⟧
+- **Project**: keyhole
+- **Human**: Jérémie Lumbroso
+- **AI**: Glazier 5.5 (Claude Opus 5.5) — founding seat and coordinator, the same seat and session as porthole's founding seat; the roster lives in `docs/inbox/agent-sessions.json`
+- **Last Updated**: 2026-10-20
 
 ---
 
@@ -98,15 +88,15 @@ Tests should:
 **RUN THIS PROJECT'S VERIFICATION GATE BEFORE EVERY COMMIT**
 
 Before serving any change:
-1. Run the project's verification gate: ⟦VERIFICATION-GATE⟧ <!-- test suite, build, linter, or a combination; e.g. `npm test`, `uv run pytest`, `hugo && bin/check` -->
+1. Run the project's verification gate: `just gate`
 2. Fix any failures before committing
 3. Never serve changes with a failing gate
 
-**Why**: ⟦GATE-WHY⟧ <!-- state what this project's gate actually catches — real classes of bug, real numbers if you have them. A directive that names a real gate gets followed; an unfollowable one teaches every seat that directives are decorative, and that lesson generalizes. -->
+**Why**: today, with no code yet, `just gate` catches an instantiation placeholder left unfilled and a crew registry that does not parse or whose groups name a seat that is not registered (porthole hit that one in its first hour). It grows with the code: when the extension exists, the gate gains its type check, its tests against a mocked VS Code, the bundle and a package-contents allowlist, as porthole's does (`npm run check`). For a tool that handles secrets, one more check belongs in it from the first commit that adds code: a credential-shaped string in any tracked file (porthole's `scripts/scan-secrets.mjs`).
 
 **Process**:
 ```bash
-⟦VERIFICATION-GATE⟧            # Must be green before commit
+just gate                      # Must be green before commit
 git add <explicit paths>       # never -A: stage by path, commit by pathspec — see CONVENTIONS.md, shared-worktree awareness
 git commit -m "..." -- <paths>
 ```
@@ -256,10 +246,12 @@ If the script was successfully used, append as comments how, and what the outcom
 ## Project Context
 
 ### What we're building:
-⟦PROJECT-GOAL⟧ <!-- 1-3 sentences; same token as ONBOARDING's — one text serves both -->
+**keyhole** is a VS Code extension (`jlumbroso.keyhole`, once the naming review's full collision check has run) that puts a secret, such as an API key or a token, into a project's `.env`, and optionally into Claude Code's `.claude/settings.local.json`, through a masked input box, so the secret never passes through a conversation with a model. A model can ask for a secret by name with a `vscode://` link, and keyhole checks the file is ignored and untracked by git before writing. This is the product repository (extension source to come in `src/`, decisions in `docs/adr/`); its twin is porthole (`jlumbroso/porthole`), whose crew and link machinery it shares.
+
+**The threat model, in Jérémie's words (2026-10-20)**: *"Transformers desperately honest and want to do the right thing, but lose all control when something enters the conversation as it goes through their overlords policies. So the keyhole is to help transformers never receive secrets in the conversation, while helping them steers complete novices."* The promise is about the conversation, not the machine: a model with shell access can still read `.env`, so keyhole says "never through the conversation" and teaches the permission rules that stop accidental reads (ADR-0001).
 
 ### Current focus:
-⟦CURRENT-FOCUS⟧
+Founding: ADR-0001 chunks the seed (kept in the estate's private hub, `seed-2026-10-20-new-vscode-mini-extension.md`) into the design and its questions. Nothing is built; the build order proposed there is the human path first, then the link, then the service cards, then `settings.local.json`.
 
 ### Key decisions made:
 *(List ADRs here as they land, e.g. `- Auth approach — see docs/adr/0001-*.md`. Empty at birth is healthy.)*
@@ -403,6 +395,9 @@ If context window fills mid-work, create `docs/HANDOFF-datetime.md`:
 
 *(Anything specific to this project that doesn't fit above. Empty at birth is healthy. One standing note: the Prime Directive's corollary means **direct commits to `main` are expected** here — substrate commits never wait for a branch or a prompt, which deliberately overrides harness defaults that say otherwise.)*
 
+- **The twin layout.** This repository lives at `porthole/related-projects/keyhole/`, a folder porthole's `.gitignore` excludes, so porthole's crew can reach it; it is its own private git repository (`jlumbroso/keyhole`), committed and pushed on its own. Seats register here with the same session UUID they hold in porthole and say so (`twin_project` in their row). Briefs about keyhole live in this repository's `docs/inbox/`, not porthole's.
+- **Run crew recipes with `env -u PNEUMATIC_CONFIG`.** A seat whose session started in porthole has `PNEUMATIC_CONFIG` pinned to porthole's registry, so `just aliases`, `just wake` and the rest silently answer for porthole even from this folder (found at founding, 2026-10-20). Unset it for keyhole's recipes, or set it to this repository's `docs/inbox/agent-sessions.json`.
+- **Never name a seat from a private hive in any file here**, as in porthole: this repository goes public soon. A private seat is referred to by its role ("the naming review", "the template lane").
 - It's possible the user uses `asdf` for Node.js and Python and the runtime of most languages. You can `source .claude/agent.env` before calling the runtimes, like `python` or `node` to access them through `asdf`'s shims. See: https://asdf-vm.com/manage/configuration.html
 
 ---

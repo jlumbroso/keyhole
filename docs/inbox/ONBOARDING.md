@@ -1,7 +1,9 @@
 # Crew Onboarding — read this first if you've been recruited
 
-Welcome to **⟦PROJECT-NAME⟧** — ⟦PROJECT-ONE-LINER⟧ <!-- one line: what this
-project is and who the human collaborator(s) are -->.
+Welcome to **keyhole** — a small VS Code extension through which a secret
+reaches a project's files without ever entering a conversation with a model;
+the human is Jérémie Lumbroso, and the crew is porthole's, working here as its
+twin project.
 
 This document captures **80% of what every seat needs to know** so per-recruit
 briefs can be short deltas (name, color, mission). Fill the bracketed
@@ -60,8 +62,7 @@ the tmux hive.
 
 ## 1. What this project is
 
-⟦PROJECT-GOAL⟧ <!-- 1-3 sentences: the goal, the repo's role (product repo?
-coordination layer?), where implementation happens; same token as CLAUDE.md's -->
+**keyhole** is a VS Code extension (`jlumbroso.keyhole`, once the naming review's full collision check has run) that puts a secret, such as an API key or a token, into a project's `.env`, and optionally into Claude Code's `.claude/settings.local.json`, through a masked input box, so the secret never passes through a conversation with a model. A model can ask for a secret by name with a `vscode://` link, and keyhole checks the file is ignored and untracked by git before writing. This is the product repository (extension source to come in `src/`, decisions in `docs/adr/`); its twin is porthole (`jlumbroso/porthole`), whose crew and link machinery it shares.
 
 **Read first**, in order:
 1. `CLAUDE.md` — directives, project context, workflow
