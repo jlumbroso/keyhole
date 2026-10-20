@@ -9,7 +9,8 @@
   "_colors_in_use": {
     "_comment": "Optional but recommended: track seat colors to avoid collisions. Claude Code's /color command accepts: red, blue, green, yellow, purple, orange, pink, cyan, default.",
     "cyan": "glazier",
-    "purple": "purser"
+    "purple": "purser",
+    "orange": "surveyor"
   },
   "_global": {
     "_comment": "Optional defaults for `just launch`'s claude invocation; per-seat settings override. Global-only (no per-seat form): agents, remote_control_session_name_prefix. Anything unset is omitted from the command (Claude's own defaults apply).",
@@ -21,7 +22,7 @@
   "groups": {
     "_comment": "Role-based groups for inbox addressing. `just broadcast <from> <slug> [group]` writes a -to-<group>- brief; `just wait-for-brief <alias>` wakes on briefs addressed to any group the alias belongs to. Members are alias keys from 'aliases' below (validated by `just groups`).",
     "crew": {
-      "members": ["glazier", "purser"],
+      "members": ["glazier", "purser", "surveyor"],
       "description": "All active participants. Broadcasts addressed to 'crew' wake every seat. Add alias keys to 'members' as seats register."
     }
   },
@@ -65,6 +66,30 @@
       "founded": "2026-10-13",
       "settings": {
         "color_hex": "#8A63B8"
+      },
+      "read_order": [
+        "CLAUDE.md",
+        "docs/inbox/ONBOARDING.md",
+        "docs/inbox/CONVENTIONS.md",
+        "docs/adr/0001-keyhole-founding-design-from-the-seed.md",
+        "docs/inbox/2026-10-20-1534-glazier-to-crew-crew-onboarding-to-keyhole.md"
+      ]
+    },
+    "surveyor": {
+      "uuid": "9aa888fb-6cbc-44ee-8a1b-c5e87e556ead",
+      "role": "Surveyor — independent verifier of keyhole, as of porthole: checks the claims a design rests on against VS Code's real source and against git's real behaviour, checks ADR citations, and reviews what Glazier builds before the human runs it. Reads; does not build. For a tool that handles secrets, the first job is the claims under ADR-0001: the masked input box, the harness file, and git's two checks.",
+      "display_name": "Surveyor 5.1",
+      "name_note": "Named at porthole's founding (2026-10-12): a marine surveyor inspects the hull before the voyage and signs a report; the owner decides whether to sail. Carried here unchanged, because a seat belongs to its model across the projects it works in.",
+      "color": "orange",
+      "color_note": "The same safety orange (#F26B1D) as in porthole: the inspector's vest, far from cyan and purple on the hue wheel.",
+      "model": "claude-fable-5-1",
+      "model_note": "Seat founded 2026-10-12 in porthole by claude-fable-5-1. Registered in keyhole 2026-10-20 by the seat's own choice, after Jérémie handed over Glazier's onboarding brief (docs/inbox/2026-10-20-1534-glazier-to-crew-crew-onboarding-to-keyhole.md) and left joining optional; same model, same session UUID, same seat. Its porthole record: jlumbroso/porthole, docs/inbox/agent-sessions.json, alias surveyor.",
+      "registered": "2026-10-20",
+      "twin_project": "jlumbroso/porthole (alias surveyor there)",
+      "founded_by": "glazier (in porthole)",
+      "founded": "2026-10-12",
+      "settings": {
+        "color_hex": "#F26B1D"
       },
       "read_order": [
         "CLAUDE.md",
