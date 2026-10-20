@@ -131,7 +131,7 @@ Option A (on request) and Option B (a setting, off by default, with allowlist an
 ---
 
 ### QST-FINGERPRINT: How does keyhole's log show which key it wrote, without any of the key entering the conversation?
-- Status: unanswered
+- Status: answered
 - Why asking: Jérémie's answer to QST-COLLISION asks for a log of every probe and change, readable by models and humans, with a way to recognize a key, for instance `<OBKEY:a****4/>` (the first and last characters, starred between). The log is exactly what a model reads to learn the outcome, so whatever the log shows of a key enters the conversation; the first law says none of the secret should. The question is what lets a person or a model tell "is this the same key as before?" without giving away a character of it.
 - Need: pick a letter (or override — any shape answers)
 
@@ -144,7 +144,7 @@ Options:
 **B — the public prefix and a short hash.** *Rationale*: it keeps what A is for (recognizing the same key across log lines, and across rotations: a new hash means a new key) while honoring the first law to the character; the prefix also tells a novice and a model which service the key belongs to. Thirty-two bits of a hash of a forty-character random token reveal nothing usable about it. *Confidence*: 0.75 — because matching against a service's "ends in …4f2a" display is a real convenience A gives and B does not. *If wrong*: if the person mostly needs to match keys against the service's page, A with the last four characters only, shown to the person in VS Code and never written to the log.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Yes, Option B is a great idea. And just to clarify, `<OBKEY:.../>` is a "format" to OBfuscate the VALUE of the KEY, not its name. Thanks for refining this idea. And my terminology is provisional obviously pending naming review.
 
 ---
 
