@@ -1,0 +1,38 @@
+# The gate's two project steps, on every push to main and every pull request: the credential-shape scan
+# (a tool for secrets must never hold one), then `npm ci` and `npm run check` (types, tests against a mocked
+# VS Code, the bundle, the package allowlist). The gate's repository checks (placeholders, crew registry) are
+# not repeated here: they guard the crew's working files, not the extension, and `just gate` runs them locally.
+#
+# Lean on purpose, because the repository is private for now and Actions minutes are metered: one job, one Node,
+# the npm cache, a newer push cancels an older run, and a time limit stops a hung job. Runs are NOT skipped for
+# docs-only changes, because the scan has to see them too (a secret in an ADR is still a secret).
+# Actions are pinned to commit SHAs, as in porthole's ci.yml; the version is in the comment.
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Credential-shape scan of the tracked files
+        run: node scripts/scan-secrets.mjs
+      - run: npm ci
+      - name: Types, tests, bundle, package contents
+        run: npm run check
