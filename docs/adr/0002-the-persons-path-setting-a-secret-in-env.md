@@ -182,6 +182,21 @@ Options:
 **Recommendation**: (by Glazier 5.5, Claude Opus 5.5, 2026-10-20)
 **C — the last four only for long values.** *Rationale*: it gives Jérémie's "ah, yes" where the person can actually compare, because the service's own page shows the same last four, and it spends only what the industry already treats as not secret (a small fraction of a long, random value), while a short password, where four characters are a real share of it, keeps the hash. *Confidence*: 0.55 — because this trades a strict reading of the first law ("none of the secret") for legibility, and that trade is Jérémie's to make, not mine. *If wrong*: A, if the first law means not one character ever, and then "Check a value" becomes the legible route; B, if a single rule matters more than the short-value case. The marker's exact form (`…f9c2`, `…f9c2#06c4`) goes to the naming review once the amount is chosen.
 
+**Recommendation**: (by the naming review, 2026-10-20 — hub ledger №110; the AMOUNT remains the rights-holder's trade, exactly as Glazier framed it; this explains the trade and rules the form)
+
+**C — and in the hybrid form: the hash is the constant, the last four are the conditional.**
+
+*The trade, explained plainly.* Your "ah, yes" is a **by-eye** recognition task, and only the value's own characters can serve it — no hash ever will, because a hash is recognizable only to a machine. So the question is purely: *when is showing four of a secret's characters not a disclosure?* The honest answer is entropy, not sentiment: four characters of a 40-character random token leave ~216 of its 240 bits unknown — the services' own dashboards and the card industry's receipts already treat that as public, which is why you can *compare* those four against the service's page at all. Four characters of a 12-character password are a third of it — a real bite. **C's threshold is not a compromise of the first law; it is the first law applied with a ruler**: by-eye recognition exactly where it costs nothing, refused exactly where it would cost something. (B spends the password's third for uniformity's sake; D's two characters are the worst of both worlds — too little to recognize, and still a withdrawal; A is perfectly safe and perfectly illegible, making every recognition a round-trip through a command.)
+
+*The form, ruled (this part is the review's lane):* **every keyprint ends in its hash; long values additionally show their last four** —
+
+- long value (≥ 32 chars): `<keyprint:ghp_…f9c2#06c47309/>`
+- short value: `<keyprint:…#06c47309/>`
+
+Keeping the hash in *both* shapes buys the invariant that makes two shapes one contract: **a keyprint always verifies** — the future "Check a value" command works uniformly on every marker ever logged, and a reader learns one sentence: *a keyprint always ends in its hash; it shows your last four only when they are a sliver of the whole.* Dropping the hash from the long form (as C's example did) would make verifiability depend on the value's length, which is the kind of conditional contract that becomes a bug report. The prefix (`ghp_`, `sk-`) stays as-is in both — it is the service's published, deliberately public tag, and it does half the "ah, yes" work for free.
+
+*Confidence*: 0.8 on the form; the amount is yours — if your ANS is A, the form collapses to the short shape everywhere and "Check a value" is promoted from convenience to the legibility route, which should then ship in the same release as the marker, not after it. *If wrong about the threshold*: 32 is a proxy for entropy, not a measurement — if a real service ships 32-character low-entropy tokens, the floor rises, and the log's which-form-was-used line (Glazier's, kept) is what makes that correction auditable.
+
 **ANS:** (by Jérémie Lumbroso)
 [Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
 
