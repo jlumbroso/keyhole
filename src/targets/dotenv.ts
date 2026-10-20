@@ -7,7 +7,7 @@ import { Secret } from '../secret';
 //
 // Rules, from ADR-0001 and Surveyor's reading of five loaders (last line wins,
 // none warns): keyhole appends, never rewrites earlier lines; each write is
-// preceded by a `#` comment saying keyhole wrote it, when, and what it replaces;
+// preceded by a `#` comment saying keyhole wrote it, when, and which line it supersedes;
 // the file is replaced atomically (written beside it, then renamed), and a new
 // file is created readable by its owner only.
 

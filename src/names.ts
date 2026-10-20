@@ -20,7 +20,7 @@ export function checkName(name: string): NameCheck {
     return { ok: false, reason: 'use capital letters, digits and underscores, starting with a letter (for example NEON_API_KEY)' };
   }
   if (REFUSED_EXACT.has(name) || REFUSED_PREFIXES.some(prefix => name.startsWith(prefix))) {
-    return { ok: false, reason: `${name} changes how programs run, so a value for it could run code in every later session; keyhole does not write it` };
+    return { ok: false, reason: `${name} changes how programs run, so a value for it could run code in every later session; Keyhole does not write it` };
   }
   return { ok: true };
 }

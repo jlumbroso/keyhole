@@ -26,12 +26,14 @@ export class Secret {
    * public prefix, when the value has it (the same for every token of that kind,
    * from its service card), and the first eight hex digits of a SHA-256 of the
    * value. Identifies the key across log lines and rotations; reveals none of it.
-   * The marker's name is provisional until the naming review.
+   * The marker is a keyprint, after the SSH key fingerprint, which identifies a
+   * key without revealing it (the naming review's word, ADR-0002,
+   * QST-NAME-PERSON-PATH).
    */
   fingerprint(publicPrefix?: string): string {
     const prefix = publicPrefix && this.#value.startsWith(publicPrefix) ? publicPrefix : '';
     const hash = createHash('sha256').update(this.#value, 'utf8').digest('hex').slice(0, 8);
-    return `<OBKEY:${prefix}…#${hash}/>`;
+    return `<keyprint:${prefix}…#${hash}/>`;
   }
 
   /** The value itself. Only the file writers may call this. */

@@ -9,11 +9,12 @@ import { append, DOTENV, probe, quote } from './targets/dotenv';
 
 // The person's own path (ADR-0001, the first build): a command, the masked box,
 // git's checks, appending to `.env`, the probes before and after, and the log.
-// No model is involved. Every word a person reads here is provisional until the
-// naming review rules.
+// No model is involved. Every word a person reads here is the naming review's
+// ruling (ADR-0002, QST-NAME-PERSON-PATH): Keyhole destroys nothing, so a second
+// value is "set" and the old line is "superseded", never "replaced".
 
 export const ADD_TO_GITIGNORE = 'Add to .gitignore';
-export const REPLACE_IT = 'Replace It';
+export const SET_NEW_VALUE = 'Set New Value';
 
 let version = '0.0.0';
 
@@ -91,10 +92,10 @@ export async function setSecret(git: GitFacts): Promise<void> {
     : `probe: ${name} is set in ${place} (line ${before.lines.join(', ')}; ${before.fingerprint}, ${before.length} characters)`);
   if (before.lines.length > 0) {
     const answer = await vscode.window.showWarningMessage(
-      `${name} is already set in ${place} (${before.fingerprint}, ${before.length} characters). Replace it?`,
-      { modal: true, detail: 'The new value is added after the old one, which stays in the file; loaders use the last.' }, REPLACE_IT,
+      `${name} is already set in ${place} (${before.fingerprint}, ${before.length} characters). Set a new value?`,
+      { modal: true, detail: 'The old line stays in the file (loaders use the last); Keyhole marks it superseded.' }, SET_NEW_VALUE,
     );
-    if (answer !== REPLACE_IT) { log(`stopped: ${name} already set; the person kept it`); return; }
+    if (answer !== SET_NEW_VALUE) { log(`stopped: ${name} already set; the person kept it`); return; }
   }
 
   // The masked box: the value goes from the person to the file, and nowhere else.
@@ -109,13 +110,13 @@ export async function setSecret(git: GitFacts): Promise<void> {
   const quoted = quote(secret);
   if (!quoted.ok) { void vscode.window.showWarningMessage(`Keyhole did not write ${name}: ${quoted.reason}.`); log(`refused: ${name}: ${quoted.reason}`); return; }
 
-  const replaces = before.lines.length > 0 ? ` (replaces the value on line ${before.lines.at(-1)})` : '';
-  const comment = `Keyhole ${version} · ${new Date().toISOString()} · set ${name}${replaces}`;
+  const supersedes = before.lines.length > 0 ? ` (supersedes line ${before.lines.at(-1)})` : '';
+  const comment = `Keyhole ${version} · ${new Date().toISOString()} · set ${name}${supersedes}`;
   const written = await append(folder.uri.fsPath, name, quoted.text, comment);
 
   const after = await probe(folder.uri.fsPath, name);
   const verified = after.fingerprint === secret.fingerprint() && after.lines.at(-1) === written.line;
-  log(`${verified ? 'wrote' : 'wrote, but could not verify,'} ${name} to ${place} line ${written.line}${written.created ? ' (new file, owner-only)' : ''}: ${secret.fingerprint()}, ${secret.length} characters${replaces}`);
+  log(`${verified ? 'wrote' : 'wrote, but could not verify,'} ${name} to ${place} line ${written.line}${written.created ? ' (new file, owner-only)' : ''}: ${secret.fingerprint()}, ${secret.length} characters${supersedes}`);
   if (!verified) {
     void vscode.window.showWarningMessage(`Keyhole wrote ${name} to ${place}, but reading it back did not match; please check the file.`);
     return;

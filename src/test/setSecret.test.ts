@@ -72,16 +72,16 @@ describe('setting a secret in .env', () => {
     expect(env().startsWith(before)).toBe(true);
   });
 
-  it('asks before replacing a value that is already set, and appends rather than rewrites', async () => {
+  it('asks before setting a new value over one that is already set, and appends rather than rewrites', async () => {
     writeFileSync(join(folder, '.env'), `GITHUB_TOKEN=${FAKE}\n`);
     typeIntoNextInputBox('GITHUB_TOKEN');
-    answerNextModal('Replace It');
+    answerNextModal('Set New Value');
     typeIntoNextInputBox(OTHER);
 
     await setSecret(git);
 
-    expect(shownMessages()[0].text).toMatch(/GITHUB_TOKEN is already set in .*\(<OBKEY:…#[0-9a-f]{8}\/>, 40 characters\)\. Replace it\?/);
-    expect(env()).toMatch(new RegExp(`^GITHUB_TOKEN=${FAKE}\\n# Keyhole [^\\n]*replaces the value on line 1\\)\\nGITHUB_TOKEN=${OTHER}\\n$`));
+    expect(shownMessages()[0].text).toMatch(/GITHUB_TOKEN is already set in .*\(<keyprint:…#[0-9a-f]{8}\/>, 40 characters\)\. Set a new value\?/);
+    expect(env()).toMatch(new RegExp(`^GITHUB_TOKEN=${FAKE}\\n# Keyhole [^\\n]*\\(supersedes line 1\\)\\nGITHUB_TOKEN=${OTHER}\\n$`));
   });
 
   it('writes nothing when the person keeps the old value', async () => {
@@ -165,7 +165,7 @@ describe('the first law', () => {
   it('never shows the value in the log, a notice or a question, whatever happens', async () => {
     writeFileSync(join(folder, '.env'), `GITHUB_TOKEN=${FAKE}\n`);
     typeIntoNextInputBox('GITHUB_TOKEN');
-    answerNextModal('Replace It');
+    answerNextModal('Set New Value');
     typeIntoNextInputBox(OTHER);
 
     await setSecret(git);
@@ -174,7 +174,7 @@ describe('the first law', () => {
     for (const value of [FAKE, OTHER]) {
       expect(everythingShown()).not.toContain(value.slice(4, 12));
     }
-    expect(everythingShown()).toMatch(/<OBKEY:…#[0-9a-f]{8}\/>/);
+    expect(everythingShown()).toMatch(/<keyprint:…#[0-9a-f]{8}\/>/);
   });
 
   it('leaves no temporary file beside .env', async () => {

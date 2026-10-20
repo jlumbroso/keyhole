@@ -46,12 +46,12 @@ describe('the fingerprint in the log (QST-FINGERPRINT, B)', () => {
 
   it('shows the public prefix only when the value has it, and none of the secret part', () => {
     const shown = new Secret(FAKE).fingerprint('ghp_');
-    expect(shown).toMatch(/^<OBKEY:ghp_…#[0-9a-f]{8}\/>$/);
+    expect(shown).toMatch(/^<keyprint:ghp_…#[0-9a-f]{8}\/>$/);
     const secretPart = FAKE.slice('ghp_'.length);
     for (let at = 0; at + 4 <= secretPart.length; at++) {
       expect(shown).not.toContain(secretPart.slice(at, at + 4));
     }
-    expect(new Secret('not-a-github-token-at-all-0000').fingerprint('ghp_')).toMatch(/^<OBKEY:…#[0-9a-f]{8}\/>$/);
+    expect(new Secret('not-a-github-token-at-all-0000').fingerprint('ghp_')).toMatch(/^<keyprint:…#[0-9a-f]{8}\/>$/);
   });
 });
 
