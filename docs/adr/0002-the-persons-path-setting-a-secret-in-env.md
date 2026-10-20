@@ -9,11 +9,11 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # The person's path: setting a secret in `.env`
 
 - **Date**: 2026-10-20
-- **Iteration**: 2
+- **Iteration**: 3
 - **Status**: Partially Implemented
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5); Surveyor 5.1 (the git route); the naming review (every word)
 
-**TL;DR**: The first feature, built and tested against a mocked VS Code and installed locally: a command takes a variable's name, checks with git that `.env` stays out of commits, takes the value in a masked box, appends it after a comment, and verifies it; git is asked through VS Code's own Git extension, so keyhole starts no process; its words are the naming review's (approved 2026-10-20), and it waits on one hand check.
+**TL;DR**: The first feature, built and tested against a mocked VS Code and installed locally: a command takes a variable's name, checks with git that `.env` stays out of commits, takes the value in a masked box, appends it after a comment, and verifies it; git is asked through VS Code's own Git extension, so keyhole starts no process; its words are the naming review's (approved 2026-10-20), and Jérémie's hand check passed in a real VS Code; before the first release, every question says what it recommends and why, and the keyprint becomes legible.
 
 ---
 
@@ -146,15 +146,60 @@ Screenshots:
 
 ---
 
+### QST-MODALS-WHY: What does each of Keyhole's questions and refusals say it recommends, and why?
+- Status: unanswered — routed to the naming review, then Jérémie; blocks the first release
+- Why asking: Jérémie, answering QST-CHECK-PERSON-PATH (2026-10-20): *"The question modal (and our modals in general) should follow an ORRCF-like flavor. Imagine that the audience may not know about `.gitignore` or may not know why you would add `.env` in `.gitignore`, or if they do, they may know you wouldn't want to commit it, but they may not know why. So we need to use every opportunity at our disposal to provide agency to our user. Let's follow moral contractualism. So here, the message should, (a) say what is recommended, and (b) why."* That is decided; what is open is the words. A VS Code modal shows a bold **message** and a plainer **detail** under it, so the drafts put the recommendation in the message and the why in the detail. Drafts, by Glazier, for the review to rule line by line (`{folder}` is the folder's name, `{NAME}` the variable's):
+  1. **Not ignored** (a question; buttons **Add to .gitignore**, **Cancel**). Now: "{folder}/.env is not ignored by git, so a "git add ." would put your secrets in the next commit. Add it to .gitignore?" Draft message: "Add .env to .gitignore first (recommended)". Draft detail: "Git does not ignore {folder}/.env yet, so a "git add ." would copy your secrets into the next commit. A commit keeps them in the project's history, where anyone who can read the repository, or any copy of it, can find them, even after the file is deleted. Keyhole adds one line to .gitignore, checks with git again, and writes nothing until .env is ignored."
+  2. **Tracked** (a refusal). Now: "Keyhole did not write {folder}/.env: git tracks it, so a secret written there would go into the next commit. Stop tracking it first (git rm --cached .env), then add it to .gitignore." Draft message: "Keyhole did not write {folder}/.env: git tracks it. Recommended: stop tracking it, then ignore it." Draft detail: "Anything written to a tracked file goes into the next commit and stays in the history. "git rm --cached .env" stops tracking the file without deleting it; then add .env to .gitignore. If .env was ever committed with a real secret in it, that secret is still in the history: replace it at its service."
+  3. **Already set** (a question; buttons **Set New Value**, **Cancel**; no option is recommended over the other, so the detail says when each fits). Now: message "{NAME} is already set in {folder}/.env ({keyprint}, N characters). Set a new value?", detail "The old line stays in the file (loaders use the last); Keyhole marks it superseded." Draft detail, added after the current one: "Set a new value when you have a new one, for example after replacing a token at its service. Cancel keeps the value that is there. Once the new value works, you can delete the old line yourself."
+  4. **Set** (the notice). Now: "Keyhole set {NAME} in {folder}/.env (N characters)." Draft, added: "Programs read .env when they start: restart the one that needs {NAME}."
+  5. **Refused names** (the dangerous-variable refusal and the format refusal): blessed as built by the review, which already gives mechanism and consequence; listed so the review can say whether either needs a "recommended" clause.
+- Need: pick a letter (or override — any shape answers), or rule each line
+
+Options:
+- **A — the drafts**: every line above ships as drafted.
+- **B — the review's words**: the review rules line by line, as it did for QST-NAME-PERSON-PATH.
+
+**Recommendation**: (by Glazier 5.5, Claude Opus 5.5, 2026-10-20)
+**B — the review's words.** *Rationale*: the drafts are longer than VS Code's modal is comfortable with (its detail wraps in a narrow box, as screenshot 4 of the check shows at four lines for one sentence), and the review's last ruling showed that a better word is often the truer description of the mechanism, which is exactly what a "why" is. *Confidence*: 0.8 — because Jérémie asked for the review here. *If wrong*: A, if the review finds the drafts right as they are.
+
+**ANS:** (by Jérémie Lumbroso)
+[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+
+---
+
+### QST-KEYPRINT-LEGIBLE: How should a keyprint show a value so the person recognizes it, and how much of the value may the conversation see?
+- Status: unanswered
+- Why asking: Jérémie, after the check (2026-10-20): *"The keyprint thing is not very legible, I want something a bit more useful and closer to the original value such that if the person knew original value, they'd be like 'ah, yes, this is obviously derived from my value'."* The keyprint the check showed was `<keyprint:…#06c47309/>`: the first eight hex digits of a SHA-256, chosen under QST-FINGERPRINT (ADR-0001, B) because it reveals none of the value. Anything a person can recognize *by eye* is made of the value's own characters, and the log is what a model reads, so this is a question about the first law, not only about words: how many characters of a secret may enter the conversation. What the services do: many dashboards show a key as its prefix and last four characters (`sk-…3f9c`), and the card industry's rules let receipts print a card's last four digits; both treat the last four of a long value as not secret. For a 40-character random token, four characters leave about 216 of its 240 bits unknown; for a 12-character password, they are a third of it.
+- Need: pick a letter (or override — any shape answers)
+
+Options:
+- **A — the hash only, as now**: `<keyprint:ghp_…#06c47309/>`. Reveals nothing. Recognizing a value needs Keyhole: a later command, "Check a value", takes a pasted value in the masked box and says whether it matches the keyprint.
+- **B — the last four characters, always**: `<keyprint:ghp_…f9c2/>`. Recognizable at a glance against the service's page. Four characters of every secret enter the conversation, including short passwords.
+- **C — the last four only for long values**: the last four characters when the value has at least 32 characters, so four are at most an eighth of it (most API tokens: GitHub's are 40, Neon's 64), and the hash otherwise: `<keyprint:ghp_…f9c2/>` for a token, `<keyprint:…#06c47309/>` for a short password. The log says which form it used.
+- **D — the first and last characters**, the seed's first idea: `<keyprint:a…4/>`. Two characters of every value; the first is often the public prefix's, so it says little.
+
+**Recommendation**: (by Glazier 5.5, Claude Opus 5.5, 2026-10-20)
+**C — the last four only for long values.** *Rationale*: it gives Jérémie's "ah, yes" where the person can actually compare, because the service's own page shows the same last four, and it spends only what the industry already treats as not secret (a small fraction of a long, random value), while a short password, where four characters are a real share of it, keeps the hash. *Confidence*: 0.55 — because this trades a strict reading of the first law ("none of the secret") for legibility, and that trade is Jérémie's to make, not mine. *If wrong*: A, if the first law means not one character ever, and then "Check a value" becomes the legible route; B, if a single rule matters more than the short-value case. The marker's exact form (`…f9c2`, `…f9c2#06c4`) goes to the naming review once the amount is chosen.
+
+**ANS:** (by Jérémie Lumbroso)
+[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+
+---
+
 ## Decision
 
-### Chosen: as built, in the naming review's words; pending the hand check
+### Chosen: as built, in the naming review's words, proven by hand
 
 The git route is decided (above): VS Code's Git extension API, no process of keyhole's own.
 
 **The words (QST-NAME-PERSON-PATH, B; Jérémie, 2026-10-20)**: the naming review's ruling, line by line, built in `d7291b0`. `keyhole.setSecret` and "Set" stay. A value already set asks "Set a new value?" with **Set New Value**, and the detail "The old line stays in the file (loaders use the last); Keyhole marks it superseded.", because Keyhole destroys nothing and "Replace It" claimed it did. The `.env` comment ends "(supersedes line L)". The log names a value by its **keyprint**, `<keyprint:{prefix}…#{hash}/>` (after the SSH key fingerprint: identifies, reveals nothing); `OBKEY` retires. "Keyhole" is capitalized in prose. Blessed as built, to keep verbatim: "It is written to {folder}/.env and nowhere else."
 
 His first use, with the installed pilot before the new words, wrote `.env` as designed: a comment line `# Keyhole 0.0.1 · {time} · set NEON_API_KEY`, then the value. That is one run of a first set, not the check (no git question, no leaving the box, no second run), so QST-CHECK-PERSON-PATH stays open.
+
+**The hand check (QST-CHECK-PERSON-PATH, A; Jérémie, 2026-10-20, VS Code 1.141.0, twelve screenshots in `attachments/screenshots/2026-10-20-testing/`)**: all as described, and more: he also set a second value, which the check had not asked for. Keyhole's own log of that window, read by Glazier, agrees line for line: git said `not-ignored`; after **Add to .gitignore**, git said `protected` one millisecond later (18:54:20.160 → .161), which settles the prediction's one doubt: VS Code's Git extension does not cache ignore rules, so Keyhole need not wait for its repository state to change. The value was written to line 2 of a new owner-only file; the second run found it, asked, and wrote line 4 "(supersedes line 2)" with a different keyprint; a third run stopped at the masked box with no value. No log line carries a value. The person's path is proven in a real VS Code, with git.
+
+**What the check opened**, from his remarks: the words of every question and refusal say what Keyhole recommends and why (QST-MODALS-WHY, for the naming review); a keyprint the person can recognize (QST-KEYPRINT-LEGIBLE, a first-law question); and accessible entry: a show-the-value toggle, research into accessibility conformance, and a full tab for entry with mass entry from a paste (ADR-0003). In his words: *"Sorry for thinking out loud, but this testing is generative!"*
 
 ---
 
@@ -165,8 +210,11 @@ His first use, with the installed pilot before the new words, wrote `.env` as de
 - [x] CI — Owner: Purser 5.5 (2026-10-20, `a57ba55`)
 - [x] Rule on the words (QST-NAME-PERSON-PATH) — Owner: the naming review, then Jérémie (2026-10-20: B)
 - [x] Build the ruled words, reinstall locally, bring the check's step 6 to them — Owner: Glazier (2026-10-20, `d7291b0`)
-- [ ] Run the check (QST-CHECK-PERSON-PATH) — Owner: Jérémie
-- [ ] Delete the throwaway check folder afterwards — Owner: Glazier
+- [x] Run the check (QST-CHECK-PERSON-PATH) — Owner: Jérémie (2026-10-20: A)
+- [x] Read Keyhole's log of the check against the answer — Owner: Glazier (2026-10-20: agrees line for line)
+- [x] Delete the throwaway check folder afterwards — Owner: Glazier (2026-10-20)
+- [ ] Rule on the recommend-and-why words (QST-MODALS-WHY) — Owner: the naming review, then Jérémie
+- [ ] Choose how much of a value a keyprint shows (QST-KEYPRINT-LEGIBLE) — Owner: Jérémie; then its form — Owner: the naming review
 
 ---
 
@@ -183,6 +231,12 @@ His first use, with the installed pilot before the new words, wrote `.env` as de
 - Contributors: the naming review, Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
 - Changes: the ruled words in the code and tests (the three tests that pin them failed first, then were updated); `keyprint` named in ADR-0001; the check's step 6 updated; reinstalled locally
 - Outcome: `Partially Implemented` (the hand check remains)
+
+### Iteration 3 (2026-10-20)
+- Trigger: Jérémie's hand check (QST-CHECK-PERSON-PATH, A) and his five remarks
+- Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
+- Changes: the check's result and Keyhole's log recorded; two questions opened (QST-MODALS-WHY, QST-KEYPRINT-LEGIBLE); accessible entry moved to ADR-0003; the throwaway folder deleted
+- Outcome: `Partially Implemented` (proven by hand; the words and the keyprint's amount are open before the first release)
 
 ---
 
