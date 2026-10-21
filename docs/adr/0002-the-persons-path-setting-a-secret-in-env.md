@@ -9,11 +9,11 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # The person's path: setting a secret in `.env`
 
 - **Date**: 2026-10-20
-- **Iteration**: 3
-- **Status**: Partially Implemented
+- **Iteration**: 4
+- **Status**: Implemented
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5); Surveyor 5.1 (the git route); the naming review (every word)
 
-**TL;DR**: The first feature, built and tested against a mocked VS Code and installed locally: a command takes a variable's name, checks with git that `.env` stays out of commits, takes the value in a masked box, appends it after a comment, and verifies it; git is asked through VS Code's own Git extension, so keyhole starts no process; its words are the naming review's (approved 2026-10-20), and Jérémie's hand check passed in a real VS Code; before the first release, every question says what it recommends and why, and the keyprint becomes legible.
+**TL;DR**: The first feature, built and tested against a mocked VS Code and installed locally: a command takes a variable's name, checks with git that `.env` stays out of commits, takes the value in a masked box, appends it after a comment, and verifies it; git is asked through VS Code's own Git extension, so keyhole starts no process; its words are the naming review's (approved 2026-10-20), and Jérémie's hand check passed in a real VS Code; every question says what it recommends and why (the naming review's modal grammar), and the keyprint is legible (prefix, last four of a long value, hash).
 
 ---
 
@@ -218,7 +218,7 @@ Option C, as ruled by the naming review, but with one additional invariant: The 
 
 ## Decision
 
-### Chosen: as built, in the naming review's words, proven by hand
+### Chosen: as built, in the naming review's words and grammar, proven by hand
 
 The git route is decided (above): VS Code's Git extension API, no process of keyhole's own.
 
@@ -229,6 +229,10 @@ His first use, with the installed pilot before the new words, wrote `.env` as de
 **The hand check (QST-CHECK-PERSON-PATH, A; Jérémie, 2026-10-20, VS Code 1.141.0, twelve screenshots in `attachments/screenshots/2026-10-20-testing/`)**: all as described, and more: he also set a second value, which the check had not asked for. Keyhole's own log of that window, read by Glazier, agrees line for line: git said `not-ignored`; after **Add to .gitignore**, git said `protected` one millisecond later (18:54:20.160 → .161), which settles the prediction's one doubt: VS Code's Git extension does not cache ignore rules, so Keyhole need not wait for its repository state to change. The value was written to line 2 of a new owner-only file; the second run found it, asked, and wrote line 4 "(supersedes line 2)" with a different keyprint; a third run stopped at the masked box with no value. No log line carries a value. The person's path is proven in a real VS Code, with git.
 
 **What the check opened**, from his remarks: the words of every question and refusal say what Keyhole recommends and why (QST-MODALS-WHY, for the naming review); a keyprint the person can recognize (QST-KEYPRINT-LEGIBLE, a first-law question); and accessible entry: a show-the-value toggle, research into accessibility conformance, and a full tab for entry with mass entry from a paste (ADR-0003). In his words: *"Sorry for thinking out loud, but this testing is generative!"*
+
+**Every question says what it recommends, and why (QST-MODALS-WHY, B; Jérémie, 2026-10-21)**: the naming review's ruling, built in `912b821`. Its **modal grammar** is now the rule for every dialog Keyhole adds: the message is the recommendation as an actionable sentence, marked "(recommended)" only when the buttons offer real alternatives; the detail is the why in at most three clauses (mechanism, consequence, what Keyhole will do); a choice where no option is better says when each fits instead of leaning; a refusal says why and how to go on. The ruled lines ship as ruled: "Add .env to .gitignore first (recommended)"; the tracked refusal's closing "If .env was ever committed with a real secret in it, that secret is still in the history: replace it at its service."; the already-set detail ending "delete the old line yourself if you like"; the notice's "Programs read .env when they start: restart the one that needs {NAME}."; and the dangerous-variable refusal's way forward, "If you truly need to set {NAME}, do it by hand, where you can see exactly what it does". The two refusals the review did not rule on (git could not be asked; `.gitignore` did not take) were written to the grammar by Glazier, each with its way forward. The review's preamble, kept: *"a better word is often the truer description of the mechanism, which is exactly what a 'why' is."*
+
+**The keyprint (QST-KEYPRINT-LEGIBLE, C in the naming review's hybrid form, with Jérémie's invariant; 2026-10-21)**, built in `912b821`: every keyprint ends in its hash, so every keyprint verifies against a value; a value of 32 characters or more also shows its last four, which the service's own page shows, so its owner recognizes it by eye; and a known public prefix always shows, even on a short value (his invariant: `ghp_12345` gives `<keyprint:ghp_…#…/>`). Long: `<keyprint:ghp_…f9c2#06c47309/>`; short: `<keyprint:…#06c47309/>`. The write's log line says which form was used, so a wrong threshold can be audited. The known prefixes live in `src/prefixes.ts` until the service cards carry them (ADR-0001), and only prefixes read in a service's own documentation belong there; a value that is nothing but a prefix shows no prefix.
 
 ---
 
@@ -242,8 +246,9 @@ His first use, with the installed pilot before the new words, wrote `.env` as de
 - [x] Run the check (QST-CHECK-PERSON-PATH) — Owner: Jérémie (2026-10-20: A)
 - [x] Read Keyhole's log of the check against the answer — Owner: Glazier (2026-10-20: agrees line for line)
 - [x] Delete the throwaway check folder afterwards — Owner: Glazier (2026-10-20)
-- [ ] Rule on the recommend-and-why words (QST-MODALS-WHY) — Owner: the naming review, then Jérémie
-- [ ] Choose how much of a value a keyprint shows (QST-KEYPRINT-LEGIBLE) — Owner: Jérémie; then its form — Owner: the naming review
+- [x] Rule on the recommend-and-why words (QST-MODALS-WHY) — Owner: the naming review, then Jérémie (2026-10-21: B)
+- [x] Choose how much of a value a keyprint shows (QST-KEYPRINT-LEGIBLE) — Owner: Jérémie; then its form — Owner: the naming review (2026-10-21: C, hybrid form, prefix always)
+- [x] Build both — Owner: Glazier (2026-10-21, `912b821`; the five tests pinning the old words and keyprint failed first)
 
 ---
 
@@ -266,6 +271,12 @@ His first use, with the installed pilot before the new words, wrote `.env` as de
 - Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
 - Changes: the check's result and Keyhole's log recorded; two questions opened (QST-MODALS-WHY, QST-KEYPRINT-LEGIBLE); accessible entry moved to ADR-0003; the throwaway folder deleted
 - Outcome: `Partially Implemented` (proven by hand; the words and the keyprint's amount are open before the first release)
+
+### Iteration 4 (2026-10-21)
+- Trigger: Jérémie's answers to QST-MODALS-WHY (B) and QST-KEYPRINT-LEGIBLE (C, with his invariant), after the naming review's rulings
+- Contributors: the naming review, Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
+- Changes: the modal grammar and the legible keyprint built and tested; reinstalled locally
+- Outcome: `Partially Implemented → Implemented` (the person's path is complete; its release waits on ADR-0003's eye button words and the first release's checks)
 
 ---
 

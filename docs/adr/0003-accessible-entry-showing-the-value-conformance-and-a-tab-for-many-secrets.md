@@ -9,8 +9,8 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # Accessible entry: showing the value, conformance, and a tab for many secrets
 
 - **Date**: 2026-10-20
-- **Iteration**: 2
-- **Status**: Draft
+- **Iteration**: 3
+- **Status**: Partially Implemented
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5); Surveyor 5.1 (VS Code's source); Sounder 6 (the conformance research)
 
 **TL;DR**: Entering a secret is all Keyhole does, so it must be accessible to everyone: a way to see what you typed, a conformance target researched rather than assumed, and a full tab for entry (many secrets at once, from a paste) beside the palette's masked box; research comes first, and the tab must never be a text editor.
@@ -116,9 +116,54 @@ Yes, Option B — and to be composed with the idea of the broader inbox possibly
 
 ---
 
+### QST-CHECK-EYE: Can a person see what they typed, by mouse and by keyboard, and what does VoiceOver say?
+- Status: unanswered
+- Why asking: **What this finds out.** The eye button (QST-SHOW-VALUE, A) and the boxes' new names are built and pass 36 tests against a mocked VS Code, but three things only a real VS Code with a real screen reader shows: whether the text and the cursor survive the switch from dots to letters and back (browser behavior, Surveyor's reading); whether the eye button can be reached **by keyboard**, which you asked for ("It would be nice if this could all be tab-able"); and what VoiceOver actually announces for each box, now that they carry a title (Sounder's row for WCAG 4.1.2). It also shows the naming review's new words and the legible keyprint once. **Safe**: a throwaway repository staged for this check, a value that is not a secret, and VoiceOver turned on and off with the same keys (**Cmd+F5**); **never paste a real token in a check.** Keyhole 0.0.1, rebuilt with all of this, is installed in your VS Code.
+- Need: pick a letter (or override — any shape answers), and write down what VoiceOver said at steps 2 and 4. About five minutes.
+
+**Where to do this.** A new VS Code window on the throwaway repository. Open it from any terminal with:
+`code --new-window /private/tmp/claude-501/-Users-jlumbroso-Programming-porthole/97e4570b-75ad-4694-9ae2-dcdd69dcaf36/scratchpad/keyhole-check-2`
+Its title bar ends with `keyhole-check-2`. Its `.gitignore` already ignores `.env`, so no `.gitignore` question appears this time. Not in your porthole or keyhole windows.
+
+**Before you start.** If any VS Code window was open before this message, reload it (**Shift+Cmd+P**, type `Reload Window`, press **Enter**) so the rebuilt Keyhole is the one running.
+
+**Steps.** One action each.
+
+1. **Turn VoiceOver on.** Press **Cmd+F5**. VoiceOver starts speaking.
+2. **Run the command and listen.** In the keyhole-check-2 window press **Shift+Cmd+P**, type `Keyhole: Set a Secret`, press **Enter**. A box opens asking for the variable's name. **Write down what VoiceOver says** as it opens (it should include `Keyhole: Set a Secret in .env`, not only "input").
+3. **Give the name.** Type `KEYHOLE_CHECK_LONG` and press **Enter**. A masked box opens asking for the value.
+4. **Listen again.** **Write down what VoiceOver says** for the masked box, and what it says when you type the first two or three characters of the value in step 5.
+5. **Type a value that is not a secret.** Type `not-a-real-token-0123456789-abcd-WXYZ` (37 characters; it shows as dots).
+6. **Show it by keyboard.** Without touching the mouse, press **Tab** (once or a few times) to try to reach the eye button at the top right of the box, then press **Space** or **Enter** on it. If the keyboard cannot reach it, click it instead (hovering shows "Show the value"), and note that the keyboard could not. **The value should now be readable, and the cursor should still be at its end.**
+7. **Leave, then come back.** Switch to another app (**Cmd+Tab**) for a few seconds, then come back. **The value should be dots again**, and the button's tooltip "Show the value".
+8. **Set it.** Click into the box if needed and press **Enter**. A notice should say **"Keyhole set KEYHOLE_CHECK_LONG in keyhole-check-2/.env (37 characters). Programs read .env when they start: restart the one that needs KEYHOLE_CHECK_LONG."**
+9. **See the keyprint.** Run the command again (step 2) with `KEYHOLE_CHECK_LONG`. The question should say it is already set, with a keyprint ending in `WXYZ#` and eight letters or digits (for example `<keyprint:…WXYZ#1a2b3c4d/>`), and the detail should end "delete the old line yourself if you like." Click **Cancel**.
+10. **Tidy up.** Press **Cmd+F5** to turn VoiceOver off, and close the window. I read Keyhole's log and delete the folder afterwards.
+
+Options:
+- **A — all as described**, and the keyboard reached the eye button.
+- **B — all as described, but the keyboard could not reach the eye button** (the mouse could).
+- **C — the text or the cursor was lost** when the value was shown or hidden (say which).
+- **D — VoiceOver said only "input"**, or nothing that names the box (write what it said).
+- **E — something else**: say what you saw.
+
+**Recommendation**: (by Glazier 5.5, Claude Opus 5.5, 2026-10-21)
+**B — all as described, but the keyboard could not reach the eye button** (a prediction). *Rationale*: the flip keeping the text is read in source at both tags (`quickInputBox.ts`, Surveyor), the blur re-mask and the names are pinned by tests, and the notice and keyprint words are tested; but I have not read whether a quick input's title-bar buttons are in the Tab order, and VS Code's own quick inputs usually reach such buttons by mouse or by a keybinding. *Confidence*: 0.45 — because the keyboard question is unread. *If wrong*: A means the button is in the Tab order and nothing changes; B, as predicted, means the keyboard route needs its own keybinding while the box is open (a `when` clause on the quick input), or the tab of QST-ENTRY-TAB; C would contradict the source reading and needs a regression test first; D means VS Code's quick input ignores the title for its label, and the prompt or a placeholder must carry the name instead.
+
+**ANS:** (by Jérémie Lumbroso)
+[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+
+---
+
 ## Decision
 
-Not yet: research first (Action Items).
+### Chosen: the eye button now; a two-column accessibility target; the entry tab composed with an inbox (ADR-0004)
+
+**Seeing what you typed (QST-SHOW-VALUE, A; Jérémie, 2026-10-21)**, built in `912b821`: the masked box has an eye button ("Show the value" / "Hide the value", tooltips provisional until the naming review), and the value is hidden again when the box closes or VS Code's window loses focus; no timer (WCAG 2.2.1). His wish that "this could all be tab-able" is checked by QST-CHECK-EYE.
+
+**The target (QST-A11Y-TARGET; Jérémie: "We should track both")**: WCAG 2.2 A and AA, read for desktop software through WCAG2ICT, **and** VS Code's own accessibility practices as a separate column, so each choice is seen in context: extra work Keyhole does matters little where VS Code itself is not compatible, since Keyhole is a small part of a much larger ecosystem, and the second column measures that extra effort. Then a scaffold: the order in which the criteria come in, release by release (Sounder).
+
+**The tab (QST-ENTRY-TAB, B; Jérémie)**: a webview with mass entry, after the link, **composed with an inbox** of requests and drafts, where nothing is now-or-never. His answers to QST-SHOW-VALUE and QST-ENTRY-TAB together describe a larger design (requests from models with their reasons, drafts started by the person, sequences of variables, deep links to each draft, and service instructions shown as Portholes), which is [ADR-0004](0004-requests-and-drafts-an-inbox-for-secrets-and-instructions-shown-in-porthole.md). Mass entry's role, in his words: *"This is not something the transformers could help with for security reasons, so we are proposing a mechanized, automatic way of doing a simple version of structuring a mass of keys."*
 
 ---
 
@@ -126,9 +171,12 @@ Not yet: research first (Action Items).
 
 - [x] Read in VS Code's source at 1.134.0 and 1.141.0: whether an open `InputBox`'s `password` can be flipped in place, what a screen reader announces in a password box, whether hot exit backs up untitled editors to disk, and what a webview's content is visible to — Owner: Surveyor 5.1 (2026-10-20: `docs/reviews/2026-10-20-accessible-entry-source-reads.md`; the flip works, untitled editors back up to disk continuously, a webview's page is private; what VoiceOver says is a hand check)
 - [x] Research WCAG 2.2 AA against Keyhole's surfaces, with VS Code's guarantees for extensions, as a table of criterion, who satisfies it, and its check — Owner: Sounder 6 (2026-10-20: [55-criterion assessment plan](../reviews/2026-10-20-accessible-entry-wcag-22-aa.md); host mechanisms distinguished from verified outcomes, WCAG2ICT software interpretation, Keyhole-owned actions and pending hand checks. Research only; no conformance claim or live accessibility test.)
-- [ ] Answer QST-SHOW-VALUE, QST-A11Y-TARGET, QST-ENTRY-TAB with the findings — Owner: Jérémie
+- [x] Answer QST-SHOW-VALUE, QST-A11Y-TARGET, QST-ENTRY-TAB with the findings — Owner: Jérémie (2026-10-21: A; both columns; B, composed with an inbox)
+- [x] Build the eye button, re-masked on window blur, with tests (one broken on purpose to prove it) — Owner: Glazier (2026-10-21, `912b821`)
+- [ ] Rule on the eye button's tooltips, "Show the value" and "Hide the value" — Owner: the naming review
+- [ ] Add VS Code's own accessibility practices as a second column of the assessment, and a scaffold for bringing the criteria in, release by release — Owner: Sounder 6
 - [x] Give both boxes an accessible name: they had only a `prompt`, so a screen reader heard "input" (Sounder's integration brief, from Surveyor's reading); both now carry the command's own title, "Keyhole: Set a Secret in .env", with a regression test — Owner: Glazier (2026-10-20)
-- [ ] A VoiceOver hand check of the boxes: what is announced for each, and, once the eye button exists, that the text and caret survive the flip — Owner: Jérémie, posed as a question when the toggle is built
+- [ ] A VoiceOver hand check of the boxes: what is announced for each, and, once the eye button exists, that the text and caret survive the flip — Owner: Jérémie (posed 2026-10-21 as QST-CHECK-EYE)
 
 ---
 
@@ -145,6 +193,12 @@ Not yet: research first (Action Items).
 - Contributors: Surveyor 5.1, Sounder 6, Glazier 5.5 (Claude Opus 5.5)
 - Changes: the three questions passed to Jérémie with the findings; each recommendation restated after the research, the earlier ones kept
 - Outcome: `Draft` (three questions for Jérémie)
+
+### Iteration 3 (2026-10-21)
+- Trigger: Jérémie's answers to the three questions
+- Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
+- Changes: the eye button built; the target set to two columns; the tab composed with an inbox, designed in ADR-0004; the hand check QST-CHECK-EYE posed
+- Outcome: `Draft → Partially Implemented`
 
 ---
 
