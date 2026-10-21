@@ -9,7 +9,7 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # Requests and drafts: an inbox for secrets, and instructions shown in Porthole
 
 - **Date**: 2026-10-21
-- **Iteration**: 1
+- **Iteration**: 2
 - **Status**: Draft
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5); the crew as each part is built
 
@@ -46,6 +46,14 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 - **A model's reasons are untrusted text shown to a novice.** A model steered by something it read could write "get your key at <a look-alike site>" into a request. Keyhole would then show a phishing instruction in its own trusted frame. Model-written words must look different from reviewed instructions, and their links must not be one click away (QST-MODEL-TEXT).
 - **Publicly editable instructions are a supply chain.** An edit that points a token page somewhere else reaches every user who trusts Keyhole. Edits by pull request with review, shipped inside each release, keep that edit visible and reviewed; fetching them live would also lift the package check's ban on network calls (QST-INSTRUCTIONS-SOURCE).
 - **Porthole opens local `.html` files** (its link, `vscode://jlumbroso.porthole/v1/open?file=…`, ADR-0013 there). Keyhole would ship each service's instructions as a page in its package, opened in Porthole when Porthole is installed and in the tab's side panel when it is not; the package check's file list grows by one folder.
+
+**Read through Simon's *Architecture of Complexity*** (the skill, loaded 2026-10-21 at Jérémie's call):
+
+- **The inbox is the watchmaker parable, for the person.** Tempus assembles a thousand parts at once and an interruption sends him back to zero; Hora builds stable subassemblies, so an interruption costs only the one in hand. Today's command is Tempus for a newcomer: the whole errand (find the service, sign in, mint the token, come back, paste) must finish in one sitting or start over. With the inbox, each record is a stable subassembly, a sequence (SMTP host, user, password) is a module of them, and each variable once set stays set: an interruption costs one value, never the errand. Jérémie's "nothing now or never" is Hora's rule, applied to a person's attention instead of a watch.
+- **Near-decomposability puts a wall through the middle of the tab.** The inbox is all request path (names, reasons, instructions, outcomes); the value field is value path. If the tab is one module, the value path grows to the size of a whole webview. So the tab is two subsystems with one narrow interface: the inbox view, which never holds a value, and a sealed entry component whose only output is one message type to the file writer, where the value becomes a `Secret` at once. The boundary test (`src/test/secret.test.ts`) grows to name that one module, and no other.
+- **Process and state, reviewed differently.** A service's instructions are a *process* description (how to mint a token; a page a person follows); its facts are a *state* description (the token's public prefix, the variable's name, the target), and facts change Keyhole's behavior: a prefix decides what a keyprint shows. ADR-0001 already keeps the two apart in each service card. So in a public repository (QST-INSTRUCTIONS-SOURCE), a recipe edit and a fact edit are different risks: a recipe edit is reviewed as prose and links; a fact edit is reviewed as code, with a test.
+- **The empty world, kept empty.** What must stay unconnected: the instructions and the network (QST-INSTRUCTIONS-SOURCE); a model's words and Keyhole's trusted frame (QST-MODEL-TEXT); Keyhole and Porthole, joined only by Porthole's public link, with Keyhole working when Porthole is absent (ADR-0001: copy the link code, do not share it). One connection already made should stay a leaf: `src/secret.ts` imports the prefix table (`src/prefixes.ts`, built 2026-10-21); when service cards arrive, the cards must feed that table, never `Secret` import the cards, or the value path's core would depend on the most-edited part of Keyhole.
+- **Hora inside the build order.** The inbox's data (records, their home, the link that creates them) is a stable form *before* its webview: a list of requests in VS Code's own Quick Pick, each opening today's masked box, works and can be released on its own. The tab then becomes a better view of the same records, not a precondition for them. This changes my recommendation on QST-ORDER-INBOX (option D, below).
 
 **Confirm**: Jérémie, that a request never holding a value is the line, and that the inbox is optional beside the command.
 
@@ -116,9 +124,13 @@ Options:
 - **A — release the person's path, then link, inbox and tab, then instructions**: 0.1.0 is the command as it is; next, the link creates a request in the inbox, and the tab shows the inbox, drafts, sequences and mass entry; then the instruction pages, opened in Porthole.
 - **B — nothing released until the inbox and tab exist**: one larger first release.
 - **C — release the person's path, then link and instructions, then inbox and tab**: a model can ask, and Keyhole can show the page for the service, before there is an inbox to queue in.
+- **D — release the person's path, then link and inbox as a list, then the tab, then instructions**: like A, with the inbox split from its view. The second release is the link creating a request record and a "requests" list in VS Code's own Quick Pick, each item opening today's masked box (so a model's request waits instead of interrupting); the third is the tab (a better view of the same records, plus sequences and mass entry); the fourth, the instruction pages in Porthole.
 
 **Recommendation**: (by Glazier 5.5, Claude Opus 5.5, 2026-10-21)
 **A — release the person's path, then link, inbox and tab, then instructions.** *Rationale*: the watchmaker's test (ADR-0001): each release must stand if work stopped there; the person's path already does, and a link without an inbox would bring back the now-or-never Jérémie wants gone, so the link and the inbox belong together; instructions are most useful once there is a request to attach them to. *Confidence*: 0.7 — because the link-with-inbox release is the largest step and could be split. *If wrong*: C, if seeing a model ask for a token with its instructions is the demonstration Keyhole needs first; B, if a first release should already show the whole idea.
+
+**Recommendation**: (by Glazier 5.5, Claude Opus 5.5, 2026-10-21 — a walk-back from A, after reading the design through Simon; see the Explicitation)
+**D — the inbox as a list before the tab.** *Rationale*: I called A's second release "the largest step" and said it "could be split"; Simon says where: the inbox's records are a stable form before any webview shows them. A Quick Pick of requests, each opening the masked box that is already built and hand-checked, gives the first release in which a model's request waits rather than interrupts, without the webview's new value path; the tab then arrives on records that have been used. Each of D's releases stands if work stopped there; A's second does not until the tab is done. *Confidence*: 0.75 — because the list reuses only built, checked parts, and its one new piece (the record and its home) is needed by every option. *If wrong*: A, if a list of requests in the palette is too poor a view to teach newcomers anything, so the tab must come with the link; C, as above.
 
 **ANS:** (by Jérémie Lumbroso)
 [Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
@@ -145,6 +157,12 @@ Not yet: four questions.
 - Trigger: Jérémie's answers to ADR-0003's QST-SHOW-VALUE and QST-ENTRY-TAB
 - Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
 - Changes: the design restated; four doubts; four questions
+- Outcome: `Draft`
+
+### Iteration 2 (2026-10-21)
+- Trigger: Jérémie invoked the architecture-of-complexity skill
+- Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
+- Changes: the design read through Simon (the inbox as Hora's subassemblies; a wall through the tab; recipes and facts reviewed differently; the prefix table kept a leaf); QST-ORDER-INBOX gains option D, and my recommendation walks back from A to D
 - Outcome: `Draft`
 
 ---
