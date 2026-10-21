@@ -147,7 +147,7 @@ Screenshots:
 ---
 
 ### QST-MODALS-WHY: What does each of Keyhole's questions and refusals say it recommends, and why?
-- Status: unanswered — routed to the naming review, then Jérémie; blocks the first release
+- Status: answered
 - Why asking: Jérémie, answering QST-CHECK-PERSON-PATH (2026-10-20): *"The question modal (and our modals in general) should follow an ORRCF-like flavor. Imagine that the audience may not know about `.gitignore` or may not know why you would add `.env` in `.gitignore`, or if they do, they may know you wouldn't want to commit it, but they may not know why. So we need to use every opportunity at our disposal to provide agency to our user. Let's follow moral contractualism. So here, the message should, (a) say what is recommended, and (b) why."* That is decided; what is open is the words. A VS Code modal shows a bold **message** and a plainer **detail** under it, so the drafts put the recommendation in the message and the why in the detail. Drafts, by Glazier, for the review to rule line by line (`{folder}` is the folder's name, `{NAME}` the variable's):
   1. **Not ignored** (a question; buttons **Add to .gitignore**, **Cancel**). Now: "{folder}/.env is not ignored by git, so a "git add ." would put your secrets in the next commit. Add it to .gitignore?" Draft message: "Add .env to .gitignore first (recommended)". Draft detail: "Git does not ignore {folder}/.env yet, so a "git add ." would copy your secrets into the next commit. A commit keeps them in the project's history, where anyone who can read the repository, or any copy of it, can find them, even after the file is deleted. Keyhole adds one line to .gitignore, checks with git again, and writes nothing until .env is ignored."
   2. **Tracked** (a refusal). Now: "Keyhole did not write {folder}/.env: git tracks it, so a secret written there would go into the next commit. Stop tracking it first (git rm --cached .env), then add it to .gitignore." Draft message: "Keyhole did not write {folder}/.env: git tracks it. Recommended: stop tracking it, then ignore it." Draft detail: "Anything written to a tracked file goes into the next commit and stays in the history. "git rm --cached .env" stops tracking the file without deleting it; then add .env to .gitignore. If .env was ever committed with a real secret in it, that secret is still in the history: replace it at its service."
@@ -178,12 +178,12 @@ The grammar (the founder's contractualism made a template): **message = the reco
 Glazier's own sentence from the rationale is adopted into the grammar's preamble, because it is the whole method: *"a better word is often the truer description of the mechanism, which is exactly what a 'why' is."* *Confidence*: 0.8. *If wrong*: all modal words are release-mutable; the grammar is the fossil worth keeping, and it is now on the record.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Approving Option B, as specified exactly by the naming review, thanks to the naming review.
 
 ---
 
 ### QST-KEYPRINT-LEGIBLE: How should a keyprint show a value so the person recognizes it, and how much of the value may the conversation see?
-- Status: unanswered
+- Status: answered
 - Why asking: Jérémie, after the check (2026-10-20): *"The keyprint thing is not very legible, I want something a bit more useful and closer to the original value such that if the person knew original value, they'd be like 'ah, yes, this is obviously derived from my value'."* The keyprint the check showed was `<keyprint:…#06c47309/>`: the first eight hex digits of a SHA-256, chosen under QST-FINGERPRINT (ADR-0001, B) because it reveals none of the value. Anything a person can recognize *by eye* is made of the value's own characters, and the log is what a model reads, so this is a question about the first law, not only about words: how many characters of a secret may enter the conversation. What the services do: many dashboards show a key as its prefix and last four characters (`sk-…3f9c`), and the card industry's rules let receipts print a card's last four digits; both treat the last four of a long value as not secret. For a 40-character random token, four characters leave about 216 of its 240 bits unknown; for a 12-character password, they are a third of it.
 - Need: pick a letter (or override — any shape answers)
 
@@ -212,7 +212,7 @@ Keeping the hash in *both* shapes buys the invariant that makes two shapes one c
 *Confidence*: 0.8 on the form; the amount is yours — if your ANS is A, the form collapses to the short shape everywhere and "Check a value" is promoted from convenience to the legibility route, which should then ship in the same release as the marker, not after it. *If wrong about the threshold*: 32 is a proxy for entropy, not a measurement — if a real service ships 32-character low-entropy tokens, the floor rises, and the log's which-form-was-used line (Glazier's, kept) is what makes that correction auditable.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Option C, as ruled by the naming review, but with one additional invariant: The public part of the value is always displayed, even if the value is short, i.e., `ghp_12345` will lead to `ghp_` displayed, even though the token itself is short, unlike the short value example. But yes on everything else.
 
 ---
 

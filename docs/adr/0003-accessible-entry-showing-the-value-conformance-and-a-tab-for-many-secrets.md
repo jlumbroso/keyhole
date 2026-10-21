@@ -52,7 +52,7 @@ His other remarks from the same answer, the words of every question (recommend, 
 ## Questions
 
 ### QST-SHOW-VALUE: How does a person see what they typed in the masked box?
-- Status: unanswered — the source reading is in (Surveyor, 2026-10-20): all three options are allowed at the 1.134.0 floor
+- Status: answered
 - Why asking: Jérémie asked for a visible/not-visible toggle on the box where a secret is typed, for accessibility. Keyhole uses `vscode.window.showInputBox({ password: true })` today, which has no toggle. Whether one can be built depends on VS Code's API at the floor, 1.134.0: `createInputBox()` gives a box whose `password` property and title-bar `buttons` can be changed while it is open, but whether flipping `password` re-renders the typed text in place, and what a screen reader announces, is a source question.
 - Need: pick a letter (or override — any shape answers), once the source reading is in
 
@@ -71,12 +71,12 @@ Options:
 **A — an eye button on the box, re-masked when the box hides or the window loses focus, with no timer.** *Rationale*: I withdraw the "short timer" in my recommendation above. A timer that hides what a person is reading is a time limit, which WCAG 2.2.1 says the person must be able to turn off, adjust or extend, and the reason for it (a "Screenshot Window" capture) needs a person's own act, which happens only while they are looking. Re-masking when the box hides, or when VS Code's window loses focus to another app, keeps that protection without timing anyone. "Losing focus" must mean the window, not moving between the box and its eye button by keyboard, which must never re-mask or move focus (Sounder's point). *Confidence*: 0.75 — as above. *If wrong*: an adjustable timer (a setting, off by default), if Jérémie wants one for shared screens.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Yes, Option A. It would be nice if this could all be tab-able, and also I realize one of the ways we can make it easier is also in terms of cognitive load, for nothing to be "now or never" — for requests to be queued in an inbox of requests and user-initiated drafts. It would be nice to create a neat decoupling of every step of this chain from, model sending a request (presumably with a variable name, an ORRCF — i.e., why they are asking for this, where to get it, why, etc., alternatives), and the user to follow the directions and fill out the secret. But the user could also use it to add environment variables in this trusted way — in which case, they would start an empty draft, and type variable name (or select it, or has us guide them based on our records, or curation of standard environment variable names), and then get instructions from our records somewhere (on the side, collapsible?), and then the key/password, etc.. We should also allow for sequences of variables (like SMTP server + username + password for instance). Each draft/record would be deep-linkable, such that a model can: (a) reopen the extension to that draft for editing and (b) iterate with the record with ease. This part is optional, and power users might not see it, but it may help make this more easy to scaffold for new comers, who are the most targeted audience.
 
 ---
 
 ### QST-A11Y-TARGET: Which accessibility standard does Keyhole conform to, and how is it checked?
-- Status: unanswered — the research is in (Sounder, 2026-10-20, `docs/reviews/2026-10-20-accessible-entry-wcag-22-aa.md`: all 55 WCAG 2.2 A and AA criteria mapped)
+- Status: answered
 - Why asking: Jérémie: "research accessibility compliance so we are comprehensive". A claim of accessibility needs a named target and a way to check it. The research should say which WCAG 2.2 criteria apply to Keyhole's surfaces (the masked box, the modal questions, the notices, a future webview tab), which VS Code already satisfies for extensions, and which Keyhole must satisfy itself, with a check for each (a screen reader on macOS, keyboard only, high contrast, zoom).
 - Need: pick a letter (or override — any shape answers), once the research is in
 
@@ -91,12 +91,12 @@ Options:
 **A — WCAG 2.2 A and AA as the assessment target, read for desktop software through WCAG2ICT.** *Rationale*: Sounder's table finds criteria Keyhole controls itself even today (labels and purpose, error identification and correction, keyboard and focus for any new control, status messages that can be recovered), and the tab would add the page's own structure, language, contrast and reflow; so B's "VS Code's practices only" would leave real criteria unowned. WCAG2ICT is the W3C's guidance for applying WCAG to software that is not a web page; it is informative, so Keyhole says "assessed against", never "conforms", until hand checks back each row. Two of Sounder's distinctions change the design: storing a key is not authenticating, so the toggle is useful but not an AA mandate (3.3.8); and a box that survives losing focus is not by itself timing conformance: a result that vanishes and cannot be recovered also counts. *Confidence*: 0.8 — because the table was checked by independent readers, and no row has been checked live. *If wrong*: B, only if Jérémie wants the narrower claim.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+We should track both. Option A is reasonable, but we should also track VS Code's own accessibility practices as a separate column: Both so we can contextualize our choices, because some of the extra work won't matter if VS Code is not broadly compatible (as Keyhole is a small part of a much larger ecosystem), and so we can measure the extra effort. Then we should scaffold how we bring these things in.
 
 ---
 
 ### QST-ENTRY-TAB: What is the entry tab, and where does it go in the build order?
-- Status: unanswered — both readings are in (2026-10-20)
+- Status: answered
 - Why asking: Jérémie proposed "a full tab that allows for entry, and maybe has some bells and whistles, like mass entry, for instance from copy-paste". The tab is a larger value path than the box (see the doubts above: a webview, never a text editor; the value wrapped at the message boundary; nothing kept by the page), so its shape and its place in ADR-0001's build order are decided together, once the research says what accessibility requires of it.
 - Need: pick a letter (or override — any shape answers), once the research is in
 
@@ -112,7 +112,7 @@ Options:
 **B — A plus mass entry, a webview, after the link.** *Rationale*: Surveyor's reading settles the surface. An untitled editor writes its text to disk in plain UTF-8 about a second after each pause, whatever `files.hotExit` says, and no API exempts a document (`workingCopyBackupTracker.ts`, both tags), so a text editor is ruled out. A webview's page is unreadable by the workbench, by other extensions and by chat tools. What remains to design around: never call `setState` with a value (it reaches the workspace's state database on disk); the window screenshot sees a visible page, so the page masks by default and re-masks as the box does; and, from Sounder, what happens when the person leaves to fetch a key from its service must be defined before building, because clearing a hidden tab forces re-entry and keeping it means holding a value in memory. *Confidence*: 0.6 — because the boundary is now read, and the interruption behavior is a design still to write. *If wrong*: A, if mass entry's parser needs its own review; C, if Jérémie prefers the box, made accessible by QST-SHOW-VALUE, until the cards and targets exist.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Yes, Option B — and to be composed with the idea of the broader inbox possibly; this is a complementary part of a broader set of tools to help. The mass entry its role is: This is not something the transformers could help with for security reasons, so we are proposing a mechanized, automatic way of doing a simple version of structuring a mass of keys. The other proposal was to help structure the cognitive load around going around to get secrets. In particular, it helped Keyhole become the attention sorting yard, to take all instructions for how and where to go get a token. In fact, per the example we documented in screenshots for Porthole, we could have Keyhole have instructions for some platforms (like Render, Neon, etc., and maybe these instructions are in a public repo and publically editable), that can be spawned as Portholes when the model requests "The Render API key" for instance. Bringing all things together so it doesn't rely on the user having a massive amounts of executive functioning is also a way to be accessible.
 
 ---
 
