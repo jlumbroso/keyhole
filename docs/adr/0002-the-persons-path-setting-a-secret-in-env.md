@@ -163,6 +163,20 @@ Options:
 **Recommendation**: (by Glazier 5.5, Claude Opus 5.5, 2026-10-20)
 **B — the review's words.** *Rationale*: the drafts are longer than VS Code's modal is comfortable with (its detail wraps in a narrow box, as screenshot 4 of the check shows at four lines for one sentence), and the review's last ruling showed that a better word is often the truer description of the mechanism, which is exactly what a "why" is. *Confidence*: 0.8 — because Jérémie asked for the review here. *If wrong*: A, if the review finds the drafts right as they are.
 
+**Recommendation**: (by the naming review, 2026-10-21 — hub ledger №113)
+
+**B — the drafts confirmed in structure, trimmed to modal width, with one agency gap filled; and the modal grammar minted so the next dialog needs no review.**
+
+The grammar (the founder's contractualism made a template): **message = the recommendation as an actionable sentence**, tagged "(recommended)" only when buttons offer real alternatives; **detail = the why in at most three clauses — mechanism → consequence → what the tool will do**; **symmetric choices get when-each-fits, never a fake recommendation** (draft 3 already does this exactly right — where no option is honestly better, pushing one would be the nudge contractualism forbids); **refusals carry why + a path forward** — a refusal without a path is a wall, not a counsel. Line rulings:
+
+1. **Not ignored** — message as drafted. Detail trimmed one clause: *"Git doesn't ignore {folder}/.env yet, so a "git add ." would commit your secrets — and a commit keeps them in the history even after the file is deleted. Keyhole adds one line to .gitignore, checks with git again, and writes nothing until .env is ignored."* (The who-can-read-the-repository clause is the cut: "even after the file is deleted" already carries the shock, in six words.)
+2. **Tracked** — as drafted, whole. The closing sentence is the best line in the set and ships untouched: *"If .env was ever committed with a real secret in it, that secret is still in the history: replace it at its service."*
+3. **Already set** — as drafted, one softening: *"…Once the new value works, delete the old line yourself if you like."* ("You can delete" reads as instruction; "if you like" keeps the symmetric choice symmetric.)
+4. **Set notice addition** — blessed as drafted: *"Programs read .env when they start: restart the one that needs {NAME}."* This single sentence prevents the tool's most predictable support question; it is the cheapest teaching-debt payment in the file.
+5. **The refusals, and the one gap**: the format refusal stands (example-as-teaching, no clause needed). **The dangerous-variable refusal gains its path-forward**: *"…Keyhole does not write it. If you truly need to set {NAME}, do it by hand, where you can see exactly what it does."* A refusal that names its own bypass respects agency — the tool is a counsel, not a jailer, and for exactly this class of variable, hand-editing with open eyes IS the safe path.
+
+Glazier's own sentence from the rationale is adopted into the grammar's preamble, because it is the whole method: *"a better word is often the truer description of the mechanism, which is exactly what a 'why' is."* *Confidence*: 0.8. *If wrong*: all modal words are release-mutable; the grammar is the fossil worth keeping, and it is now on the record.
+
 **ANS:** (by Jérémie Lumbroso)
 [Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
 
