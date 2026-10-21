@@ -38,20 +38,35 @@ describe('a secret cannot be leaked by accident', () => {
   });
 });
 
-describe('the fingerprint in the log (QST-FINGERPRINT, B)', () => {
+describe('the keyprint (ADR-0002, QST-KEYPRINT-LEGIBLE, C)', () => {
   it('is the same for the same value and different for a rotated one', () => {
-    expect(new Secret(FAKE).fingerprint('ghp_')).toBe(new Secret(FAKE).fingerprint('ghp_'));
-    expect(new Secret(FAKE).fingerprint('ghp_')).not.toBe(new Secret(`${FAKE}X`).fingerprint('ghp_'));
+    expect(new Secret(FAKE).keyprint()).toBe(new Secret(FAKE).keyprint());
+    expect(new Secret(FAKE).keyprint()).not.toBe(new Secret(`${FAKE}X`).keyprint());
   });
 
-  it('shows the public prefix only when the value has it, and none of the secret part', () => {
-    const shown = new Secret(FAKE).fingerprint('ghp_');
-    expect(shown).toMatch(/^<keyprint:ghp_…#[0-9a-f]{8}\/>$/);
-    const secretPart = FAKE.slice('ghp_'.length);
-    for (let at = 0; at + 4 <= secretPart.length; at++) {
-      expect(shown).not.toContain(secretPart.slice(at, at + 4));
+  it('shows a long token\'s public prefix and last four, so its owner recognizes it, and nothing else of it', () => {
+    const shown = new Secret(FAKE).keyprint();
+    expect(shown).toMatch(/^<keyprint:ghp_…1234#[0-9a-f]{8}\/>$/);
+    const hidden = FAKE.slice('ghp_'.length, -4);
+    for (let at = 0; at + 4 <= hidden.length; at++) {
+      expect(shown).not.toContain(hidden.slice(at, at + 4));
     }
-    expect(new Secret('not-a-github-token-at-all-0000').fingerprint('ghp_')).toMatch(/^<keyprint:…#[0-9a-f]{8}\/>$/);
+  });
+
+  it('shows a short value\'s public prefix but none of the rest, where four characters would be a real share of it', () => {
+    // Jérémie's invariant: the public prefix always shows, even on a short value.
+    const short = ['ghp', '12345'].join('_');
+    expect(new Secret(short).keyprint()).toMatch(/^<keyprint:ghp_…#[0-9a-f]{8}\/>$/);
+    expect(new Secret('hunter2-but-longer').keyprint()).toMatch(/^<keyprint:…#[0-9a-f]{8}\/>$/);
+  });
+
+  it('starts showing the last four at 32 characters, not before', () => {
+    expect(new Secret('a'.repeat(31)).keyprint()).toMatch(/^<keyprint:…#[0-9a-f]{8}\/>$/);
+    expect(new Secret(`${'a'.repeat(28)}WXYZ`).keyprint()).toMatch(/^<keyprint:…WXYZ#[0-9a-f]{8}\/>$/);
+  });
+
+  it('never shows a value that is nothing but a known prefix', () => {
+    expect(new Secret('sk-').keyprint()).toMatch(/^<keyprint:…#[0-9a-f]{8}\/>$/);
   });
 });
 

@@ -16,8 +16,8 @@ export const DOTENV = '.env';
 export interface Presence {
   /** 1-based line numbers where the variable is assigned, in order; the last one wins. */
   lines: number[];
-  /** The fingerprint of the value that wins, or undefined when the variable is absent. */
-  fingerprint?: string;
+  /** The keyprint of the value that wins, or undefined when the variable is absent. */
+  keyprint?: string;
   /** The winning value's length. */
   length?: number;
 }
@@ -41,7 +41,7 @@ async function readIfPresent(path: string): Promise<string | undefined> {
 }
 
 /** Where the variable is set in this folder's `.env`, without showing its value. */
-export async function probe(folderPath: string, name: string, publicPrefix?: string): Promise<Presence> {
+export async function probe(folderPath: string, name: string): Promise<Presence> {
   const text = await readIfPresent(join(folderPath, DOTENV));
   if (text === undefined) { return { lines: [] }; }
   const pattern = assignment(name);
@@ -53,7 +53,7 @@ export async function probe(folderPath: string, name: string, publicPrefix?: str
   });
   if (last === undefined) { return { lines }; }
   const winning = new Secret(last);
-  return { lines, fingerprint: winning.fingerprint(publicPrefix), length: winning.length };
+  return { lines, keyprint: winning.keyprint(), length: winning.length };
 }
 
 export type Quoted = { ok: true; text: string } | { ok: false; reason: string };

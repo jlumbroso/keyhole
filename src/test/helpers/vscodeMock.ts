@@ -18,6 +18,9 @@ export function resetVscodeMock(): void {
   inputAnswers = [];
   inputBoxes = [];
   workspaceFolders = undefined;
+  windowStateListeners = [];
+  holdNext = false;
+  heldBox = undefined;
 }
 
 /** Every line the extension wrote to its output channel, in order. */
@@ -60,7 +63,66 @@ export const window = {
     return answer;
   },
   async showQuickPick<T>(items: T[], _options?: unknown) { return items[0]; },
+  /**
+   * A box the extension drives itself (the masked box with its eye button).
+   * On show() it takes the next typed answer and accepts it, or hides on
+   * undefined, unless the test holds it open with holdNextInputBox() to press
+   * its button or move focus away first.
+   */
+  createInputBox() {
+    const box = new MockInputBox();
+    return box;
+  },
+  onDidChangeWindowState(listener: (state: { focused: boolean }) => void) {
+    windowStateListeners.push(listener);
+    return { dispose: () => { windowStateListeners = windowStateListeners.filter(other => other !== listener); } };
+  },
 };
+
+type Listener<T> = (value: T) => void;
+let windowStateListeners: Array<(state: { focused: boolean }) => void> = [];
+let holdNext = false;
+let heldBox: MockInputBox | undefined;
+
+class MockInputBox {
+  title?: string;
+  prompt?: string;
+  password = false;
+  ignoreFocusOut = true;
+  value = '';
+  buttons: Array<{ iconPath: unknown; tooltip?: string }> = [];
+  disposed = false;
+  #accept: Array<Listener<void>> = [];
+  #hide: Array<Listener<void>> = [];
+  #button: Array<Listener<{ iconPath: unknown; tooltip?: string }>> = [];
+  onDidAccept(listener: Listener<void>) { this.#accept.push(listener); return { dispose() {} }; }
+  onDidHide(listener: Listener<void>) { this.#hide.push(listener); return { dispose() {} }; }
+  onDidTriggerButton(listener: Listener<{ iconPath: unknown; tooltip?: string }>) { this.#button.push(listener); return { dispose() {} }; }
+  show() {
+    inputBoxes.push({ title: this.title, prompt: this.prompt, password: this.password, ignoreFocusOut: this.ignoreFocusOut });
+    if (holdNext) { holdNext = false; heldBox = this; return; }
+    this.finish(inputAnswers.shift());
+  }
+  /** The person types `answer` and presses Enter, or Escape when undefined. */
+  finish(answer: Answer) {
+    if (answer === undefined) { this.#hide.forEach(listener => listener()); return; }
+    this.value = answer;
+    this.#accept.forEach(listener => listener());
+  }
+  press(index = 0) { this.#button.forEach(listener => listener(this.buttons[index])); }
+  hide() { this.#hide.forEach(listener => listener()); }
+  dispose() { this.disposed = true; }
+}
+
+/** Keep the next created input box open; the test gets it from heldInputBox(). */
+export function holdNextInputBox(): void { holdNext = true; }
+export const heldInputBox = () => heldBox;
+/** VS Code's window gains or loses focus (the person switches to another app). */
+export function setWindowFocused(focused: boolean): void { windowStateListeners.forEach(listener => listener({ focused })); }
+
+export class ThemeIcon {
+  constructor(readonly id: string) {}
+}
 
 export const workspace = {
   get workspaceFolders() { return workspaceFolders; },

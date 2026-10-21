@@ -15,5 +15,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   with git that `.env` is ignored and not tracked (and offers to add it to `.gitignore`), takes the
   value in a masked box and appends it to `.env` under a comment line. Setting a value that is already
   set asks first (**Set New Value**); the old line stays, and the new comment says which line it
-  supersedes. The log names a value only by its keyprint, `<keyprint:ghp_…#3fa7a3c1/>`. Its words are
-  the naming review's.
+  supersedes. Its words are the naming review's: every question says what Keyhole recommends and why,
+  and every refusal says how to go on.
+- The keyprint: the log and the questions name a value by its public prefix and a short hash, and a
+  value of 32 characters or more also shows its last four, as the service's own page does, so you
+  can recognize it: `<keyprint:ghp_…f9c2#06c47309/>`. A shorter value shows none of its characters.
+- The masked box has an eye button to show what you typed; the value is hidden again when you switch
+  to another app. Both boxes are named for screen readers.

@@ -6,7 +6,7 @@ import type { GitFacts, Protection } from '../git';
 import { initLog } from '../log';
 import { setSecret } from '../setSecret';
 import {
-  answerNextModal, loggedLines, resetVscodeMock, setWorkspaceFolders, shownInputBoxes, shownMessages, typeIntoNextInputBox,
+  answerNextModal, heldInputBox, holdNextInputBox, loggedLines, resetVscodeMock, setWindowFocused, setWorkspaceFolders, shownInputBoxes, shownMessages, typeIntoNextInputBox,
 } from './helpers/vscodeMock';
 
 // The person's own path (ADR-0001, the first build), on real folders: the
@@ -80,7 +80,7 @@ describe('setting a secret in .env', () => {
 
     await setSecret(git);
 
-    expect(shownMessages()[0].text).toMatch(/GITHUB_TOKEN is already set in .*\(<keyprint:…#[0-9a-f]{8}\/>, 40 characters\)\. Set a new value\?/);
+    expect(shownMessages()[0].text).toMatch(/GITHUB_TOKEN is already set in .*\(<keyprint:ghp_…1234#[0-9a-f]{8}\/>, 40 characters\)\. Set a new value\?/);
     expect(env()).toMatch(new RegExp(`^GITHUB_TOKEN=${FAKE}\\n# Keyhole [^\\n]*\\(supersedes line 1\\)\\nGITHUB_TOKEN=${OTHER}\\n$`));
   });
 
@@ -114,6 +114,51 @@ describe('setting a secret in .env', () => {
   });
 });
 
+describe('seeing what you typed (ADR-0003, QST-SHOW-VALUE, A)', () => {
+  /** Runs the command until the masked box is open, and hands it over. */
+  async function openValueBox() {
+    typeIntoNextInputBox('GITHUB_TOKEN');
+    holdNextInputBox();
+    const run = setSecret(git);
+    for (let tries = 0; !heldInputBox() && tries < 50; tries++) { await new Promise(resolve => setTimeout(resolve, 0)); }
+    const box = heldInputBox();
+    if (!box) { throw new Error('the masked box never opened'); }
+    return { box, run };
+  }
+
+  it('shows the value with the eye button and hides it again with the same button', async () => {
+    const { box, run } = await openValueBox();
+    expect(box.password).toBe(true);
+    expect(box.buttons[0].tooltip).toBe('Show the value');
+
+    box.press();
+    expect(box.password).toBe(false);
+    expect(box.buttons[0].tooltip).toBe('Hide the value');
+
+    box.press();
+    expect(box.password).toBe(true);
+    expect(box.buttons[0].tooltip).toBe('Show the value');
+
+    box.finish(FAKE);
+    await run;
+    expect(env()).toContain(`GITHUB_TOKEN=${FAKE}`);
+  });
+
+  it('hides a shown value when the person switches to another app, since a shown value is in the window\'s pixels', async () => {
+    const { box, run } = await openValueBox();
+    box.press();
+    expect(box.password).toBe(false);
+
+    setWindowFocused(false);
+    expect(box.password).toBe(true);
+    expect(box.buttons[0].tooltip).toBe('Show the value');
+
+    box.finish(undefined);
+    await run;
+    expect(loggedLines().at(-1)).toMatch(/stopped: no value given/);
+  });
+});
+
 describe('git keeps the secret out of commits', () => {
   it('refuses when git tracks .env, and says how to stop tracking it', async () => {
     protectionNow = 'tracked';
@@ -122,7 +167,9 @@ describe('git keeps the secret out of commits', () => {
     await setSecret(git);
 
     expect(shownInputBoxes()).toHaveLength(1); // never asked for the value
-    expect(shownMessages().at(-1)?.text).toMatch(/git tracks it.*git rm --cached \.env/);
+    const refusal = shownMessages().at(-1);
+    expect(refusal?.text).toMatch(/git tracks it\. Recommended: stop tracking it, then ignore it/);
+    expect(refusal?.detail).toMatch(/git rm --cached \.env.*still in the history: replace it at its service/);
   });
 
   it('offers to add .env to .gitignore when no rule ignores it, then writes', async () => {
@@ -171,10 +218,15 @@ describe('the first law', () => {
     await setSecret(git);
 
     expect(loggedLines().length).toBeGreaterThanOrEqual(3); // the log really was captured (git, the probe, the write)
+    // A long value's keyprint shows its public prefix and its last four
+    // (QST-KEYPRINT-LEGIBLE, C); nothing else of it may appear anywhere.
     for (const value of [FAKE, OTHER]) {
-      expect(everythingShown()).not.toContain(value.slice(4, 12));
+      const hidden = value.slice('ghp_'.length, -4);
+      for (let at = 0; at + 4 <= hidden.length; at++) {
+        expect(everythingShown()).not.toContain(hidden.slice(at, at + 4));
+      }
     }
-    expect(everythingShown()).toMatch(/<keyprint:…#[0-9a-f]{8}\/>/);
+    expect(everythingShown()).toMatch(/<keyprint:ghp_…9876#[0-9a-f]{8}\/>/);
   });
 
   it('leaves no temporary file beside .env', async () => {
