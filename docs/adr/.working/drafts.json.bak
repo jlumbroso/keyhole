@@ -1,0 +1,13 @@
+[
+  {
+    "key": "jlumbroso-keyhole:4::6202c926152d::0",
+    "adrPath": "docs/adr/0004-requests-and-drafts-an-inbox-for-secrets-and-instructions-shown-in-porthole.md",
+    "adrNumber": 4,
+    "questionText": "Where do requests and drafts live?",
+    "draftText": "Agreed with Option C. (For actual keys, etc., they should only be stored where they won't be committed and/or read by models accidentally, so we must still stick to that.)",
+    "updatedAt": "2026-10-22T03:26:20.169Z",
+    "history": [],
+    "totalOccurrences": 1,
+    "source": "panel"
+  }
+]

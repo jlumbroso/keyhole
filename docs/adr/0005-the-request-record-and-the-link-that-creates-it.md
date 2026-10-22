@@ -48,7 +48,7 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 ## Questions
 
 ### QST-REQUEST-ROUTE: How does a model make a request: by the link, by writing the project's request file, or both?
-- Status: unanswered
+- Status: answered
 - Why asking: In Keyhole's second release, a model asks for a secret by name (never a value). The project's requests are kept in a file in the project (ADR-0004, QST-RECORD-HOME, C), and that file holds nothing secret, so a model with file access could add a request by editing the file instead of opening Keyhole's `vscode://` link. Either way the request's reasons are the assistant's words, shown labeled as such (ADR-0004, QST-MODEL-TEXT, A).
 - Need: pick a letter (or override — any shape answers)
 
@@ -61,12 +61,12 @@ Options:
 **C — both: the file is the record, the link is a doorbell.** *Rationale*: by Simon's empty world, the record is the one contract and both routes reduce to it; the check lives at the record, not at the route, so a second route adds no second check. The link keeps Porthole's genre and the skill's one-line instruction; the file keeps Keyhole usable by models and harnesses that cannot open links. *Confidence*: 0.6 — because a watched file is a new surface that can be edited by anything, though what it can hold is only names and text that is shown labeled. *If wrong*: A, if a hand check shows a model's direct edits confuse people about who asked.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Yes, agreed with Option C. The structure is near-decomposable: Links are the doorbell that produce a record, and the file edits the record directly, is also admissible.
 
 ---
 
 ### QST-OUTCOME-ROUTE: Where does a model read whether the secret it asked for is now set?
-- Status: unanswered
+- Status: answered
 - Why asking: A model that asked for `NEON_API_KEY` must learn that it is set, its length and its keyprint, to go on with the task (ADR-0001: `{name, outcome, length}` out; never the value). ADR-0004 keeps the person's progress private, in VS Code's storage for the workspace, which a model cannot read, and the project's committed request file is shared with everyone who clones it, so a person's "set on Tuesday" does not belong there.
 - Need: pick a letter (or override — any shape answers)
 
@@ -79,12 +79,12 @@ Options:
 **A — a local outcomes file, ignored by git.** *Rationale*: it is the only option both readable by the model and private to the person, which is ADR-0004's split applied to outcomes; it holds what ADR-0001 already lets cross (name, outcome, length) plus the keyprint ADR-0002 made legible, and the `.gitignore` check is code that exists and was checked by hand. *Confidence*: 0.7 — because a second ignored file is one more thing to explain to a newcomer. *If wrong*: B, if Jérémie prefers nothing new in the project beyond the request file.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+For abstraction reasons, it makes more sense for keyhole to always provide the interface for this check. Keyhole is an automated system that can open the `.env` files and check it. It can do so at any time. The idea of an outcomes file makes sense as a local cache that is maintained by Keyhole, but having models read from that file itself doesn't necessarily make sense, as the format could change, be extended, contain keys not pertaining to a specific seat, etc.. So I would say something like "Option D, an 'API' provided by Keyhole, possibly through an MCP server, and possibly using Option A as a local implementation to reduce checks in the actual files".
 
 ---
 
 ### QST-REQUEST-FILE: Which file holds a project's requests: Keyhole's own, `.env.example`, or both?
-- Status: unanswered
+- Status: answered
 - Why asking: ADR-0004 decided that the project's requests are committed in the project, as a map of the secrets it needs. Many projects already keep exactly such a map: `.env.example`, committed, names with empty or fake values, read by people and some tools; Keyhole's manual recommends one. Keyhole's records also need structure a comment line holds badly: a sequence of names, the assistant's reasons, the service.
 - Need: pick a letter (or override — any shape answers)
 
@@ -97,7 +97,7 @@ Options:
 **C — both, kept in step.** *Rationale*: the record needs structure and one owner (A's strength, and the boundary Simon asks for), while the newcomer and every other tool already look at `.env.example` (B's strength); offering, not forcing, the `.env.example` line keeps the convention without making Keyhole parse a file it does not own. *Confidence*: 0.55 — because keeping two files in step is a known source of drift. *If wrong*: A, if the offer to edit `.env.example` reads as Keyhole overreaching; B, if one file matters more than structure.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Agreed with Option C, and allowing useful `.env.example` would be a nice side-benefit, right now that feature is under-utilized.
 
 ---
 

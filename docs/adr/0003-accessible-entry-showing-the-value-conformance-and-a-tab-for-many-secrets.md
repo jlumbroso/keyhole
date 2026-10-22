@@ -117,7 +117,7 @@ Yes, Option B — and to be composed with the idea of the broader inbox possibly
 ---
 
 ### QST-CHECK-EYE: Can a person see what they typed, by mouse and by keyboard, and what does VoiceOver say?
-- Status: unanswered
+- Status: answered
 - Why asking: **What this finds out.** The eye button (QST-SHOW-VALUE, A) and the boxes' new names are built and pass 36 tests against a mocked VS Code, but three things only a real VS Code with a real screen reader shows: whether the text and the cursor survive the switch from dots to letters and back (browser behavior, Surveyor's reading); whether the eye button can be reached **by keyboard**, which you asked for ("It would be nice if this could all be tab-able"); and what VoiceOver actually announces for each box, now that they carry a title (Sounder's row for WCAG 4.1.2). It also shows the naming review's new words and the legible keyprint once. **Safe**: a throwaway repository staged for this check, a value that is not a secret, and VoiceOver turned on and off with the same keys (**Cmd+F5**); **never paste a real token in a check.** Keyhole 0.0.1, rebuilt with all of this, is installed in your VS Code.
 - Need: pick a letter (or override — any shape answers), and write down what VoiceOver said at steps 2 and 4. About five minutes.
 
@@ -151,7 +151,18 @@ Options:
 **B — all as described, but the keyboard could not reach the eye button** (a prediction). *Rationale*: the flip keeping the text is read in source at both tags (`quickInputBox.ts`, Surveyor), the blur re-mask and the names are pinned by tests, and the notice and keyprint words are tested; but I have not read whether a quick input's title-bar buttons are in the Tab order, and VS Code's own quick inputs usually reach such buttons by mouse or by a keybinding. *Confidence*: 0.45 — because the keyboard question is unread. *If wrong*: A means the button is in the Tab order and nothing changes; B, as predicted, means the keyboard route needs its own keybinding while the box is open (a `when` clause on the quick input), or the tab of QST-ENTRY-TAB; C would contradict the source reading and needs a regression test first; D means VS Code's quick input ignores the title for its label, and the prompt or a placeholder must carry the name instead.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Excellent guide, Option A. Starting with opening the command palette, I was able to do everything and in particular reach the eye button from the keyboard. The only thing I would say is that the explanation/description in the command palette message for the password currently mentions "Enter" and "Esc" as options, but it could call attention to the (non-standard in VS Code AFAIK) eye button that can be reached from Cmd+Tab. I am not sure what the right text to describe this.
+
+Screenshots for reference:
+- See: `related-projects/keyhole/docs/adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.46.09 PM.png`
+- See: `related-projects/keyhole/docs/adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.46.57 PM.png`
+- See: `related-projects/keyhole/docs/adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.47.10 PM.png`
+- See: `related-projects/keyhole/docs/adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.47.40 PM.png`
+- See: `related-projects/keyhole/docs/adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.48.50 PM.png`
+- See: `related-projects/keyhole/docs/adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.48.59 PM.png`
+- See: `related-projects/keyhole/docs/adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.49.08 PM.png`
+- See: `related-projects/keyhole/docs/adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.49.58 PM.png`
+- See: `related-projects/keyhole/docs/adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.50.23 PM.png`
 
 ---
 

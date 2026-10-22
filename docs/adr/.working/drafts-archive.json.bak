@@ -1,0 +1,76 @@
+[
+  {
+    "key": "jlumbroso-keyhole:4::6202c926152d::0",
+    "adrPath": "docs/adr/0004-requests-and-drafts-an-inbox-for-secrets-and-instructions-shown-in-porthole.md",
+    "adrNumber": 4,
+    "questionText": "Where do requests and drafts live?",
+    "draftText": "Agreed with Option C. (For actual keys, etc., they should only be stored where they won't be committed and/or read by models accidentally, so we must still ",
+    "updatedAt": "2026-10-22T03:26:17.556Z",
+    "history": [
+      "Agreed with Option C.",
+      "Agreed with Option C. ",
+      "Agreed with Option C. (For ",
+      "Agreed with Option C. (For actual keys, etc.",
+      "Agreed with Option C. (For actual keys, etc., they should only be stored w",
+      "Agreed with Option C. (For actual keys, etc., they should only be stored where they won't be committed and/or read by models accidentally, so we "
+    ],
+    "totalOccurrences": 1,
+    "source": "panel",
+    "archivedAt": "2026-10-22T03:26:20.117Z",
+    "reason": "promoted"
+  },
+  {
+    "key": "jlumbroso-keyhole:4::aaa99103ebeb::0",
+    "adrPath": "docs/adr/0004-requests-and-drafts-an-inbox-for-secrets-and-instructions-shown-in-porthole.md",
+    "adrNumber": 4,
+    "questionText": "Where do the instructions for each service come from, and how is an edit trusted?",
+    "draftText": "Option B sounds like a reasonable compromise. This can be implemented with \"shipped\" meaning \"actually shipped\" or \"versioned URL.\"",
+    "updatedAt": "2026-10-22T03:27:23.291Z",
+    "history": [
+      "Option B sounds like a reasonable compromise.",
+      "Option B sounds like a reasonable compromise. ",
+      "Option B sounds like a reasonable compromise. Thi",
+      "Option B sounds like a reasonable compromise. This",
+      "Option B sounds like a reasonable compromise. This can be implemented with \"shipped\" meaning \"actually shipped\" or \"",
+      "Option B sounds like a reasonable compromise. This can be implemented with \"shipped\" meaning \"actually shipped\" or \"versioned URL\"."
+    ],
+    "totalOccurrences": 1,
+    "source": "panel",
+    "archivedAt": "2026-10-22T03:27:23.328Z",
+    "reason": "promoted"
+  },
+  {
+    "key": "jlumbroso-keyhole:4::a40e2aa3444e::0",
+    "adrPath": "docs/adr/0004-requests-and-drafts-an-inbox-for-secrets-and-instructions-shown-in-porthole.md",
+    "adrNumber": 4,
+    "questionText": "How does Keyhole show the reasons and directions a model writes into a request?",
+    "draftText": "Option A sounds good.",
+    "updatedAt": "2026-10-22T03:27:58.453Z",
+    "history": [
+      "Option A sounds good.",
+      "Option A sounds good.\n"
+    ],
+    "totalOccurrences": 1,
+    "source": "panel",
+    "archivedAt": "2026-10-22T03:27:58.494Z",
+    "reason": "promoted"
+  },
+  {
+    "key": "jlumbroso-keyhole:4::b89ace706845::0",
+    "adrPath": "docs/adr/0004-requests-and-drafts-an-inbox-for-secrets-and-instructions-shown-in-porthole.md",
+    "adrNumber": 4,
+    "questionText": "In what order are the inbox, the link, the tab and the instructions built?",
+    "draftText": "Agreed with Option D, with the inbox as a stable form.",
+    "updatedAt": "2026-10-22T03:28:45.247Z",
+    "history": [
+      "Agreed with Option D, with the inbox ",
+      "Agreed with Option D, with the inbox as ",
+      "Agreed with Option D, with the inbox as a stable b",
+      "Agreed with Option D, with the inbox as a stable form "
+    ],
+    "totalOccurrences": 1,
+    "source": "panel",
+    "archivedAt": "2026-10-22T03:28:46.406Z",
+    "reason": "promoted"
+  }
+]
