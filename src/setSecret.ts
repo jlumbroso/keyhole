@@ -122,21 +122,38 @@ function askForValue(prompt: string): Promise<string | undefined> {
   });
 }
 
+/** What a run of the person's path did, for the caller that keeps Keyhole's cache (ADR-0005). */
+export interface SetOutcome {
+  folder: vscode.WorkspaceFolder;
+  name: string;
+  /** True only when the value was written and read back. */
+  set: boolean;
+}
+
 /** The command: asks for a name, then for the value in a masked box, and appends it to the folder's `.env`. */
-export async function setSecret(git: GitFacts): Promise<void> {
+export async function setSecret(git: GitFacts): Promise<SetOutcome | undefined> {
   const folder = await pickFolder();
-  if (!folder) { return; }
+  if (!folder) { return undefined; }
   const name = await vscode.window.showInputBox({
     title: BOX_TITLE,
     prompt: 'Name of the variable to set (for example NEON_API_KEY)',
     ignoreFocusOut: true,
     validateInput: text => { const check = checkName(text); return check.ok ? undefined : check.reason; },
   });
-  if (!name) { return; }
-  const nameCheck = checkName(name);
-  if (!nameCheck.ok) { void vscode.window.showWarningMessage(`Keyhole did not write ${name}: ${nameCheck.reason}.`); return; }
+  if (!name) { return undefined; }
+  return { folder, name, set: await setNamed(git, folder, name) };
+}
 
-  if (!(await protect(git, folder))) { return; }
+/**
+ * The person's path for a name already chosen (by the command's name box, or
+ * by a request in the list): git's checks, the masked box, the append and the
+ * read-back. True only when the value was written and verified.
+ */
+export async function setNamed(git: GitFacts, folder: vscode.WorkspaceFolder, name: string): Promise<boolean> {
+  const nameCheck = checkName(name);
+  if (!nameCheck.ok) { void vscode.window.showWarningMessage(`Keyhole did not write ${name}: ${nameCheck.reason}.`); return false; }
+
+  if (!(await protect(git, folder))) { return false; }
 
   const place = `${folder.name}/${DOTENV}`;
   const before = await probe(folder.uri.fsPath, name);
@@ -149,16 +166,16 @@ export async function setSecret(git: GitFacts): Promise<void> {
       { modal: true, detail: 'The old line stays in the file (loaders use the last); Keyhole marks it superseded. Set a new value when you have a new one, for example after replacing a token at its service. Cancel keeps the value that is there. Once the new value works, delete the old line yourself if you like.' },
       SET_NEW_VALUE,
     );
-    if (answer !== SET_NEW_VALUE) { log(`stopped: ${name} already set; the person kept it`); return; }
+    if (answer !== SET_NEW_VALUE) { log(`stopped: ${name} already set; the person kept it`); return false; }
   }
 
   // The value goes from the person to the file, and nowhere else.
   const typed = await askForValue(`Paste the value of ${name}. It is written to ${place} and nowhere else.`);
-  if (!typed) { log(`stopped: no value given for ${name}`); return; }
+  if (!typed) { log(`stopped: no value given for ${name}`); return false; }
   const secret = new Secret(typed);
 
   const quoted = quote(secret);
-  if (!quoted.ok) { void vscode.window.showWarningMessage(`Keyhole did not write ${name}: ${quoted.reason}.`); log(`refused: ${name}: ${quoted.reason}`); return; }
+  if (!quoted.ok) { void vscode.window.showWarningMessage(`Keyhole did not write ${name}: ${quoted.reason}.`); log(`refused: ${name}: ${quoted.reason}`); return false; }
 
   const supersedes = before.lines.length > 0 ? ` (supersedes line ${before.lines.at(-1)})` : '';
   const comment = `Keyhole ${version} · ${new Date().toISOString()} · set ${name}${supersedes}`;
@@ -171,7 +188,8 @@ export async function setSecret(git: GitFacts): Promise<void> {
   log(`${verified ? 'wrote' : 'wrote, but could not verify,'} ${name} to ${place} line ${written.line}${written.created ? ' (new file, owner-only)' : ''}: ${secret.keyprint()} (${form}), ${secret.length} characters${supersedes}`);
   if (!verified) {
     void vscode.window.showWarningMessage(`Keyhole wrote ${name} to ${place}, but reading it back did not match; please check the file.`);
-    return;
+    return false;
   }
   void vscode.window.showInformationMessage(`Keyhole set ${name} in ${place} (${secret.length} characters). Programs read ${DOTENV} when they start: restart the one that needs ${name}.`);
+  return true;
 }

@@ -31,12 +31,20 @@
     "Other"
   ],
   "main": "./dist/extension.js",
-  "activationEvents": [],
+  "activationEvents": [
+    "onUri",
+    "workspaceContains:.keyhole/requests.json"
+  ],
   "contributes": {
     "commands": [
       {
         "command": "keyhole.setSecret",
         "title": "Set a Secret in .env…",
+        "category": "Keyhole"
+      },
+      {
+        "command": "keyhole.showRequests",
+        "title": "Show Requests",
         "category": "Keyhole"
       }
     ]

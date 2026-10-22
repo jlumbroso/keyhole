@@ -7,6 +7,7 @@ type Answer = string | undefined;
 let logged: string[] = [];
 let messages: Array<{ kind: 'info' | 'warning'; text: string; modal: boolean; detail?: string }> = [];
 let modalAnswers: Answer[] = [];
+let noticeAnswers: Answer[] = [];
 let inputAnswers: Answer[] = [];
 let inputBoxes: Array<{ title?: string; prompt?: string; password?: boolean; ignoreFocusOut?: boolean }> = [];
 let workspaceFolders: Array<{ name: string; uri: { scheme: string; fsPath: string }; index: number }> | undefined;
@@ -15,12 +16,17 @@ export function resetVscodeMock(): void {
   logged = [];
   messages = [];
   modalAnswers = [];
+  noticeAnswers = [];
   inputAnswers = [];
   inputBoxes = [];
   workspaceFolders = undefined;
   windowStateListeners = [];
   holdNext = false;
   heldBox = undefined;
+  quickPicks = [];
+  quickPickChoices = [];
+  uriHandler = undefined;
+  watchers.length = 0;
 }
 
 /** Every line the extension wrote to its output channel, in order. */
@@ -34,6 +40,8 @@ export const shownInputBoxes = () => inputBoxes;
 export function typeIntoNextInputBox(answer: Answer): void { inputAnswers.push(answer); }
 /** What the person answers to the next modal question (undefined: they cancelled). */
 export function answerNextModal(answer: Answer): void { modalAnswers.push(answer); }
+/** Which button the person clicks on the next notice that is not modal (undefined: they let it go). */
+export function answerNextNotice(answer: Answer): void { noticeAnswers.push(answer); }
 
 export function setWorkspaceFolders(paths: string[]): void {
   workspaceFolders = paths.map((path, index) => ({ name: path.split('/').filter(Boolean).at(-1)!, uri: { scheme: 'file', fsPath: path }, index }));
@@ -46,7 +54,7 @@ function show(kind: 'info' | 'warning', text: string, rest: unknown[]): Promise<
   const options = rest[0] as { modal?: boolean; detail?: string } | undefined;
   const modal = Boolean(options && typeof options === 'object' && options.modal);
   messages.push({ kind, text, modal, detail: modal ? options?.detail : undefined });
-  return Promise.resolve(modal ? modalAnswers.shift() : undefined);
+  return Promise.resolve(modal ? modalAnswers.shift() : noticeAnswers.shift());
 }
 
 export const window = {
@@ -62,7 +70,11 @@ export const window = {
     if (answer !== undefined && options.validateInput && options.validateInput(answer)) { return undefined; }
     return answer;
   },
-  async showQuickPick<T>(items: T[], _options?: unknown) { return items[0]; },
+  async showQuickPick<T>(items: T[], options?: unknown) {
+    quickPicks.push({ items: items as unknown[], options });
+    const choice = quickPickChoices.length > 0 ? quickPickChoices.shift() : 0;
+    return choice === undefined ? undefined : items[choice];
+  },
   /**
    * A box the extension drives itself (the masked box with its eye button).
    * On show() it takes the next typed answer and accepts it, or hides on
@@ -72,6 +84,10 @@ export const window = {
   createInputBox() {
     const box = new MockInputBox();
     return box;
+  },
+  registerUriHandler(handler: { handleUri: (uri: { path: string; query: string }) => unknown }) {
+    uriHandler = handler;
+    return { dispose: () => { uriHandler = undefined; } };
   },
   onDidChangeWindowState(listener: (state: { focused: boolean }) => void) {
     windowStateListeners.push(listener);
@@ -116,6 +132,12 @@ class MockInputBox {
 
 /** Keep the next created input box open; the test gets it from heldInputBox(). */
 export function holdNextInputBox(): void { holdNext = true; }
+let quickPicks: Array<{ items: unknown[]; options?: unknown }> = [];
+let quickPickChoices: Array<number | undefined> = [];
+/** Every quick pick shown, with its items. */
+export const shownQuickPicks = () => quickPicks;
+/** Which item the person picks in the next quick pick, by index (undefined: Escape). The default is the first. */
+export function pickNext(index: number | undefined): void { quickPickChoices.push(index); }
 export const heldInputBox = () => heldBox;
 /** VS Code's window gains or loses focus (the person switches to another app). */
 export function setWindowFocused(focused: boolean): void { windowStateListeners.forEach(listener => listener({ focused })); }
@@ -124,8 +146,43 @@ export class ThemeIcon {
   constructor(readonly id: string) {}
 }
 
+let uriHandler: { handleUri: (uri: { path: string; query: string }) => unknown } | undefined;
+/** The person (or a model) opens a `vscode://jlumbroso.keyhole/…` link; resolves when Keyhole has handled it. */
+export async function openLink(link: string): Promise<void> {
+  const url = new URL(link);
+  // VS Code hands the extension a query it has already percent-decoded.
+  await uriHandler?.handleUri({ path: url.pathname, query: decodeURIComponent(url.search.slice(1)) });
+}
+
+type FileEvent = (uri: { fsPath: string }) => unknown;
+const watchers: Array<{ pattern: string; change: FileEvent[]; create: FileEvent[]; remove: FileEvent[] }> = [];
+/** A file matching a watcher's pattern changed on disk; resolves when every listener has run. */
+export async function fileChanged(fsPath: string, kind: 'change' | 'create' | 'delete' = 'change'): Promise<void> {
+  const name = fsPath.split('/').slice(-2).join('/');
+  for (const watcher of watchers.filter(w => name.endsWith(w.pattern.replace('**/', '')))) {
+    const listeners = kind === 'change' ? watcher.change : kind === 'create' ? watcher.create : watcher.remove;
+    for (const listener of listeners) { await listener({ fsPath }); }
+  }
+}
+
 export const workspace = {
   get workspaceFolders() { return workspaceFolders; },
+  getWorkspaceFolder(uri: { fsPath: string }) {
+    return workspaceFolders?.find(folder => uri.fsPath === folder.uri.fsPath || uri.fsPath.startsWith(`${folder.uri.fsPath}/`));
+  },
+  createFileSystemWatcher(pattern: string) {
+    const watcher = { pattern, change: [] as FileEvent[], create: [] as FileEvent[], remove: [] as FileEvent[] };
+    watchers.push(watcher);
+    const on = (list: FileEvent[]) => (listener: FileEvent) => { list.push(listener); return { dispose() {} }; };
+    return {
+      onDidChange: on(watcher.change), onDidCreate: on(watcher.create), onDidDelete: on(watcher.remove),
+      dispose: () => { watchers.splice(watchers.indexOf(watcher), 1); },
+    };
+  },
+};
+
+export const Disposable = {
+  from: (...items: Array<{ dispose(): unknown }>) => ({ dispose: () => items.forEach(item => item.dispose()) }),
 };
 
 const registered = new Map<string, (...args: unknown[]) => unknown>();
