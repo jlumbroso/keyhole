@@ -9,11 +9,11 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # Requests and drafts: an inbox for secrets, and instructions shown in Porthole
 
 - **Date**: 2026-10-21
-- **Iteration**: 2
-- **Status**: Draft
+- **Iteration**: 3
+- **Status**: Accepted
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5); the crew as each part is built
 
-**TL;DR**: Nothing in Keyhole is now-or-never: a model's request for a secret, or a person's own draft, waits in an inbox as a record of names, reasons and instructions, never a value, and the value is typed only when the person is ready; reviewed instructions for each service open beside it as a Porthole; four questions decide where records live, where instructions come from, how a model's own words are shown, and the build order.
+**TL;DR**: Nothing in Keyhole is now-or-never: a model's request for a secret, or a person's own draft, waits in an inbox as a record of names, reasons and instructions, never a value, and the value is typed only when the person is ready; reviewed instructions for each service open beside it as a Porthole; the project's requests live in the project and a person's drafts privately, instructions are reviewed and released, a model's words are labeled as its own, and the inbox ships as a list before its tab.
 
 ---
 
@@ -139,14 +139,23 @@ Agreed with Option D, with the inbox as a stable form.
 
 ## Decision
 
-Not yet: four questions.
+### Chosen: records of names, never values, in two homes; reviewed instructions; the assistant's words labeled; the inbox as a list before the tab
+
+**Where records live (QST-RECORD-HOME, C; Jérémie, 2026-10-21)**: the project's requests in a file in the project, committed, the project's map of the secrets it needs; the person's own drafts and their progress in VS Code's storage for the workspace, private. His line, kept as the rule: *"For actual keys, etc., they should only be stored where they won't be committed and/or read by models accidentally, so we must still stick to that."* A record never holds a value, in either home, and a test checks it.
+
+**Instructions (QST-INSTRUCTIONS-SOURCE, B)**: a public repository, edited by pull request with review, and *"'shipped' meaning 'actually shipped' or 'versioned URL.'"* Both keep the property that matters, that a person only ever sees a page a reviewer merged and a release named: a page bundled in Keyhole's package, or a URL that names an immutable version (a commit, not a branch or a movable tag), pinned by the Keyhole release that lists it. The versioned URL raises one question of principle the answer leaves to the design: Keyhole's package check forbids network calls. The way to keep it whole is for **Keyhole never to fetch**: a versioned page is opened *in a browser* (VS Code's integrated browser through Porthole, or the person's own), which fetches it, while Keyhole's code only names the URL. If Keyhole ever had to fetch a page itself (to show it in the tab's side panel), the release would carry each page's hash and Keyhole would refuse a mismatch; that would lift the ban for that one call, and is not planned.
+
+**The assistant's words (QST-MODEL-TEXT, A)**: shown under a label saying they are the assistant's, apart from Keyhole's reviewed instructions; any address in them shown as text, not a link, with Keyhole's own reviewed link for that service beside it when Keyhole knows the service.
+
+**The order (QST-ORDER-INBOX, D; Jérémie: "with the inbox as a stable form")**: 0.1.0 is the person's path (after ADR-0003's QST-CHECK-EYE and the naming review's tooltips); then the link and the inbox as a list (a request record, a Quick Pick of requests, each opening the masked box); then the tab (inbox view and a sealed entry component, sequences, mass entry); then the instruction pages in Porthole. Each release stands if work stopped there.
 
 ---
 
 ## Action Items
 
-- [ ] Answer QST-RECORD-HOME, QST-INSTRUCTIONS-SOURCE, QST-MODEL-TEXT, QST-ORDER-INBOX — Owner: Jérémie
-- [ ] Read Porthole's link handler for what Keyhole must ship for an instruction page to open in it (a file in Keyhole's own extension folder, the allowlist, a page with links) — Owner: Surveyor 5.1, once QST-INSTRUCTIONS-SOURCE is answered
+- [x] Answer QST-RECORD-HOME, QST-INSTRUCTIONS-SOURCE, QST-MODEL-TEXT, QST-ORDER-INBOX — Owner: Jérémie (2026-10-21: C, B, A, D)
+- [ ] Read Porthole's link handler for what Keyhole must ship for an instruction page to open in it (a file in Keyhole's own extension folder, the allowlist, a page with links), and whether Porthole or VS Code's integrated browser can open a versioned `https://` URL so that Keyhole itself never fetches — Owner: Surveyor 5.1
+- [ ] Design the request record, its project file and the link that creates it (the second release), in its own ADR — Owner: Glazier
 - [ ] Name the inbox, the records and the deep links' verbs — Owner: the naming review, once the design is answered
 
 ---
@@ -164,6 +173,12 @@ Not yet: four questions.
 - Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
 - Changes: the design read through Simon (the inbox as Hora's subassemblies; a wall through the tab; recipes and facts reviewed differently; the prefix table kept a leaf); QST-ORDER-INBOX gains option D, and my recommendation walks back from A to D
 - Outcome: `Draft`
+
+### Iteration 3 (2026-10-21)
+- Trigger: Jérémie's answers (C, B, A, D)
+- Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
+- Changes: the decision written; "versioned URL" kept within the network ban by having a browser fetch, never Keyhole
+- Outcome: `Draft → Accepted`
 
 ---
 
