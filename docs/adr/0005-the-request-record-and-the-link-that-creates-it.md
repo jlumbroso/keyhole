@@ -123,7 +123,7 @@ Agreed with Option C, and allowing useful `.env.example` would be a nice side-be
 
 - [x] Answer QST-REQUEST-ROUTE, QST-OUTCOME-ROUTE, QST-REQUEST-FILE — Owner: Jérémie (2026-10-22: C; D, an API; C)
 - [ ] Name the link's verb and keys, the list's command, the record and cache files, the MCP server and its tool — Owner: the naming review (briefed 2026-10-22)
-- [ ] Build the link (copied from Porthole's `outsideLinks.ts`, not shared), the record, the list, the `.env.example` offer and the cache, with tests: a link carrying any value-like key is refused; no record field ever holds a value given in a test; the list opens the built masked box with the name given — Owner: Glazier
+- [x] Build the link (copied from Porthole's `outsideLinks.ts`, not shared), the record, the list, the `.env.example` offer and the cache, with tests: a link carrying any value-like key is refused; no record field ever holds a value given in a test; the list opens the built masked box with the name given — Owner: Glazier (2026-10-22, `f52ae25` on the branch `release-2-inbox`, which merges after 0.1.0 ships so that 0.1.0 stays the person's path; names provisional; 65 tests, the three new guards each broken once and caught)
 - [ ] Teach models the link in Keyhole's own skill, as Porthole's skill does — Owner: Glazier, with Sounder for the manual's chapter
 - [ ] Read how each harness registers an MCP server shipped inside a VS Code extension (a stable path across versions), and VS Code's API for offering one to its own chat — Owner: Surveyor 5.1 (briefed 2026-10-22)
 - [ ] Build the MCP server that answers from the cache alone, never `.env`, with a test that it opens no file but the cache — Owner: Glazier, after Surveyor's reading

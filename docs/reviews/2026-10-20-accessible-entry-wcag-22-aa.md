@@ -1,11 +1,12 @@
 # Accessible entry: WCAG 2.2 A/AA assessment plan
 
-- **Author:** Sounder 6 (GPT-6 Astra), 2026-10-20; updated 2026-10-21
+- **Author:** Sounder 6 (GPT-6 Astra), 2026-10-20; updated 2026-10-22
 - **For:** [ADR-0003](../adr/0003-accessible-entry-showing-the-value-conformance-and-a-tab-for-many-secrets.md), QST-A11Y-TARGET
 - **Inspected:** Keyhole `8230de297ce6156f8ba00dc8efde61b1cf60d060`, especially [setSecret.ts](../../src/setSecret.ts); [ADR-0002](../adr/0002-the-persons-path-setting-a-secret-in-env.md), iteration 3; ADR-0003, iteration 1.
 - **Source integration:** Surveyor's review at `021b530` and ADR-0003 iteration 2, read later the same evening; source findings sharpen the checks without changing the assessment target.
 - **2026-10-21 update:** inspected Keyhole `306c449` (implementation `912b821`, including the earlier labels in `685bafd`), ADR-0003 iteration 3 and ADR-0004 through iteration 2. Adds the adopted host-practice comparison and a proposed release scaffold; live documentation checked on this date is not version-pinned host evidence.
-- **Evidence:** vendor documentation, Keyhole source inspection, and Surveyor's version-pinned VS Code source review (linked below). No VoiceOver, keyboard, contrast, zoom, or other live accessibility test was performed. The earlier functional hand check is not an accessibility assessment.
+- **2026-10-22 update:** ADR-0003 iteration 4 records Jérémie's QST-CHECK-EYE answer A; nine supplied screenshots provide partial caption evidence. ADR-0004 adopts order D. Main at `9e9325b` remains the person's command; the later inbox/link work is on `release-2-inbox`, outside 0.1.0.
+- **Evidence:** vendor documentation, source inspection and the human-run check distinguished below. I performed no live accessibility test. The reported eye check does not establish all criteria; contrast, zoom and the remaining flow checks are still unverified.
 
 ## Adopted target and its limits
 
@@ -27,7 +28,7 @@ is informative guidance, not another certification standard. An embedded HTML
 form does not turn the entire desktop extension into an ordinary website.
 Use its software interpretations, including titles and criteria concerning
 sets of documents/programs, and document the platform dependencies. The target
-is decided; release order remains proposed in ADR-0004. Describe completed
+and release order D are decided in ADR-0003/0004. Describe completed
 checks as “assessed against” with their scope and results; before execution,
 say “assessment planned.” This document does not authorize “conforms.”
 
@@ -45,8 +46,8 @@ experience still needs checking on the supported versions.
 | Secret-value box | Built: titled `createInputBox`, masked initially, `ignoreFocusOut: true` | Purpose/destination prompt, paste-friendly flow, submission and cancellation |
 | Questions | Built: git-ignore and existing-value modals; ADR-0002 wording implemented | Recommendation, explanation, button labels and effects |
 | Refusals and results | Built: host warning/information notifications and a nonsecret output log | Accurate state, actionable next step and content that must not expose the value |
-| Reveal control | Built: eye button, re-mask on window focus loss, dispose on hide; no timer. QST-CHECK-EYE unanswered | Meaningful name/state, deliberate activation, preserved input and focus; keyboard reach still unverified |
-| Request inbox, drafts and single/batch entry tab | Chosen direction in ADR-0003; ADR-0004 storage, trust and release choices unanswered; not implemented | Record/value separation, HTML semantics, layout, focus, errors, review, theme integration and lifecycle |
+| Reveal control | Built; QST-CHECK-EYE answered A on macOS/VS Code 1.141.0. Keyboard reach reported; masked-state button caption captured | Full name/state announcement sequence remains open under EYE-NAME-01 below |
+| Request inbox, drafts and single/batch entry tab | Later releases under ADR-0004 D; inbox/link work is on `release-2-inbox`, not in 0.1.0; tab follows | Record/value separation, HTML semantics, layout, focus, errors, review, theme integration and lifecycle |
 | Service instructions in Porthole or fallback panel | Proposed in ADR-0004; not implemented | Reviewed content, meaningful navigation, reading order, return to the request and accessible fallback |
 
 Surveyor's completed [VS Code source review](2026-10-20-accessible-entry-source-reads.md)
@@ -56,16 +57,17 @@ eye-button API at both versions; an input accessible name composed from
 announcements; and destruction of a hidden webview's iframe when
 `retainContextWhenHidden` is false. Its editor-backup findings also support
 excluding editable text documents as secret-entry surfaces. These are source
-findings, not runtime observations. Caret/value preservation, actual speech
-and the complete interruption/recovery flow still need hand checks; do not
-infer what VoiceOver speaks from a password attribute alone.
+findings, not runtime observations. Jérémie's later eye check supplies bounded
+runtime evidence below; it does not establish the complete speech sequence
+or every interruption/recovery path. Do not infer what VoiceOver speaks from
+a password attribute alone.
 
 ### What the VS Code documentation provides
 
 The second matrix column is the requested host comparison, not a claim that
 VS Code passes the criterion. **Documented mechanism**, **author guidance**,
 **version-pinned source finding** and **observed result** are different evidence.
-No hand-check result is recorded here. “No provision/result identified” means
+The dated evidence record below is separate from these host claims. “No provision/result identified” means
 the linked material did not establish one; it does not establish a host defect.
 Current docs may describe features absent from the minimum supported version.
 
@@ -82,7 +84,7 @@ Current docs may describe features absent from the minimum supported version.
 - **Now** means the built command sequence at the 2026-10-21 update, including
   reveal. **Tab** includes the planned inbox/draft/batch webview. Instruction
   pages add a separate document set, addressed in the release scaffold.
-- **Y**: applies to this surface; verification is pending. **C**: applies if
+- **Y**: applies to this surface; consult the dated evidence for partial results. **C**: applies if
   the stated feature/condition exists. **N**: trigger absent in the bounded
   design; recheck that reason before release. None of these means “passed.”
 - **H**: host mechanism. **K**: Keyhole implementation/content. **H+K**:
@@ -140,7 +142,7 @@ Current docs may describe features absent from the minimum supported version.
 
 | Criterion | VS Code practice and evidence limit | Applicability: Now / Tab | Responsible layer · work | Check and expected evidence |
 | --- | --- | --- | --- | --- |
-| [2.1.1 A](https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html) · keyboard completion | [Keyboard navigation][U] exists; [webview guidance][W] requires author support. Eye-button reach untested. | Y / Y | H+K · **R+A** | Complete first set, supersede, correction and cancellation without a pointer. Include paste, the built reveal control, submission, and row editing once the tab exists. |
+| [2.1.1 A](https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html) · keyboard completion | [Keyboard navigation][U] exists; [webview guidance][W] requires author support. Eye-button reach reported in the dated check below. | Y / Y | H+K · **R+A** | Complete first set, supersede, correction and cancellation without a pointer. Include paste, the built reveal control, submission, and row editing once the tab exists. |
 | [2.1.2 A](https://www.w3.org/WAI/WCAG22/Understanding/no-keyboard-trap.html) · keyboard exit | [Host Tab navigation][U] documents a webview exception; test entry and exit. | Y / Y | H+K · **R+A** | Escape/cancel every dialog; leave and return to the tab using documented workbench navigation, including F6/Shift+F6 where supported. No stranded focus or accidental write. |
 | [2.1.4 A](https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts.html) · single-character shortcuts | [Keybinding editor][K] supports removal/remapping; [when clauses][C] scope extension bindings. | N: none added / C | K shortcuts; H inherited bindings · **R+A** | Check no typing character triggers save/reveal while entering a value. If a global character shortcut is added, provide the criterion's disable/remap/focus restriction. |
 | [2.2.1 A](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable.html) · time limits | [Notification access][U] supports reading; retention and timing remain unverified. | C: host notices; no Keyhole entry timer / C | H notice lifetime; K timeouts/lifecycle · **R+A** | Pause entry; visit provider/password manager; return. Check any disappearing notice has a recoverable equivalent and any introduced deadline has a permitted adjustment/exception. Focus-loss survival alone is insufficient. |
@@ -178,8 +180,42 @@ Current docs may describe features absent from the minimum supported version.
 | [3.3.4 AA](https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-legal-financial-data.html) · consequential data changes | [Modal notifications][N] support choices; Keyhole owns review, correction and reversal semantics. | C: especially superseding existing settings / C | K safeguards; H dialog · **R+A** | Assess each operation; where triggered, verify reversibility, checking with correction, or review/confirmation/correction before submission. An old line remaining in a file is not proof of accessible undo. |
 | [3.3.7 A](https://www.w3.org/WAI/WCAG22/Understanding/redundant-entry.html) · repeated information | [Input value API][A] does not supply workflow-level retry retention; Keyhole owns it. | C: correction/retry within one activity / Y for batch correction | K flow/lifetime · **A** | Correct one input without unnecessarily repeating valid information. Check current restart-after-value-refusal behavior. Document any actual security/invalidity exception; no requirement to persist secrets across sessions. |
 | [3.3.8 AA](https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-minimum.html) · authentication assistance | [Input API][A] documents masking, not an accessible authentication process. | N for credential storage alone / C if sign-in added | K authentication design; H input · **Inventory/A** | Current flow stores a credential rather than authenticating its operator. Preserve paste anyway. If authentication is added, assess cognitive tasks and permitted assistance across the entire sign-in process. |
-| [4.1.2 A](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html) · exposed control semantics | [Screen-reader mode][U], [webview class][V] and [source findings][S] provide mechanisms; inspect actual controls. | Y / Y | H control API; K supplied labels and HTML · **R+A** | Inspect name/role/state and test with VoiceOver. For the built reveal control, expose its action/state, preserve entry/focus, and do not announce the entire value without the person's deliberate request. |
+| [4.1.2 A](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html) · exposed control semantics | [Screen-reader mode][U], [webview class][V] and [source findings][S] provide mechanisms; inspect actual controls. | Y / Y | H control API; K supplied labels and HTML · **R+A** | Inspect name/role/state and test with VoiceOver. For the built reveal control, preserve entry/focus and avoid unsolicited value announcement. **Open: EYE-NAME-01** in the [dated evidence](#recorded-evidence-22-october-eye-check); masked-state name/role captured, revealed-state name and transition announcements unresolved. |
 | [4.1.3 AA](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html) · announced outcomes | [Accessible View][U] supports notifications; recovery is distinct from automatic announcement. [Notices][N] still need testing. | Y / Y | H notifications; K result text/HTML status · **R+A** | Success, refusal, verification mismatch and batch progress are conveyed without hunting for a new visual message. A focus-taking modal is tested as a dialog; a log alone does not establish announcement. |
+
+## Recorded evidence: 22 October eye check
+
+Jérémie answered **A — all as described, and the keyboard reached the eye
+button** in [QST-CHECK-EYE](../adr/0003-accessible-entry-showing-the-value-conformance-and-a-tab-for-many-secrets.md#qst-check-eye-can-a-person-see-what-they-typed-by-mouse-and-by-keyboard-and-what-does-voiceover-say).
+That is a human-reported result for the posed check, including the flip and
+window-blur re-mask, not an independently rerun test by this reviewer. The
+record identifies macOS, VS Code 1.141.0 and the locally rebuilt Keyhole 0.0.1;
+an exact tested commit and macOS/VoiceOver versions are not recorded here.
+
+| Captured evidence | What it establishes | What it does not establish |
+| --- | --- | --- |
+| [2:47:40 PM](<../adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.47.40 PM.png>): the name input's caption includes the Keyhole title, variable-name instruction and “edit text, application” | Positive caption evidence for the name field's identity and guidance | The value input's full initial announcement or all input/error associations |
+| [2:48:59 PM](<../adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.48.59 PM.png>): masked value, outlined eye control, caption “Show the value, button, group” | Positive caption evidence for the masked-state action name and button role | The revealed-state action name or the full speech sequence across transitions |
+| [2:48:50 PM](<../adr/attachments/screenshots/2026-10-22-voice-over-test/Screenshot 2026-10-22 at 2.48.50 PM.png>): revealed dummy value, outlined crossed-eye control, caption gives the toolbar interaction hint | The toolbar hint was captured in that state | Whether “Hide the value” was announced before or after the hint; a missing caption is not proof of a missing accessible name |
+
+**Correction to the incoming brief and ADR-0003's summary:** the nine images
+do include “Show the value”; the 2:48:59 image above supplies it. No image in
+this set captures “Hide the value.” Keep the positive evidence and narrow
+the unresolved question rather than recording either a blanket pass or a
+button-name failure.
+
+| Open evidence row | Criterion and status | Next observation needed | Owner/timing |
+| --- | --- | --- | --- |
+| **EYE-NAME-01 — reveal control through both states** | **4.1.2 A: open, partial evidence.** Masked-state name/role captured; revealed-state name and transition updates unresolved | Capture actual name/role/state and complete announcements before/after Show, before/after Hide, and after window-blur re-mask; distinguish the toolbar hint from the button announcement. Also capture the value input's initial name/description. | Glazier will include this with the next release's checks; no new check is requested now. |
+
+For that check, record the installed build, host/OS/VoiceOver versions and
+verbosity/settings, plus the exact keyboard/VoiceOver interaction sequence.
+Use only a dummy value. Allow the complete utterance and any instructed
+toolbar interaction to finish; record both action names and the control's
+role as focus and masking change. If speech remains ambiguous, inspect the
+accessible name/role/state with the same harmless input. Record an observed
+failure separately from an unavailable or incomplete observation. The nine
+still images are not a recording of the full utterance sequence.
 
 ## Interpretations that affect the design
 
@@ -233,7 +269,8 @@ preferences into asserted WCAG failures.
 
 ## Checks to run later, with harmless values only
 
-These are proposed checks, not steps executed during this research. Use a
+These are reusable protocols, not a record that every step has run. The eye
+check above is the only newly reported live check in this update. Use a
 throwaway project and invented values that resemble no actual credential.
 Record extension commit, VS Code build (minimum 1.134.0 and the 1.141.0
 reference build where available), macOS and VoiceOver version, language, theme, zoom,
@@ -271,8 +308,9 @@ after changes to controls, wording, focus, layout or supported host versions.
    [Surveyor's section 2](2026-10-20-accessible-entry-source-reads.md#2-what-a-screen-reader-hears-in-a-password-box)
    traces the title into the input's name. The shared title alone does not
    prove that the name step, value step and destination can be distinguished:
-   record the actual name/description and speech in QST-CHECK-EYE. The source
-   change is implemented; its accessibility outcome is not yet observed.
+   QST-CHECK-EYE now records A, and the name-input caption is evidence above.
+   Preserve that result while leaving the value input's full initial
+   announcement and the reveal transitions open under EYE-NAME-01.
 2. **Design correction and review paths** (3.3.1/3/4/7). Identify the bad
    field and safe correction without reproducing its value; preserve valid
    work during the same activity where appropriate. Decide batch partial-write
@@ -281,7 +319,8 @@ after changes to controls, wording, focus, layout or supported host versions.
 3. **Finish the keyboard and focus contract** (2.1.1/2, 2.4.3/7/11,
    2.5.2/3/8, 4.1.2). The built eye button and future row actions need names,
    state, keyboard activation, appropriate targets and focus recovery.
-   QST-CHECK-EYE starts the palette check; a working mouse click or a mocked
+   QST-CHECK-EYE reports keyboard reach in the tested environment. Other
+   versions and new row actions still need their own checks; a mocked
    button event does not establish a keyboard route.
 4. **Make outcomes perceivable and recoverable** (4.1.3; 2.2.1 if timing
    applies). State whether nothing was written, saving succeeded, or a write
@@ -301,21 +340,15 @@ after changes to controls, wording, focus, layout or supported host versions.
 These are Keyhole-owned acceptance conditions and identified checks, not a
 list of confirmed failures. ADR-0003 now chooses the reveal control, both
 assessment columns and the batch tab/inbox direction. The following scaffold
-applies those choices without answering ADR-0004's remaining questions.
+now follows ADR-0004's accepted release order D.
 
-## Proposed release scaffold
+## Release scaffold: adopted order D
 
-This follows **option A in ADR-0004's QST-ORDER-INBOX**, which is still
-unanswered. It is an assessment/build scaffold, not a new release decision.
-That option couples the link with an inbox and tab so a request can wait;
-the link is an implementation checkpoint inside that release, not a separate
-transient-prompt release. Only **0.1.0** is assigned a version here.
-
-**Update while this assessment was being written:** ADR-0004 iteration 2
-adds **D**, now Glazier's recommendation: command → link/inbox in a native
-Quick Pick → tab → instructions. The human answer remains open. The option-A
-scaffold requested by the brief is retained below; the D split is explicit
-after the tab stage, so neither recommendation silently becomes a decision.
+Jérémie selected **D in ADR-0004's QST-ORDER-INBOX**: command → link/inbox in
+a native Quick Pick → tab → instructions. The 2026-10-21 scaffold compared
+A and D while the answer was open; D now determines the release boundaries
+below. **0.1.0 is the person's command only.** Inbox/link development on
+`release-2-inbox` does not enter that release's scope.
 
 Each release inherits the preceding release's applicable criteria. A new
 surface activates its checks before it ships. “Deferred” below means the
@@ -326,13 +359,10 @@ limitation remains a dependency with evidence, not a WCAG exemption.
 
 ### 0.1.0: the person's command, including reveal
 
-Start with [QST-CHECK-EYE](../adr/0003-accessible-entry-showing-the-value-conformance-and-a-tab-for-many-secrets.md#qst-check-eye-can-a-person-see-what-they-typed-by-mouse-and-by-keyboard-and-what-does-voiceover-say).
-It is posed and unanswered. Record both inputs' actual names/descriptions,
-keyboard reach and activation of the eye, value/caret preservation, window
-blur and return behavior. If keyboard reach fails, the reveal function needs
-a usable keyboard route in this release; the future tab does not discharge
-the current command's 2.1.1 assessment. Determine the host mechanism before
-choosing a workaround.
+[QST-CHECK-EYE](../adr/0003-accessible-entry-showing-the-value-conformance-and-a-tab-for-many-secrets.md#qst-check-eye-can-a-person-see-what-they-typed-by-mouse-and-by-keyboard-and-what-does-voiceover-say)
+is answered A. Preserve its reported keyboard/flip/re-mask result and the
+captions above. EYE-NAME-01 remains open for the next release's checks;
+that scheduling does not mark 4.1.2 fully verified for 0.1.0.
 
 The five-minute eye check is not the whole release assessment. Use the
 protocols above for first set, same-basename workspace choices, invalid name,
@@ -352,10 +382,10 @@ same criteria still apply to current controls where their triggers exist.
 Record macOS/VoiceOver and VS Code versions; other platforms or versions
 without results remain untested rather than inheriting this result.
 
-### Next release: link, inbox/drafts and single/batch tab
+### Work across the link/inbox and tab releases
 
-Work in three checkpoints, with one complete request-to-outcome assessment
-before publication:
+The following checkpoints are split across the next two releases as specified
+below. Assess the complete request-to-outcome flow offered by each release:
 
 1. **Request arrival and reopening.** A link identifies a nonsecret record,
    waits without forcing entry, and reopens the intended draft. Test arrival
@@ -379,14 +409,14 @@ on these new surfaces. Saving names/reasons/instructions in a draft does not
 prove that partially entered secret values can be corrected without needless
 repetition. Define that boundary and test it with harmless values. Distinguish
 assistant-provided text from reviewed directions through headings and words,
-not only color; the actual trust/storage choices remain ADR-0004 questions.
+not only color, following ADR-0004's accepted trust/storage choices.
 
 **May wait:** service-instruction pages and Porthole integration, because they
 are not yet shipped. Media, complex gestures, motion, dragging and sign-in
 remain conditional on their actual introduction. Deferred surfaces do not
 justify deferring the tab's own labels, keyboard operation or visual checks.
 
-### If option D is selected: split the native inbox from the tab
+### Release boundaries: native inbox first, tab afterward
 
 Keep 0.1.0's assessment unchanged. The next release takes checkpoint 1 above
 plus the native request list: check distinct request names/destinations,
@@ -402,7 +432,7 @@ batch/sequence controls and their recovery checks. Those can wait while the
 tab is absent; native-list failures cannot. Instructions follow afterward.
 This split preserves a waiting request without requiring the webview first.
 
-### Following release: service instructions in Porthole and a fallback
+### After the tab: service instructions in Porthole and a fallback
 
 Assess the instruction documents and the whole transition: open the correct
 guide, follow it to a provider with a dummy example, return to the intended
@@ -435,8 +465,8 @@ these planning categories into invented estimates.
 
 | Work to record | Host contribution | Keyhole increment to measure |
 | --- | --- | --- |
-| Titles, prompts, modal reasons, outcomes | Native controls and presentation APIs | Writing/configuration time; integration-check time. Labels and reveal are implemented, not yet live-verified. |
-| Eye-button keyboard/focus behavior | Native title-bar button/event machinery | Investigation and any workaround time, separately from the eye's implementation; QST-CHECK-EYE result pending. |
+| Titles, prompts, modal reasons, outcomes | Native controls and presentation APIs | Writing/configuration time; integration-check time. QST-CHECK-EYE and captions supply bounded evidence above; full-flow checks remain. |
+| Eye-button keyboard/focus behavior | Native title-bar button/event machinery | QST-CHECK-EYE reports keyboard reach; EYE-NAME-01 records the remaining announcement check. Record check time separately from implementation. |
 | Native contrast, zoom, spacing and target geometry | Host rendering, theme and zoom mechanisms | Measurement time; host issue/reproduction time if a failure is actually observed. |
 | Inbox/tab form and batch recovery | Webview container, theme/font hooks | HTML/interaction implementation, correction/lifecycle design and regression-check time. |
 | Guides and Porthole/fallback transitions | Two host surfaces and their navigation | Content/markup work and cross-surface checks; provider obstacles tracked separately. |
@@ -451,5 +481,6 @@ because its documentation lacks a criterion-specific claim.
 
 The resulting release note can say: “Assessed against the listed WCAG 2.2
 A/AA criteria on [versions/platform], using [methods]; [results and untested
-or unmet rows].” Until those checks run, the accurate state is **assessment
-planned; documentation/source review complete**.
+or unmet rows].” The current state is **documentation/source review complete;
+the human eye check reported with partial caption evidence; remaining
+assessment checks planned**.
