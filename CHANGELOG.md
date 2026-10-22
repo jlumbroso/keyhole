@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Founded: the design and its decisions (ADR-0001); the build, the tests and the gate; the `Secret`
   type, which prints as `[redacted]` by every route a string is made and refuses to serialize, so the
-  first law (a secret never enters the conversation) is a checked fact. Nothing is installable yet.
+  first law (a secret never enters the conversation) is a checked fact.
 - The person's path (ADR-0002): **Keyhole: Set a Secret in .env…** asks for a variable's name, checks
   with git that `.env` is ignored and not tracked (and offers to add it to `.gitignore`), takes the
   value in a masked box and appends it to `.env` under a comment line. Setting a value that is already
