@@ -3,9 +3,10 @@
 An API key lets a program use an account or service. Your assistant can help
 you obtain one and explain where it belongs without seeing the value.
 
-Keyhole is being built to put that value into a project file through a masked
-input box. After it is saved, the assistant may still be able to read the file
-with its other tools. This chapter helps you reduce those accidental reads.
+Keyhole's **Set a Secret in .env…** command in VS Code's Command Palette
+writes that value to your project folder's `.env` through a masked input box.
+After it is saved, the assistant may still be able to read the file with its
+other tools. This chapter helps you reduce those accidental reads.
 
 **Choose the application running your assistant**, sometimes called its
 *harness*: [Claude Code](#claude-code), [Codex](#codex),
@@ -32,8 +33,8 @@ Three different controls matter:
 | Command environment settings | Control values handed directly to programs the assistant runs, even without opening a file. |
 
 Git also keeps tracking a file that was already added, despite a later ignore
-rule. That is why Keyhole's design checks both whether a destination is
-ignored and whether it is already tracked. Neither check removes a value
+rule. For a destination in a Git repository, Keyhole checks both whether
+the file is ignored and whether it is already tracked. Neither check removes a value
 from existing history. [Git's ignore documentation](https://git-scm.com/docs/gitignore)
 
 For the examples below:
@@ -78,8 +79,8 @@ change. In this project settings file, `/` means that starting folder, not
 your disk's root. Start at the project root; files above that boundary need
 their own rules.
 
-The last rule protects another destination in Keyhole's design: Claude's
-local settings file can itself contain secrets. Do not copy it into chat.
+The last rule protects Claude's local settings file, which can itself contain
+secrets. Do not copy it into chat. Keyhole 0.1.0 writes to `.env` only.
 
 Open `/permissions` and check that the deny rules appear with the expected
 settings source. Claude Code reloads permission edits; if the rules do not
@@ -101,7 +102,7 @@ its default read access is broad.
 
 A variable placed under `env` in `.claude/settings.local.json` is deliberately
 made available to commands. Blocking tool reads of that file does not remove
-those inherited values. Choose that destination only when the commands need
+those inherited values. Put a variable there only when Claude's commands need
 the credential. [Claude Code environment settings](https://code.claude.com/docs/en/env-vars#set-variables-in-settings-files)
 
 ## Codex
