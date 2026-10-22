@@ -1,0 +1,68 @@
+# Pushing a tag like v0.1.0 builds the extension and creates a GitHub Release whose notes are
+# that version's CHANGELOG.md section, with the .vsix attached. It does NOT publish to the
+# Marketplace or Open VSX directly: that is `just release X.Y.Z`, run from a machine that holds the
+# Marketplace token (it is deliberately not stored as a repository secret). A tag whose version does
+# not match package.json, or has no CHANGELOG section, fails here before anything is created.
+# After the Release exists it asks publish-open-vsx.yml to run, which publishes this same .vsix to Open VSX
+# with a short-lived OIDC token (no approval; its header says what guards it instead; ported from porthole's ADR-0012). The
+# Marketplace is published by `just release`, which also waits for and verifies both.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  actions: write   # to ask publish-open-vsx.yml to run
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: The tag, package.json and CHANGELOG.md agree
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          package=$(node -p "require('./package.json').version")
+          if [ "$version" != "$package" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match package.json version ${package}"
+            exit 1
+          fi
+          node scripts/release-notes.mjs "$version" > release-notes.md
+      - run: npm ci
+      - name: Credential-shape scan
+        run: node scripts/scan-secrets.mjs
+      - name: Typecheck, tests, bundle, package contents
+        run: npm run check
+      - name: Package
+        run: |
+          mkdir -p releases   # vsce does not create its --out folder, and a clean checkout has none
+          npm run package
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          {
+            echo
+            echo "---"
+            echo
+            echo "**Install**: search for \"Keyhole\" in VS Code's Extensions view, or run \`code --install-extension jlumbroso.keyhole\`. The attached \`.vsix\` was built by CI from this tag, and the registries were published from the same commit; install it with \`code --install-extension keyhole-${version}.vsix\`."
+            echo
+            echo "Full history: [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/CHANGELOG.md)"
+          } >> release-notes.md
+          gh release create "$GITHUB_REF_NAME" "releases/keyhole-${version}.vsix" \
+            --title "keyhole ${version}" \
+            --notes-file release-notes.md \
+            --verify-tag
+      - name: Ask for the Open VSX publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run publish-open-vsx.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME" -f tag="$GITHUB_REF_NAME"

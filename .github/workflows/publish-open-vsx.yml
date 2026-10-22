@@ -1,0 +1,110 @@
+# Publishes the .vsix attached to a GitHub Release to Open VSX, with no stored token: the job
+# proves its identity to the registry with a short-lived OIDC token ("Trusted Publishing",
+# https://github.com/eclipse-openvsx/openvsx/wiki/Trusted-Publishing).
+#
+# Ported from porthole (jlumbroso/porthole, ADR-0012, option D), names changed. There is no approval click.
+# What stands between a run and the registry instead: the `open-vsx` environment accepts only `v*` tags; only
+# the repository owner can create `v*` tags, and nobody can move or delete one (a tag ruleset); and this
+# workflow refuses a tag whose commit is not on main or has no green `tests` run. A version that is already
+# live counts as DONE, so a second run for the same tag does nothing. These guards are SETTINGS on the GitHub
+# repository and on open-vsx.org; the file alone does not make them true (see the 0.1.0 completion brief for
+# what is applied and what is left for Jérémie).
+#
+# The registration on open-vsx.org (Settings, Trusted Publishers) names THIS FILE, so renaming
+# it breaks publishing until the registration is redone. Registered values:
+#   owner jlumbroso, repository keyhole, workflow publish-open-vsx.yml, environment open-vsx.
+#
+# Started by release.yml after it creates the Release, or by hand:
+#   gh workflow run publish-open-vsx.yml --ref vX.Y.Z -f tag=vX.Y.Z
+# It publishes the file the Release carries, so what is attached is what is live. The VS Code
+# Marketplace is not covered: it has no OIDC path yet (porthole's ADR-0012 has the research), so `just release` does it.
+name: publish-open-vsx
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag whose .vsix to publish, for example v0.1.0"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: open-vsx
+    permissions:
+      contents: read
+      id-token: write   # lets the job request the OIDC token the registry verifies
+    steps:
+      - name: The tag looks like a version tag
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::'$TAG' is not a tag of the form vX.Y.Z"
+            exit 1
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0   # so the tag's commit can be compared with main
+      - name: Refuse a commit that is not on main
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          git fetch --quiet origin main
+          if ! git merge-base --is-ancestor "$(git rev-parse HEAD)" origin/main; then
+            echo "::error::$TAG points at a commit that is not on main; refusing to publish it"
+            exit 1
+          fi
+      - name: Wait for a green tests run on this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          sha=$(git rev-parse HEAD)
+          for attempt in $(seq 1 30); do
+            runs=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow tests --commit "$sha" --json status,conclusion)
+            if [ "$(echo "$runs" | jq '[.[] | select(.conclusion == "success")] | length')" -gt 0 ]; then echo "tests are green for $sha"; exit 0; fi
+            if [ "$(echo "$runs" | jq '[.[] | select(.status != "completed")] | length')" -eq 0 ] && [ "$(echo "$runs" | jq 'length')" -gt 0 ]; then
+              echo "::error::the tests run for $sha did not succeed; refusing to publish"; exit 1
+            fi
+            echo "tests not finished for $sha (attempt $attempt of 30); waiting 20 s"; sleep 20
+          done
+          echo "::error::no green tests run for $sha after 10 minutes; refusing to publish"; exit 1
+      - name: Stop quietly when this version is already live
+        id: live
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          live=$(curl -s "https://open-vsx.org/api/jlumbroso/keyhole" | jq -r '.version // ""')
+          if [ "$live" = "${TAG#v}" ]; then echo "Open VSX already shows $live: nothing to do"; echo "skip=true" >> "$GITHUB_OUTPUT"; else echo "skip=false" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.live.outputs.skip != 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.live.outputs.skip != 'true'
+        run: npm ci   # installs the pinned ovsx (devDependency) so no `npx` fetch happens at publish time
+      - name: Download the .vsix the Release carries
+        if: steps.live.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.vsix' --dir releases
+      - name: Publish to Open VSX with an OIDC token
+        if: steps.live.outputs.skip != 'true'
+        run: |
+          set -uo pipefail
+          file=$(ls releases/*.vsix)
+          echo "Publishing $file"
+          node_modules/.bin/ovsx publish "$file" --trusted-publishing 2>&1 | tee publish.log
+          status=${PIPESTATUS[0]}
+          # "already published" means another run got there first: the destination is reached, so that is done
+          if [ "$status" -ne 0 ] && grep -qi "already published" publish.log; then echo "already published: done"; exit 0; fi
+          exit "$status"

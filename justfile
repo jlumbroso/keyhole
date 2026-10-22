@@ -522,6 +522,34 @@ gate:
     npm run check
     echo "✅ gate green"
 
+# `release` asserts a destination: "X.Y.Z is released everywhere". Every step reads its own result from the world
+# (the git remote, GitHub, both registries), skips what is done and resumes at the first step that is not, so it is
+# safe to run again after any failure. Ported from porthole (jlumbroso/porthole, ADR-0012, option D; that ADR has
+# the table of steps). Instant, public, and the extension ID is permanent. No new user-facing name ships without
+# the naming review first. The typed-version prompt is a guard against a slip, answered by whoever runs it, for
+# example `echo 0.1.0 | just release 0.1.0`. --ovsx-fallback publishes to Open VSX with OVSX_PAT if the workflow
+# failed; the first release of an extension NEEDS a token (trusted publishing registers an extension that already
+# exists), so keyhole's 0.1.0 uses it, and the flag goes once a release has used the workflow.
+[group('project')]
+[doc("Release X.Y.Z everywhere (tag, GitHub Release, Open VSX, Marketplace). Idempotent; type the version to confirm")]
+release version:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "▸ gate"
+    just gate
+    node scripts/release.mjs "{{version}}" --dry-run
+    echo
+    echo "This releases keyhole {{version}} to BOTH registries, live at once. The ID is permanent; there is no undo."
+    read -r -p "Type the version ({{version}}) to go ahead: " ANSWER
+    if [[ "${ANSWER}" != "{{version}}" ]]; then echo "Not confirmed. Nothing was released."; exit 1; fi
+    node scripts/release.mjs "{{version}}" --ovsx-fallback
+
+# Read-only: what each step of a release finds for this version and what `release` would do. Changes nothing.
+[group('project')]
+[doc("What a release of X.Y.Z has done and would do. Read-only")]
+release-status version:
+    node scripts/release.mjs "{{version}}" --dry-run
+
 # Is this instance fully instantiated? Greps for remaining ⟦SIGIL⟧ placeholders
 # (the closed registry: docs/adr/templates/placeholders.yaml) and warns on
 # adopted-but-unlocked kintsugi state. Exits nonzero while anything remains —
