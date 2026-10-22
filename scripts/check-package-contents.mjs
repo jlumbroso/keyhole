@@ -12,9 +12,10 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // Grows file by file, each addition named in the commit that ships it (copied from porthole, 2026-10-20).
-const ALLOWED = new Set(['package.json', 'README.md', 'CHANGELOG.md', 'LICENSE', 'LICENSE.txt', 'NOTICE', 'dist/extension.js']);
+// dist/mcp-server.js: Keyhole's API for models, a second bundle (ADR-0005).
+const ALLOWED = new Set(['package.json', 'README.md', 'CHANGELOG.md', 'LICENSE', 'LICENSE.txt', 'NOTICE', 'dist/extension.js', 'dist/mcp-server.js']);
 // Apache-2.0 (Jérémie, 2026-10-20): the package must carry the license and its NOTICE.
-const REQUIRED = ['package.json', 'dist/extension.js', 'LICENSE', 'NOTICE'];
+const REQUIRED = ['package.json', 'dist/extension.js', 'dist/mcp-server.js', 'LICENSE', 'NOTICE'];
 
 const vsce = resolve(root, 'node_modules', '.bin', 'vsce');
 const listed = execFileSync(vsce, ['ls'], { cwd: root, encoding: 'utf8' })
@@ -43,6 +44,21 @@ const required = [...bundle.matchAll(/require\(["'](?:node:)?([a-z_0-9/]+)["']\)
 const networked = required.filter(name => NETWORK_MODULES.includes(name));
 if (networked.length) { problems.push(`dist/extension.js requires network or process modules: ${networked.join(', ')}`); }
 if (/\bfetch\s*\(|XMLHttpRequest|WebSocket/.test(bundle)) { problems.push('dist/extension.js calls fetch, XMLHttpRequest or WebSocket'); }
+
+// The MCP server (ADR-0005), the process a model's harness starts: the same
+// network rule, and a wall of its own. It may hold no code from the side that
+// reads `.env` or holds a value (the bundler leaves a `//#region src/<file>`
+// marker for every module it inlines; src/test/mcpServer.test.ts checks the
+// same wall on the sources).
+const server = readFileSync(resolve(root, 'dist', 'mcp-server.js'), 'utf8');
+const serverRequired = [...server.matchAll(/require\(["'](?:node:)?([a-z_0-9/]+)["']\)/g)].map(match => match[1]);
+const serverNetworked = serverRequired.filter(name => NETWORK_MODULES.includes(name));
+if (serverNetworked.length) { problems.push(`dist/mcp-server.js requires network or process modules: ${serverNetworked.join(', ')}`); }
+if (/\bfetch\s*\(|XMLHttpRequest|WebSocket/.test(server)) { problems.push('dist/mcp-server.js calls fetch, XMLHttpRequest or WebSocket'); }
+if (/require\(["']vscode["']\)/.test(server)) { problems.push('dist/mcp-server.js requires vscode: it runs outside VS Code'); }
+const valueSide = [...server.matchAll(/\/\/#region (src\/(?:secret|setSecret|outcomes|inbox|targets\/[^\s]+)\.ts)/g)].map(match => match[1]);
+if (valueSide.length) { problems.push(`dist/mcp-server.js contains code that reads .env or holds a value: ${valueSide.join(', ')}`); }
+if (!server.includes('//#region src/names.ts')) { problems.push('dist/mcp-server.js has no //#region markers: the wall above cannot be checked; adjust the check to the bundler'); }
 
 if (problems.length) {
   console.error(`✗ package check failed:\n  - ${problems.join('\n  - ')}`);

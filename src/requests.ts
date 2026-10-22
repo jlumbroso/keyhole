@@ -9,8 +9,9 @@ import { checkName } from './names';
 // at the record, whichever route wrote it. The file's name is provisional
 // until the naming review rules.
 
-export const KEYHOLE_FOLDER = '.keyhole';
-export const REQUESTS_FILE = `${KEYHOLE_FOLDER}/requests.json`;
+import { KEYHOLE_FOLDER, REQUESTS_FILE } from './paths';
+
+export { KEYHOLE_FOLDER, REQUESTS_FILE };
 const FORMAT = 1;
 /** The longest the assistant's words may be, per field: a sentence or two, not a page. */
 export const TEXT_LIMIT = 500;

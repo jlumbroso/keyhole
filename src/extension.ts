@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { connectAssistant, installServerCopy, offerToVsCodeChat } from './assistants';
 import { gitThroughVsCode } from './gitApi';
 import { describeError, initLog, log } from './log';
 import { handleRequestLink, showRequests, watchInbox } from './inbox';
@@ -42,6 +43,14 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
     watchInbox(gitThroughVsCode),
   );
+  // Keyhole's API for models (ADR-0005): a copy at a path that survives updates, and VS Code's own chat.
+  const server = installServerCopy(context).catch(err => { log(`the API for models could not be copied: ${describeError(err)}`); return undefined; });
+  register(context, 'keyhole.connectAssistant', async () => {
+    const path = await server;
+    if (path) { await connectAssistant(path); }
+  });
+  const chat = offerToVsCodeChat(context);
+  if (chat) { context.subscriptions.push(chat); }
 }
 
 export function deactivate(): void {}

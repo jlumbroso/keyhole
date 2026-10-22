@@ -27,6 +27,8 @@ export function resetVscodeMock(): void {
   quickPickChoices = [];
   uriHandler = undefined;
   watchers.length = 0;
+  clipboardText = '';
+  mcpProviders = [];
 }
 
 /** Every line the extension wrote to its output channel, in order. */
@@ -48,7 +50,27 @@ export function setWorkspaceFolders(paths: string[]): void {
 }
 
 export const version = '1.141.0-mock';
-export const env = { appName: 'Visual Studio Code (mock)' };
+let clipboardText = '';
+export const env = {
+  appName: 'Visual Studio Code (mock)',
+  clipboard: { writeText: async (text: string) => { clipboardText = text; }, readText: async () => clipboardText },
+};
+/** What Keyhole last put on the clipboard. */
+export const clipboard = () => clipboardText;
+
+let mcpProviders: Array<{ id: string; provider: { provideMcpServerDefinitions: () => unknown } }> = [];
+export const lm = {
+  registerMcpServerDefinitionProvider(id: string, provider: { provideMcpServerDefinitions: () => unknown }) {
+    mcpProviders.push({ id, provider });
+    return { dispose: () => { mcpProviders = mcpProviders.filter(entry => entry.provider !== provider); } };
+  },
+};
+/** The MCP server definition providers an extension registered with VS Code's chat. */
+export const registeredMcpProviders = () => mcpProviders;
+export class McpStdioServerDefinition {
+  cwd?: unknown;
+  constructor(readonly label: string, readonly command: string, readonly args: string[] = [], readonly env: { [key: string]: string | null } = {}, readonly version?: string) {}
+}
 
 function show(kind: 'info' | 'warning', text: string, rest: unknown[]): Promise<Answer> {
   const options = rest[0] as { modal?: boolean; detail?: string } | undefined;

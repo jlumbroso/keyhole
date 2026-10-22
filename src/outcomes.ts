@@ -1,7 +1,8 @@
 import { appendFile, mkdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { GitFacts } from './git';
-import { KEYHOLE_FOLDER, writeJsonAtomic } from './requests';
+import { KEYHOLE_FOLDER, OUTCOMES_FILE } from './paths';
+import { writeJsonAtomic } from './requests';
 import { probe } from './targets/dotenv';
 
 // The cache behind Keyhole's API for models (ADR-0005, QST-OUTCOME-ROUTE, D):
@@ -15,7 +16,7 @@ import { probe } from './targets/dotenv';
 // (a `.gitignore` inside Keyhole's own folder), and says so in the log when
 // it cannot. The file's name is provisional until the naming review rules.
 
-export const OUTCOMES_FILE = `${KEYHOLE_FOLDER}/outcomes.local.json`;
+export { OUTCOMES_FILE };
 const FORMAT = 1;
 const IGNORE_LINE = '*.local.json';
 

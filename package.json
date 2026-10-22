@@ -46,11 +46,22 @@
         "command": "keyhole.showRequests",
         "title": "Show Requests",
         "category": "Keyhole"
+      },
+      {
+        "command": "keyhole.connectAssistant",
+        "title": "Connect an Assistant…",
+        "category": "Keyhole"
+      }
+    ],
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "keyhole.mcp",
+        "label": "Keyhole"
       }
     ]
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && vite build -c vite.mcp.config.mts",
     "build:watch": "vite build --watch",
     "test": "vitest run",
     "test:watch": "vitest",
