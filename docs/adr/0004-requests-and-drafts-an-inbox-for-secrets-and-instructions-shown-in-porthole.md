@@ -62,7 +62,7 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 ## Questions
 
 ### QST-RECORD-HOME: Where do requests and drafts live?
-- Status: unanswered
+- Status: answered
 - Why asking: A request or draft is a record of names, reasons and instructions, never a value (this ADR's Explicitation). Where it is kept decides who can see it: only this person on this machine, or everyone who clones the project, and whether a model reads it by a file or only through Keyhole's link. A project's requests are, in effect, a richer `.env.example`: the variables it needs, why, and where to get each.
 - Need: pick a letter (or override — any shape answers)
 
@@ -75,12 +75,12 @@ Options:
 **C — both, split by owner.** *Rationale*: what a project needs is the project's knowledge and helps the next newcomer (B's strength), while which of them this person has set, and the drafts they started for themselves, are theirs (A's strength); one store for both would either publish personal progress or hide the project's needs. *Confidence*: 0.55 — because a committed file is a new kind of thing for Keyhole to write, and some projects will not want it. *If wrong*: A, if Jérémie wants nothing of Keyhole's in the project; B, if personal progress is better shown than hidden.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Agreed with Option C. (For actual keys, etc., they should only be stored where they won't be committed and/or read by models accidentally, so we must still stick to that.)
 
 ---
 
 ### QST-INSTRUCTIONS-SOURCE: Where do the instructions for each service come from, and how is an edit trusted?
-- Status: unanswered
+- Status: answered
 - Why asking: Jérémie proposed instructions "in a public repo and publically editable", opened as Portholes. They tell a newcomer where to go and what to copy, so a bad edit is a phishing page shown in Keyhole's trusted frame. Keyhole's package check also forbids network calls today (ADR-0001), so fetching instructions live would be a change of principle.
 - Need: pick a letter (or override — any shape answers)
 
@@ -93,12 +93,12 @@ Options:
 **B — a public repository, by pull request, shipped inside each release.** *Rationale*: it keeps Jérémie's "publicly editable" (anyone can propose, so the instructions grow with the services) and puts a reviewer and a release between an edit and a newcomer, which is the whole defense against a look-alike link; and it keeps the network ban that the first law's package check enforces. *Confidence*: 0.7 — because the cost is a release for each instruction change, which services' pages may outpace. *If wrong*: C, if instructions go stale faster than releases, and then with signed pages; A, if no outside contributor appears.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Option B sounds like a reasonable compromise. This can be implemented with "shipped" meaning "actually shipped" or "versioned URL."
 
 ---
 
 ### QST-MODEL-TEXT: How does Keyhole show the reasons and directions a model writes into a request?
-- Status: unanswered
+- Status: answered
 - Why asking: Jérémie's design has the model send its reasons with a request ("why they are asking for this, where to get it, why, etc., alternatives"). Those words come from a model, which can be steered by anything it read, so they may be wrong or hostile, and Keyhole would show them inside its own trusted frame to the newcomer it protects. Keyhole's own reviewed instructions (QST-INSTRUCTIONS-SOURCE) are different in kind.
 - Need: pick a letter (or override — any shape answers)
 
@@ -111,12 +111,12 @@ Options:
 **A — shown, marked as the assistant's.** *Rationale*: the model's reasons are the part of Jérémie's design that turns a bare name into something a newcomer understands, so B loses the point; but a model's address must never borrow Keyhole's trust, so it is labeled, kept apart, and not clickable, and where Keyhole knows the service its reviewed link sits beside it, which is also how a person notices a mismatch. *Confidence*: 0.65 — because "not clickable" costs every honest request a copy and paste. *If wrong*: B, if a labeled assistant's words still read as Keyhole's to newcomers in a hand check; C never, by this ADR's doubt.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Option A sounds good.
 
 ---
 
 ### QST-ORDER-INBOX: In what order are the inbox, the link, the tab and the instructions built?
-- Status: unanswered
+- Status: answered
 - Why asking: ADR-0001's order is the person's path, then the link, the cards (instructions) and the harness targets, one release each, each release a stable form even if work stopped there. This ADR adds the inbox and the tab. The person's path is now complete (ADR-0002, Implemented) and needs one hand check (ADR-0003, QST-CHECK-EYE) and the naming review's words for the eye button before a first release.
 - Need: pick a letter (or override — any shape answers)
 
@@ -133,7 +133,7 @@ Options:
 **D — the inbox as a list before the tab.** *Rationale*: I called A's second release "the largest step" and said it "could be split"; Simon says where: the inbox's records are a stable form before any webview shows them. A Quick Pick of requests, each opening the masked box that is already built and hand-checked, gives the first release in which a model's request waits rather than interrupts, without the webview's new value path; the tab then arrives on records that have been used. Each of D's releases stands if work stopped there; A's second does not until the tab is done. *Confidence*: 0.75 — because the list reuses only built, checked parts, and its one new piece (the record and its home) is needed by every option. *If wrong*: A, if a list of requests in the palette is too poor a view to teach newcomers anything, so the tab must come with the link; C, as above.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Agreed with Option D, with the inbox as a stable form.
 
 ---
 
