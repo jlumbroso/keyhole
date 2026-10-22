@@ -9,7 +9,7 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # Accessible entry: showing the value, conformance, and a tab for many secrets
 
 - **Date**: 2026-10-20
-- **Iteration**: 3
+- **Iteration**: 4
 - **Status**: Partially Implemented
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5); Surveyor 5.1 (VS Code's source); Sounder 6 (the conformance research)
 
@@ -172,6 +172,8 @@ Screenshots for reference:
 
 **Seeing what you typed (QST-SHOW-VALUE, A; Jérémie, 2026-10-21)**, built in `912b821`: the masked box has an eye button ("Show the value" / "Hide the value", tooltips provisional until the naming review), and the value is hidden again when the box closes or VS Code's window loses focus; no timer (WCAG 2.2.1). His wish that "this could all be tab-able" is checked by QST-CHECK-EYE.
 
+**The hand check (QST-CHECK-EYE, A; Jérémie, 2026-10-22, VoiceOver on, VS Code 1.141.0, nine screenshots in `attachments/screenshots/2026-10-22-voice-over-test/`)**: all as described, **and the keyboard reached the eye button** (Tab from the box). My prediction was B (keyboard could not), at 0.45; it was wrong, and the keyboard-route action item it would have triggered is struck. Keyhole's log of the run agrees, and shows both keyprint forms live: the 37-character value logged `<keyprint:…WXYZ#435f1df0/> (last four shown, 32 or more characters)`, and a 15-character second value (he chose **Set New Value** at step 9, beyond what the step asked) logged `<keyprint:…#9cc1cf32/> (no last four, under 32 characters)` with "(supersedes line 2)". Two things it opened: (1) his remark that the box's prompt mentions only Enter and Escape (VS Code adds "(Press 'Enter' to confirm or 'Escape' to cancel)") and could call attention to the eye button, which is not standard in VS Code's boxes; the words go to the naming review with the tooltips; (2) from the screenshots, VoiceOver's caption on the focused button reads "You are currently on a toolbar", and no screenshot shows it saying "Show the value"; whether VoiceOver announces the button's name is not settled by these captions, and goes to Sounder's assessment as an open row.
+
 **The target (QST-A11Y-TARGET; Jérémie: "We should track both")**: WCAG 2.2 A and AA, read for desktop software through WCAG2ICT, **and** VS Code's own accessibility practices as a separate column, so each choice is seen in context: extra work Keyhole does matters little where VS Code itself is not compatible, since Keyhole is a small part of a much larger ecosystem, and the second column measures that extra effort. Then a scaffold: the order in which the criteria come in, release by release (Sounder).
 
 **The tab (QST-ENTRY-TAB, B; Jérémie)**: a webview with mass entry, after the link, **composed with an inbox** of requests and drafts, where nothing is now-or-never. His answers to QST-SHOW-VALUE and QST-ENTRY-TAB together describe a larger design (requests from models with their reasons, drafts started by the person, sequences of variables, deep links to each draft, and service instructions shown as Portholes), which is [ADR-0004](0004-requests-and-drafts-an-inbox-for-secrets-and-instructions-shown-in-porthole.md). Mass entry's role, in his words: *"This is not something the transformers could help with for security reasons, so we are proposing a mechanized, automatic way of doing a simple version of structuring a mass of keys."*
@@ -185,10 +187,10 @@ Screenshots for reference:
 - [x] Answer QST-SHOW-VALUE, QST-A11Y-TARGET, QST-ENTRY-TAB with the findings — Owner: Jérémie (2026-10-21: A; both columns; B, composed with an inbox)
 - [x] Build the eye button, re-masked on window blur, with tests (one broken on purpose to prove it) — Owner: Glazier (2026-10-21, `912b821`)
 - [ ] Rule on the eye button's tooltips, "Show the value" and "Hide the value" — Owner: the naming review
-- [ ] If QST-CHECK-EYE answers that the keyboard cannot reach the eye button, give it a keyboard route before 0.1.0 (a keybinding while the masked box is open), with its own check: the release scaffold does not let a current control borrow its keyboard route from the future tab (Sounder, `2026-10-21-2248-sounder-completion-a11y-host-column-and-release-scaffold.md`) — Owner: Glazier
+- [x] ~~If QST-CHECK-EYE answers that the keyboard cannot reach the eye button, give it a keyboard route before 0.1.0 (a keybinding while the masked box is open), with its own check: the release scaffold does not let a current control borrow its keyboard route from the future tab (Sounder, `2026-10-21-2248-sounder-completion-a11y-host-column-and-release-scaffold.md`)~~ — not needed: the keyboard reached it (QST-CHECK-EYE, A, 2026-10-22)
 - [x] Add VS Code's own accessibility practices as a second column of the assessment, and a scaffold for bringing the criteria in, release by release — Owner: Sounder 6 (2026-10-21: [assessment and scaffold](../reviews/2026-10-20-accessible-entry-wcag-22-aa.md), all 55 rows with host evidence/limits and work categories; proposed option A plus iteration 2's option-D split; live checks and QST-ORDER-INBOX remain open.)
 - [x] Give both boxes an accessible name: they had only a `prompt`, so a screen reader heard "input" (Sounder's integration brief, from Surveyor's reading); both now carry the command's own title, "Keyhole: Set a Secret in .env", with a regression test — Owner: Glazier (2026-10-20)
-- [ ] A VoiceOver hand check of the boxes: what is announced for each, and, once the eye button exists, that the text and caret survive the flip — Owner: Jérémie (posed 2026-10-21 as QST-CHECK-EYE)
+- [x] A VoiceOver hand check of the boxes: what is announced for each, and, once the eye button exists, that the text and caret survive the flip — Owner: Jérémie (posed 2026-10-21 as QST-CHECK-EYE; answered A, 2026-10-22)
 
 ---
 
@@ -211,6 +213,12 @@ Screenshots for reference:
 - Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
 - Changes: the eye button built; the target set to two columns; the tab composed with an inbox, designed in ADR-0004; the hand check QST-CHECK-EYE posed
 - Outcome: `Draft → Partially Implemented`
+
+### Iteration 4 (2026-10-22)
+- Trigger: Jérémie's hand check, QST-CHECK-EYE (A)
+- Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
+- Changes: the check recorded against Keyhole's log; my prediction (B) was wrong and its action item struck; the prompt's mention of the eye button sent to the naming review; VoiceOver's naming of the button sent to Sounder as an open row
+- Outcome: `Partially Implemented` (the eye button proven by hand; the tab waits for ADR-0004's order)
 
 ---
 

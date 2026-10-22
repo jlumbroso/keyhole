@@ -9,11 +9,11 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # The request record and the link that creates it
 
 - **Date**: 2026-10-21
-- **Iteration**: 1
-- **Status**: Draft
+- **Iteration**: 2
+- **Status**: Accepted
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5); the naming review (every name); Surveyor 5.1 (Porthole's link, read)
 
-**TL;DR**: Keyhole's second release (ADR-0004, D): a model asks for a secret by name with a `vscode://jlumbroso.keyhole/v1/…` link that never carries a value; Keyhole records the request (names, the assistant's reasons, never a value) and lists waiting requests in a Quick Pick, each opening the masked box already built; three questions decide whether a model may also write the record directly, where a model reads the outcome, and which file holds a project's requests.
+**TL;DR**: Keyhole's second release (ADR-0004, D): a model asks for a secret by name with a `vscode://jlumbroso.keyhole/v1/…` link that never carries a value; Keyhole records the request (names, the assistant's reasons, never a value) and lists waiting requests in a Quick Pick, each opening the masked box already built; a model may also write the record directly, reads the outcome through Keyhole's API (which answers from a cache and never opens `.env`), and the record keeps `.env.example` in step.
 
 ---
 
@@ -103,16 +103,30 @@ Agreed with Option C, and allowing useful `.env.example` would be a nice side-be
 
 ## Decision
 
-Not yet: three questions, then the naming review.
+### Chosen: the record is the contract (link or file), an API for the outcome, and `.env.example` kept in step
+
+**Two routes to one record (QST-REQUEST-ROUTE, C; Jérémie, 2026-10-22)**: *"The structure is near-decomposable: Links are the doorbell that produce a record, and the file edits the record directly, is also admissible."* Every entry is checked the same way at the record, whichever route wrote it: names by `checkName`, text length and control characters, and no field that could carry a value.
+
+**The outcome through an API, not a file (QST-OUTCOME-ROUTE, D, his own option)**: *"For abstraction reasons, it makes more sense for keyhole to always provide the interface for this check. […] The idea of an outcomes file makes sense as a local cache that is maintained by Keyhole, but having models read from that file itself doesn't necessarily make sense, as the format could change, be extended, contain keys not pertaining to a specific seat, etc.. So I would say something like 'Option D, an 'API' provided by Keyhole, possibly through an MCP server, and possibly using Option A as a local implementation to reduce checks in the actual files'."* The design that follows, by Glazier:
+
+- **Keyhole's extension keeps the cache**: a local file ignored by git (provisionally `.keyhole/outcomes.local.json`), one entry per variable Keyhole has set or been asked for: set or not, length, keyprint, when, and a schema version. It is written after every write Keyhole makes and refreshed when `.env` changes on disk (a file watcher re-probes the requested names), so a value edited by hand is seen too. It never holds a value; a test reads it after every test run that writes and fails on any value it was given.
+- **The API reads only the cache, never `.env`.** A model reaches Keyhole through a small MCP server shipped inside the extension, which the model's harness starts. That process belongs to the model's side, so it must never open `.env`: it answers from the cache alone (`is NEON_API_KEY set? → {name, set, length, keyprint}`), and the only code that ever reads a value stays inside VS Code's extension host. This is Simon's empty world applied to processes: the value path does not reach the process a model launches. The cache's format can then change freely, as Jérémie wants, because models see the API, never the file.
+- **Open, for Surveyor**: how each harness (Claude Code, Codex, Gemini CLI, Grok Build) registers an MCP server that lives inside a VS Code extension, whose folder carries the version in its name (the same versioned-path problem Porthole has, ADR-0004); and VS Code's own API for an extension to offer an MCP server to VS Code's chat.
+
+**Keyhole's own file, with `.env.example` kept in step (QST-REQUEST-FILE, C)**: provisionally `.keyhole/requests.json` is the record; Keyhole offers to add each requested name to `.env.example` (the name, an empty value, a one-line comment). His note: *"allowing useful `.env.example` would be a nice side-benefit, right now that feature is under-utilized."*
+
+**What is built first** (this ADR's release, ADR-0004's D): the record and its checks, the link, the list, the `.env.example` offer, and the cache; then the MCP server once Surveyor's reading says how harnesses can find it. Names are provisional until the naming review rules.
 
 ---
 
 ## Action Items
 
-- [ ] Answer QST-REQUEST-ROUTE, QST-OUTCOME-ROUTE, QST-REQUEST-FILE — Owner: Jérémie
-- [ ] Name the link's verb and keys, the list's command, the record and outcome files — Owner: the naming review, after the answers
-- [ ] Build the link (copied from Porthole's `outsideLinks.ts`, not shared), the record, the list and the outcome, with tests: a link carrying any value-like key is refused; no record field ever holds a value given in a test; the list opens the built masked box with the name given — Owner: Glazier
+- [x] Answer QST-REQUEST-ROUTE, QST-OUTCOME-ROUTE, QST-REQUEST-FILE — Owner: Jérémie (2026-10-22: C; D, an API; C)
+- [ ] Name the link's verb and keys, the list's command, the record and cache files, the MCP server and its tool — Owner: the naming review (briefed 2026-10-22)
+- [ ] Build the link (copied from Porthole's `outsideLinks.ts`, not shared), the record, the list, the `.env.example` offer and the cache, with tests: a link carrying any value-like key is refused; no record field ever holds a value given in a test; the list opens the built masked box with the name given — Owner: Glazier
 - [ ] Teach models the link in Keyhole's own skill, as Porthole's skill does — Owner: Glazier, with Sounder for the manual's chapter
+- [ ] Read how each harness registers an MCP server shipped inside a VS Code extension (a stable path across versions), and VS Code's API for offering one to its own chat — Owner: Surveyor 5.1 (briefed 2026-10-22)
+- [ ] Build the MCP server that answers from the cache alone, never `.env`, with a test that it opens no file but the cache — Owner: Glazier, after Surveyor's reading
 
 ---
 
@@ -123,6 +137,12 @@ Not yet: three questions, then the naming review.
 - Contributors: Glazier 5.5 (Claude Opus 5.5)
 - Changes: the link, the record, the list and the outcome described; three doubts as questions
 - Outcome: `Draft`
+
+### Iteration 2 (2026-10-22)
+- Trigger: Jérémie's answers (C; D, his own: an API; C)
+- Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
+- Changes: the decision written; the API designed to read only Keyhole's cache, so the process a model launches never opens `.env`; the MCP registration question sent to Surveyor; the names to the naming review
+- Outcome: `Draft → Accepted`
 
 ---
 
