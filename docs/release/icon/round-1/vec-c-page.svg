@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" stroke="#6B5FD6" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Keyhole icon, vector C "page": the ADR Manager's idiom (a page with a folded corner, thick rounded stroke) with a keyhole where its seal is (from generated concept 2.1). Purser 5.5, 2026-10-23 -->
+  <path d="M146 48 H310 L404 142 V422 a42 42 0 0 1 -42 42 H146 a42 42 0 0 1 -42 -42 V90 a42 42 0 0 1 42 -42 Z" stroke-width="32"/>
+  <path d="M310 48 V108 a34 34 0 0 0 34 34 H404" stroke-width="32"/>
+  <path d="M170 190 H290 M170 240 H240" stroke-width="28"/>
+  <g fill="#6B5FD6" stroke-width="10">
+    <circle cx="256" cy="318" r="34"/>
+  <path d="M238 336 L274 336 L292 410 L220 410 Z"/>
+  </g>
+</svg>
