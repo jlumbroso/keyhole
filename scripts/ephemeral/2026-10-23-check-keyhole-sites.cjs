@@ -4,6 +4,9 @@
 // installation; adds no application dependencies and visits no GitHub links.
 // Outputs screenshots plus report.json. Fake clipboard-denial testing is scoped
 // to its own browser context. No extension, service account, or credential is used.
+// Used 2026-10-24 against local previews and both GitHub Pages sites: all five
+// pages and 40 layout cases passed; exact page/code copies, clipboard fallbacks,
+// hosted font, no-JavaScript reading, and exports passed with no browser errors.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
