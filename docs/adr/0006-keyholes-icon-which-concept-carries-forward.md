@@ -9,8 +9,8 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # Keyhole's icon: which concept carries forward
 
 - **Date**: 2026-10-23
-- **Iteration**: 1
-- **Status**: Draft
+- **Iteration**: 2
+- **Status**: Implemented
 - **Deciders**: Jérémie Lumbroso (picks); Purser 5.5 (Claude Sonnet 5.5) drew the concepts
 
 **TL;DR**: Keyhole's icon should be Porthole's twin (the same double ring and eight rivets, a keyhole where Porthole's page is) in indigo, redrawn as a vector so it holds up at 40 pixels; Jérémie picks the shape and the colour.
@@ -83,17 +83,31 @@ Option A as recommended sounds perfect.
 
 ## Decision
 
-*Pending the two answers.* What follows once they are given, from Glazier's brief: the picked vector is rendered at 256 pixels, transparent, as `media/icon.png`; `"icon"` goes in `package.json`; `media/icon.png` is added to both lists in `scripts/check-package-contents.mjs` and as `!media/icon.png` to `.vscodeignore`; a `galleryBanner` colour is chosen with the icon.
+### Chosen (Jérémie, 2026-10-24): the twin with a bigger keyhole, in indigo, the keyhole moved up
+
+- **Shape: D, vector A2**, with one change from Jérémie: *"the keyhole in the center is a bit too close vertically to the circle … I would move it up about 10-20px, it doesn't have to be centered but just a bit off from how close it is to the edge."*
+- **Colour: A, indigo `#6B5FD6`.**
+- **How the change was made.** His pixels were not tied to a canvas, so I took the previews he looked at (the A2 sheet's 220 px panel, and the 256 px icon size) as his reference: **the keyhole moved up 20 units of the SVG's 512-unit canvas**, which is about 9 px at 220 px and 10 px at 256 px, the low end of his range, so it stays clear of the ring at the top. A2 had its keyhole's head 42 units from the inner ring's edge and its slot 26 from it at the bottom; now it is about 22 above and 46 below. It is deliberately not centered, as he said. The result is `docs/release/icon/round-1/vec-a2-final-keyhole-up-20.svg`, compared with A2 at 300, 128, 40 and 32 px on light and dark in `a2-vs-final-at-300-128-40-32px.jpg`. If he meant more, the number is one edit in the SVG.
+- **Done (2026-10-24):** `media/icon.png` is that SVG at 256 px, transparent (corner pixel fully transparent); `"icon": "media/icon.png"` and `galleryBanner` in `package.json`; `media/icon.png` in both lists of `scripts/check-package-contents.mjs` and `!media/icon.png` in `.vscodeignore`. The gate lists the icon in the package, and with the icon hidden the package check fails (`required files are missing from the package: media/icon.png`).
+- **`galleryBanner` was my choice, not asked**: `#2E2A72` (a deep indigo) with theme `dark`, so the Marketplace page header shows light text on it. It is one line in `package.json` if he wants another.
+- **Not yet checked by a person**: how the icon looks in a real Extensions list and on the Marketplace card; the 40-pixel previews are my screen.
 
 ### Action Items
 
 - [x] Concepts drawn and rendered, vectors redrawn, previews made - Owner: Purser (done 2026-10-23)
-- [ ] Jérémie picks shape and colour - Owner: Jérémie
-- [ ] Render the picked vector to `media/icon.png`, wire it into the manifest, the package check and `.vscodeignore`, choose `galleryBanner` - Owner: Purser, after the answers
+- [x] Jérémie picks shape and colour - Owner: Jérémie (done 2026-10-24)
+- [x] Move the keyhole up; render `media/icon.png`; wire it into the manifest, the package check and `.vscodeignore`; choose `galleryBanner` - Owner: Purser (done 2026-10-24)
+- [ ] Look at the icon in a real Extensions list once the package is installed locally - Owner: Jérémie, whenever convenient
 
 ---
 
 ## Iterations
+
+### Iteration 2 (2026-10-24)
+- Trigger: Jérémie answered both questions (shape D with the keyhole moved up; indigo).
+- Contributors: Purser 5.5 (Claude Sonnet 5.5); Jérémie Lumbroso.
+- Changes: Decision written; the keyhole moved up 20 units; the icon and its plumbing done.
+- Outcome: `Draft → Implemented`.
 
 ### Iteration 1 (2026-10-23)
 - Trigger: Glazier's brief carrying Jérémie's request for an icon in Porthole's aesthetic.

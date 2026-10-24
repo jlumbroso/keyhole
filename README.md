@@ -26,8 +26,10 @@ token, by name, without the value ever passing through the chat.
    whether it is ignored. If it is not ignored, Keyhole offers to add it to `.gitignore`
    first, and says what it recommends and why. If it is tracked, it tells you how to go on and
    does not write. If git cannot be asked (the Git extension is off), it writes nothing it cannot
-   check. If the folder is not a git repository at all, it says so and writes, since nothing
-   can commit the file by accident from there.
+   check. The same goes for a repository VS Code's Git extension did not open (git refuses
+   some, for example when the folder belongs to another user): Keyhole finds the `.git` itself,
+   says so, and writes nothing. If there is no git repository at all, it says so and writes,
+   since nothing can commit the file by accident from there.
 3. **Takes the value in a masked box.** There is a button to show what you typed, which hides
    the value again when you switch to another app. Both boxes have names for screen readers.
 4. **Appends to `.env` under a comment line.** If the variable is already set, Keyhole asks

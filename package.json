@@ -5,6 +5,11 @@
   "version": "0.0.1",
   "publisher": "jlumbroso",
   "private": true,
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#2E2A72",
+    "theme": "dark"
+  },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

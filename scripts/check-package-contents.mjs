@@ -12,9 +12,11 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // Grows file by file, each addition named in the commit that ships it (copied from porthole, 2026-10-20).
-const ALLOWED = new Set(['package.json', 'README.md', 'CHANGELOG.md', 'LICENSE', 'LICENSE.txt', 'NOTICE', 'dist/extension.js']);
+const ALLOWED = new Set(['package.json', 'README.md', 'CHANGELOG.md', 'LICENSE', 'LICENSE.txt', 'NOTICE', 'dist/extension.js', 'media/icon.png']);
 // Apache-2.0 (Jérémie, 2026-10-20): the package must carry the license and its NOTICE.
-const REQUIRED = ['package.json', 'dist/extension.js', 'LICENSE', 'NOTICE'];
+// The icon (ADR-0006) is required too: a listing without it looks unfinished, and a package check that allows a file
+// but does not require it would let the icon vanish from a release unnoticed.
+const REQUIRED = ['package.json', 'dist/extension.js', 'LICENSE', 'NOTICE', 'media/icon.png'];
 
 const vsce = resolve(root, 'node_modules', '.bin', 'vsce');
 const listed = execFileSync(vsce, ['ls'], { cwd: root, encoding: 'utf8' })
