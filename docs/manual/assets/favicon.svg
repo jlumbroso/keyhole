@@ -1,14 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" stroke="#6B5FD6" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Keyhole icon, vector A2: A with a keyhole that fills the inner ring, so it survives 40 px. Same rings and eight rivets as Porthole. Purser 5.5, 2026-10-23 -->
+  <!-- Keyhole icon, FINAL: vector A2 (ADR-0006: shape D, colour indigo) with the keyhole moved up 20 units of this 512 canvas, at Jérémie's request
+       ("move it up about 10-20px"; 20 units is about 9 px at the 220 px preview and 10 px at the 256 px icon). Purser 5.5, 2026-10-24.
+       Gaps to the inner ring's inner edge (radius 138): about 22 above the keyhole's head, about 46 below its slot (A2 had 42 and 26). -->
   <circle cx="256" cy="256" r="234" stroke-width="32"/>
   <circle cx="256" cy="256" r="154" stroke-width="32"/>
   <g fill="#6B5FD6" stroke="none">
     <circle cx="450" cy="256" r="17"/><circle cx="393.1" cy="393.1" r="17"/><circle cx="256" cy="450" r="17"/><circle cx="118.9" cy="393.1" r="17"/>
     <circle cx="62" cy="256" r="17"/><circle cx="118.9" cy="118.9" r="17"/><circle cx="256" cy="62" r="17"/><circle cx="393.1" cy="118.9" r="17"/>
   </g>
-  <!-- Sounder 6, 2026-10-24: move only the centre up 15 viewBox units, within Jérémie\'s requested 10–20 (ADR-0006). -->
-  <g fill="#6B5FD6" stroke-width="12" transform="translate(0 -15)">
-    <circle cx="256" cy="216" r="50"/>
-    <path d="M226 244 L286 244 L312 362 L200 362 Z"/>
+  <g fill="#6B5FD6" stroke-width="12">
+    <circle cx="256" cy="196" r="50"/>
+    <path d="M226 224 L286 224 L312 342 L200 342 Z"/>
   </g>
 </svg>
