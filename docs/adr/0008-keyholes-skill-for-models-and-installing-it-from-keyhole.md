@@ -47,7 +47,7 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 ## Questions
 
 ### QST-SKILL-REACH: Which harnesses does Keyhole's skill reach when Keyhole installs it in a project?
-- Status: unresolved — Surveyor reads each harness's skill and standing-instruction files first (brief 2026-10-24)
+- Status: answered
 - Why asking: Right after 0.1.0 Keyhole ships a skill teaching models never to take a secret in the conversation and to send the person to Keyhole, and a command that installs it into a project (this ADR). Porthole's version writes `.claude/skills/<name>/SKILL.md`, which only Claude Code reads. Keyhole was designed for four harnesses (Claude Code, Codex CLI, Gemini CLI, Grok Build; ADR-0001), and each has its own file for standing instructions or skills, some read only in a trusted folder.
 - Need: pick a letter (or override — any shape answers), once the reading is in
 
@@ -60,7 +60,7 @@ Options:
 **C — Claude Code now, the others with the second release.** *Rationale*: right after 0.1.0 the skill can only point to a command in VS Code, which every harness can name equally, so the extra files buy little; in the second release the skill gains the link and `check_secret`, and that is when a Codex or Grok model most needs to know them. Porthole's installer, copied, covers the first step at no new cost. *Confidence*: 0.55 — because Surveyor's reading may show that one shared file (an `AGENTS.md`-style convention) reaches several harnesses at once, which would make B nearly free now. *If wrong*: B, if one file reaches most harnesses; A, if the others' project files all need trust a newcomer will not have.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+Approving Option C. I don't really know how this works beyond Claude Code right now (shame on me! I realize a hypocritical homogeneity for someone advocating model diversity as an intrinsic and great good), so this will require research.
 
 ---
 
