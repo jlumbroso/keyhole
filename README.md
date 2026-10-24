@@ -4,6 +4,12 @@ A small VS Code extension that puts a secret (an API key, a token) into your
 project's `.env` through a masked box, so the secret never has to appear in a
 conversation with an AI assistant.
 
+[Product page](https://jlumbroso.github.io/keyhole/) ·
+[Manual](https://jlumbroso.github.io/keyhole-docs/)
+
+The first release is in preparation. Start with the manual's harmless
+walkthrough and assistant-specific file protections.
+
 When you need to give a project a token for GitHub, Neon, Render or another
 service, you run **Keyhole: Set a Secret in .env…**. Keyhole asks for the
 variable's name, checks with git that `.env` is ignored and not tracked, takes

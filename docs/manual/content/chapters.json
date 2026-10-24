@@ -1,0 +1,67 @@
+[
+  {
+    "slug": "overview",
+    "nav": "Start here",
+    "title": "A secret your project needs.",
+    "dek": "What goes in the conversation, what goes in the file, and what to do first.",
+    "margin": [
+      {
+        "title": "Name, not value",
+        "text": "Your assistant can discuss DATABASE_URL without seeing the connection string."
+      },
+      {
+        "title": "Start harmlessly",
+        "text": "Use the practice setting before introducing a real credential."
+      }
+    ]
+  },
+  {
+    "slug": "first-secret",
+    "nav": "Your first secret",
+    "title": "Try it with a harmless value.",
+    "dek": "Walk through the command once, using a setting that cannot unlock anything.",
+    "margin": [
+      {
+        "title": "Practice value",
+        "text": "not-a-secret is deliberately harmless. Keep real credentials out of screenshots and chat."
+      },
+      {
+        "title": "After saving",
+        "text": "A saved file does not establish that your program has loaded it."
+      }
+    ]
+  },
+  {
+    "slug": "keeping-secrets-out-of-the-conversation",
+    "nav": "Protect the file",
+    "title": "Keep secrets out of the conversation.",
+    "dek": "Choose the application running your assistant, then check its protections before adding a real key.",
+    "source": "https://github.com/jlumbroso/keyhole/blob/main/docs/manual/keeping-secrets-out-of-the-conversation.md",
+    "margin": [
+      {
+        "title": "Checked 20 October",
+        "text": "These recipes were checked against documentation and source. They have not been exercised here in running assistants."
+      },
+      {
+        "title": "Test harmlessly",
+        "text": "A passing check covers the tested routes and setup. It is not proof about every tool or future version."
+      }
+    ]
+  },
+  {
+    "slug": "troubleshooting",
+    "nav": "Troubleshooting",
+    "title": "When a step stops you.",
+    "dek": "Find the message or symptom, then check the next step without exposing the value.",
+    "margin": [
+      {
+        "title": "When asking for help",
+        "text": "Share the variable name and the message. Leave out the value, .env contents, and revealed screenshots."
+      },
+      {
+        "title": "Local settings",
+        "text": "Writing a local .env does not configure a hosted service."
+      }
+    ]
+  }
+]

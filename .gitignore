@@ -22,3 +22,11 @@ node_modules/
 dist/
 releases/
 coverage/
+
+# Generated manual, browser captures, and separately hosted licensed fonts
+docs/manual/_site/
+scripts/ephemeral/output/
+*.woff
+*.woff2
+*.otf
+*.ttf
