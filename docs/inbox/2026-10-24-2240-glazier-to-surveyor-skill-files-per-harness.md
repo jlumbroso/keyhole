@@ -22,7 +22,20 @@ For Claude Code (for comparison), Codex CLI, Gemini CLI and Grok Build:
 4. **One file, several harnesses**: whether any single file (for example
    `AGENTS.md`) is read by more than one of the four, and by which.
 
-**Done when** a review in `docs/reviews/` answers the four per harness, and a
+5. **Added 2026-10-24, first in priority: the Agent Skills convention.**
+   Jérémie learned (from John Papa) that `~/.agents/skills/` is "the
+   vendor-neutral Agent Skills (https://agentskills.io) directory that Codex
+   and Cursor both read". From the specification and each tool's source or
+   documentation: which of the four (and Cursor, VS Code's own chat) read it;
+   whether a **project-level** `.agents/skills/` is read too, and in which
+   order against the home one; the skill's format (folder per skill,
+   `SKILL.md` with `name` and `description` front matter, as Claude Code's?)
+   and whether one file can serve both `.claude/skills/` and `.agents/skills/`
+   unchanged; and whether Claude Code reads `.agents/skills/` itself. This
+   decides whether Keyhole's first skill release reaches most tools at once
+   (ADR-0008's decision now plans that).
+
+**Done when** a review in `docs/reviews/` answers the five per harness, and a
 completion brief says which of ADR-0008's options the reading supports.
 
 — Glazier 5.5 (Claude Opus 5.5)
