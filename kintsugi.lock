@@ -1,17 +1,16 @@
 # kintsugi.lock — tool-written state; do not hand-edit.
 # What this repo HAS, per artifact (base version + exact canonical blob).
 kintsugi_schema: 1
-canonical_version: 3.11.6
-synced: '2026-10-20T14:58:35Z'
+canonical_version: 3.12.3
+synced: '2026-10-24T02:03:50Z'
 artifacts:
   .claude/agent.env:
     base_version: 3.11.6
     base_blob: c20a2608bb5fb10c4a26975071fcd4df92fbf299
     state_at_adopt: unmodified+current
   .claude/skills/adr-authoring/SKILL.md:
-    base_version: 0+git.fa5ea8d
-    base_blob: 7dab7c534d2591c3887dd3410fff8d9625d601ba
-    state_at_adopt: unmodified+behind
+    base_version: 3.12.3
+    base_blob: 13ebbb106487e96e5d0a6fc1453421edb2d30684
   .claude/skills/adr-authoring/references/depth.md:
     base_version: 3.11.6
     base_blob: 479e7aeaa4fac1c6fed7d2d57077e8c1ef58bca4
@@ -25,7 +24,8 @@ artifacts:
     base_blob: edb0148e4db42c6b6df925cdf9f2b8fc5ab2b968
     state_at_adopt: unmodified+current
   .claude/skills/adrs4ai-tooling/SKILL.md:
-    state_at_adopt: not-in-canonical
+    base_version: 3.12.3
+    base_blob: 8ffc963e0343992ca2c661412de783f74360f77a
   .claude/skills/adrs4ai-tooling/references/seats-models-and-usage-caps.md:
     state_at_adopt: not-in-canonical
   .claude/skills/question-tours/SKILL.md:
@@ -69,9 +69,8 @@ artifacts:
     base_blob: 09622e4274c73f946b8f96f29e93c8b9c172440c
     state_at_adopt: unmodified+behind
   docs/adr/templates/adr.md:
-    base_version: 0+git.5a8590e
-    base_blob: 42d8627b88d9ca144023ca2568b408e1816de4bb
-    state_at_adopt: unmodified+behind
+    base_version: 3.12.3
+    base_blob: 7531fbba230b6c1399cc2ae8488b0055f739da41
   docs/adr/templates/debrief.md:
     base_version: 3.11.6
     base_blob: d739a95efaea09d6be0fe9b82653778bd36cb1bf
