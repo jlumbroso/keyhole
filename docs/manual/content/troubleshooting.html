@@ -16,10 +16,12 @@
 <p>Then add <code>.env</code> to <code>.gitignore</code> and run Keyhole again. If an earlier commit contains a real secret, these changes do not remove that exposure. Revoke or rotate the credential through its service.</p>
 <h3 id="still-not-ignored">“Git still does not ignore it”</h3>
 <p>Keyhole may have added an ignore rule, but its second check failed. It has not written the secret to <code>.env</code>. Review conflicting ignore rules, particularly rules beginning with <code>!</code>, and retry once Git reports the file ignored.</p>
-<h3 id="no-git-repository">Keyhole reports no Git repository</h3>
-<p>Keyhole permits the write when VS Code returns no repository. That can mean there is no repository, but it can also mean Git refused to recognize one because of an ownership warning. This version does not distinguish those cases; the tracking and ignore checks do not run on that path.</p>
-<p>If you expected the project to use Git, stop before entering a real credential. Check VS Code's Source Control view and Git output, and resolve why the repository was not recognized. Do not dismiss an ownership warning merely to make the message disappear.</p>
-<p>For a folder that intentionally does not use Git, the write is allowed. If you later enable Git or copy the project elsewhere, make sure <code>.env</code> is ignored before adding project files to a commit.</p>
+<h3 id="repository-not-opened">“A git repository that VS Code's Git extension did not open”</h3>
+<p>VS Code did not return a usable repository, but Keyhole found a <code>.git</code> marker in the project folder or a folder above it. Keyhole refuses to write because it cannot check the tracking and ignore rules.</p>
+<p>Run <code>git status</code> in a terminal in that folder to see why, or inspect VS Code's Git output. Git may report an ownership warning. Resolve the cause before retrying; do not dismiss a warning merely to make the message disappear.</p>
+<h3 id="no-git-repository">The folder does not use Git</h3>
+<p>If VS Code returns no repository and Keyhole finds no <code>.git</code> marker in the folder or any parent folder, it treats the folder as having no repository and permits the write. The tracking and ignore checks do not run on that path.</p>
+<p>If you later enable Git or copy the project elsewhere, make sure <code>.env</code> is ignored before adding project files to a commit.</p>
 
 <h2 id="input-not-accepted">The name or value was not accepted</h2>
 <h3 id="invalid-name">The name is not accepted</h3>

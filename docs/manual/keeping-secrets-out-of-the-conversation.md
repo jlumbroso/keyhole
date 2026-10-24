@@ -37,10 +37,11 @@ rule. When VS Code recognizes the destination's Git repository, Keyhole checks b
 the file is ignored and whether it is already tracked. Neither check removes a value
 from existing history. [Git's ignore documentation](https://git-scm.com/docs/gitignore)
 
-If VS Code returns no repository, Keyhole currently permits a write without
-those checks. That result can also occur for a repository Git considers unsafe
-because of an ownership warning. If you expected a repository, resolve why it
-was not recognized before adding a real credential.
+If VS Code returns no repository, Keyhole also looks for a `.git` marker in
+the project folder and its parent folders. Finding one stops the write,
+because the repository's tracking and ignore rules could not be checked.
+If no marker is found, Keyhole treats the folder as having no repository and
+permits the write without those checks.
 
 For the examples below:
 

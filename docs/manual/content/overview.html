@@ -12,7 +12,7 @@
 <p>Before obtaining a credential, ask which service and credential type the project needs, what it will use it for, and the exact variable name it expects. A database connection string and an account-management API key serve different purposes, even when both come from the same provider.</p>
 
 <h2 id="what-keyhole-does">What Keyhole does</h2>
-<p>Run <code>Keyhole: Set a Secret in .env…</code> from VS Code's Command Palette. Keyhole asks for the variable's name, checks Git's tracking and ignore rules when VS Code recognizes a repository, and takes the value in a masked input box. It appends the setting to the selected folder's <code>.env</code>. Read any Git message: <a href="troubleshooting.html#no-git-repository">repository detection has limits</a>.</p>
+<p>Run <code>Keyhole: Set a Secret in .env…</code> from VS Code's Command Palette. Keyhole asks for the variable's name, checks Git's tracking and ignore rules when a repository is present, and takes the value in a masked input box. It appends the setting to the selected folder's <code>.env</code>. If it finds a repository VS Code cannot open, it refuses the write. <a href="troubleshooting.html#no-git-repository">A folder without a detected repository can receive a value</a>.</p>
 <p>You start the command yourself. The first release writes to <code>.env</code> only; it does not provide an inbox of requests or write to an assistant's settings file.</p>
 <p><code>.env</code> is an ordinary text file. Your program must be configured to read it. Writing this local file does not update the settings of a deployed service.</p>
 

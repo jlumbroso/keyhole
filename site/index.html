@@ -77,7 +77,7 @@
           <article>
             <span class="feature-number" aria-hidden="true">01 /</span>
             <h3>Checks Git first.</h3>
-            <p>For a repository VS Code recognizes, Keyhole checks that <code>.env</code> is ignored and untracked. It offers to add an ignore rule and checks again. A tracked-file result or reported Git error stops the write. <a href="https://jlumbroso.github.io/keyhole-docs/troubleshooting.html#no-git-repository">Repository-detection limits</a>.</p>
+            <p>Keyhole checks that <code>.env</code> is ignored and untracked. It offers to add an ignore rule and checks again. A tracked file, a reported Git error, or a repository VS Code cannot open stops the write. <a href="https://jlumbroso.github.io/keyhole-docs/troubleshooting.html#no-git-repository">Folders without Git</a>.</p>
           </article>
           <article>
             <span class="feature-number" aria-hidden="true">02 /</span>
@@ -118,7 +118,7 @@
         <div class="requirement-grid">
           <div>
             <h3>VS Code desktop</h3>
-            <p>Version <strong>1.134.0 or later</strong>, with its built-in Git extension enabled. When VS Code reports no repository, Keyhole permits a write without the repository checks. If you expected a repository, resolve that discrepancy before entering a real value.</p>
+            <p>Version <strong>1.134.0 or later</strong>, with its built-in Git extension enabled. When no repository is detected, Keyhole permits a write without the tracking and ignore checks. Protect <code>.env</code> before later adding that folder to Git.</p>
           </div>
           <div>
             <h3>Checked on macOS</h3>
