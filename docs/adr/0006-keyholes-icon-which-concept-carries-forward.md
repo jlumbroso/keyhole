@@ -97,7 +97,7 @@ Option A as recommended sounds perfect.
 - [x] Concepts drawn and rendered, vectors redrawn, previews made - Owner: Purser (done 2026-10-23)
 - [x] Jérémie picks shape and colour - Owner: Jérémie (done 2026-10-24)
 - [x] Move the keyhole up; render `media/icon.png`; wire it into the manifest, the package check and `.vscodeignore`; choose `galleryBanner` - Owner: Purser (done 2026-10-24)
-- [ ] Look at the icon in a real Extensions list once the package is installed locally - Owner: Jérémie, whenever convenient
+- [ ] Look at the icon in a real Extensions list once the package is installed locally - Owner: Jérémie, whenever convenient. *(Jérémie, 2026-10-24, on the final icon as drawn: "the final icon is beyond perfect human language doesn't have quite a word for it." That is his reaction to the previews; the real-list look above is still open.)*
 
 ---
 
