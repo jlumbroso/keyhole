@@ -228,7 +228,7 @@ def render(chapter, chapters, body, exported):
 <body>
   <a class="skip" href="#reading">Skip to the chapter</a>
   <header class="masthead">
-    <a class="brand" href="index.html"><span>Keyhole<span class="brand-period" aria-hidden="true">.</span></span><span class="divider" aria-hidden="true"></span><span class="manual">Manual</span></a>
+    <a class="brand" href="index.html"><img src="assets/favicon.svg" width="32" height="32" alt=""><span>Keyhole<span class="brand-period" aria-hidden="true">.</span></span><span class="divider" aria-hidden="true"></span><span class="manual">Manual</span></a>
     <nav class="masthead-links" aria-label="Project"><a href="{PRODUCT}">Product page ↗</a><a href="{REPOSITORY}">GitHub ↗</a></nav>
   </header>
   <div class="book">
