@@ -42,7 +42,7 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 ## Questions
 
 ### QST-ICON-SHAPE: Which shape should Keyhole's icon take?
-- Status: unanswered
+- Status: answered
 - Why asking: the icon is the first thing a stranger sees on the Marketplace card, and a taste call only you can make. All four vector candidates are in `docs/release/icon/round-1/` (`vec-*.svg`, with the 40-pixel comparisons as `.jpg` files); each is one colour, thick rounded strokes, no text, and transparent as SVG. The colour is a separate question below.
 - Need: pick a letter (or override: any shape answers, such as "A2 with six rivets")
 
@@ -57,13 +57,13 @@ Options:
 
 **D — the twin with a bigger keyhole (A2).** *Rationale*: Jérémie asked for Porthole's aesthetic first; A2 keeps the ring and the eight rivets exactly, so the two read as a pair in the Extensions list, and its keyhole is large enough to stay recognizable at 40 pixels, which A's is not (`vectors-a-b-c-at-300-128-40px.jpg`). *Confidence*: 0.6 — because I judged from previews and not in a real list, and B is stronger at the smallest size. *If wrong*: if you value legibility over family resemblance, this flips to B; if you want Keyhole closer to the ADR Manager, to C.
 
-**ANS:** (by [name])
-[Fill this in]
+**ANS:** (by Jérémie Lumbroso)
+OK, agreed, Option D (A2) is excellent. The only thing is that the keyhole in the center is a bit too close vertically to the circle. It is not vertically centered. I would move it up about 10-20px, it doesn't have to be centered but just a bit off from how close it is to the edge. The options are fantastic, and your ultimate choice is perfect — a faithful reification of my intent. Thank you for skillfully doing so!
 
 ---
 
 ### QST-ICON-COLOR: Which colour?
-- Status: unanswered
+- Status: answered
 - Why asking: Porthole is teal (`#2AA3AE`) and the ADR Manager is rust; Keyhole should be neither, and visible on both a white and a dark editor. A banner colour for the Marketplace page is chosen with it. `vector-a2-colours-at-220-128-40px.jpg` shows the same shape in three colours on light and dark.
 - Need: pick a letter (or override: a hex value or a description answers)
 
@@ -76,8 +76,8 @@ Options:
 
 **A — indigo.** *Rationale*: of the three it is the only one that does not sit next to a sibling's colour (teal, rust, brass), checked on the same preview sheet on light and dark. *Confidence*: 0.7 — because the separation from the siblings is a fact of the colour wheel, but whether it feels right for a secrets tool is taste. *If wrong*: if you want the warmth of a key, gold is C.
 
-**ANS:** (by [name])
-[Fill this in]
+**ANS:** (by Jérémie Lumbroso)
+Option A as recommended sounds perfect.
 
 ---
 
