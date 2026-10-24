@@ -9,8 +9,8 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # Keyhole's skill for models, and installing it from Keyhole
 
 - **Date**: 2026-10-24
-- **Iteration**: 1
-- **Status**: Draft
+- **Iteration**: 2
+- **Status**: Accepted
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5); the naming review (every name); Surveyor 5.1 (how each harness finds a skill, read)
 
 **TL;DR**: Right after 0.1.0 (Jérémie, 2026-10-24), Keyhole ships a skill that teaches models never to take a secret in the conversation and to send the person to Keyhole instead, and a command (and a link) that installs it into a project, copied from Porthole's; it grows with the link and the API in the next release; one question decides which harnesses it reaches.
@@ -66,14 +66,14 @@ Approving Option C. I don't really know how this works beyond Claude Code right 
 
 ## Decision
 
-**When (Jérémie, 2026-10-24)**: right after the first release, as the next one (provisionally 0.1.1), before the inbox release (ADR-0004, D), which then extends the skill with the link and the API. What it contains: this ADR's Explicitation, items 1 to 3. Which harnesses: QST-SKILL-REACH.
+**When (Jérémie, 2026-10-24)**: right after the first release, as the next one (provisionally 0.1.1), before the inbox release (ADR-0004, D), which then extends the skill with the link and the API. What it contains: this ADR's Explicitation, items 1 to 3. **Which harnesses (QST-SKILL-REACH, C; Jérémie, 2026-10-24)**: Claude Code with this release; Codex CLI, Gemini CLI and Grok Build with the inbox release, from Surveyor's reading of their skill files. His words: *"I don't really know how this works beyond Claude Code right now (shame on me! I realize a hypocritical homogeneity for someone advocating model diversity as an intrinsic and great good), so this will require research."* The research is briefed (the action item below), and its result shapes the inbox release's skill.
 
 ---
 
 ## Action Items
 
 - [ ] Read each harness's skill and standing-instruction files (Codex, Gemini CLI, Grok Build; Claude Code's for comparison): the project-level file, the trust it needs, how a model discovers it, and whether one file serves several — Owner: Surveyor 5.1
-- [ ] Answer QST-SKILL-REACH — Owner: Jérémie
+- [x] Answer QST-SKILL-REACH — Owner: Jérémie (2026-10-24: C)
 - [ ] Name the skill, the install command and its link verb (Porthole's ruled `install-skill` is the obvious sibling), and review the skill's text, which models will treat as instructions — Owner: the naming review
 - [ ] Build the skill and its installer right after 0.1.0 ships, copied from Porthole's `src/skill.ts` (not shared), with its tests: twice is a no-op; an edited copy is never overwritten without asking; the skill holds no token-shaped example — Owner: Glazier
 - [ ] Extend the skill with the request link and `check_secret` in the inbox release — Owner: Glazier (ADR-0005's action item, folded in here)
@@ -87,6 +87,12 @@ Approving Option C. I don't really know how this works beyond Claude Code right 
 - Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
 - Changes: the skill's content by release, its three channels, the install copied from Porthole; one question, waiting on a reading
 - Outcome: `Draft`
+
+### Iteration 2 (2026-10-24)
+- Trigger: Jérémie's answer to QST-SKILL-REACH (C)
+- Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
+- Changes: the decision gains the harnesses, by release
+- Outcome: `Draft → Accepted`
 
 ---
 
