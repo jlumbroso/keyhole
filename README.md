@@ -7,8 +7,8 @@ conversation with an AI assistant.
 [Product page](https://jlumbroso.github.io/keyhole/) ·
 [Manual](https://jlumbroso.github.io/keyhole-docs/)
 
-The first release is in preparation. Start with the manual's harmless
-walkthrough and assistant-specific file protections.
+Start with the manual's harmless walkthrough and its assistant-specific file
+protections.
 
 When you need to give a project a token for GitHub, Neon, Render or another
 service, you run **Keyhole: Set a Secret in .env…**. Keyhole asks for the
@@ -16,6 +16,21 @@ variable's name, checks with git that `.env` is ignored and not tracked, takes
 the value in a masked box, and appends it to `.env`. The value goes from the box
 to the file and nowhere else. An assistant can still help you find and set up the
 token, by name, without the value ever passing through the chat.
+
+## See it
+
+Both pictures are the real extension in VS Code on macOS, in a throwaway folder with a
+made-up value. The value is not a secret.
+
+![Keyhole's masked box in VS Code: a row of dots for the value, the prompt "Paste the value of KEYHOLE_CHECK_LONG. It is written to keyhole-check-2/.env and nowhere else.", and a button at the right to show what you typed.](docs/images/keyhole-masked-box.png)
+
+*The masked box. It says where the value is going, and the button at the right shows what you
+typed if you need to check it.*
+
+![A question from Keyhole: "KEYHOLE_CHECK_LONG is already set in keyhole-check-2/.env (a keyprint ending in WXYZ, 37 characters). Set a new value?", explaining that the old line stays in the file and Keyhole marks it superseded, with the buttons Set New Value and Cancel.](docs/images/keyhole-already-set.png)
+
+*Setting a variable that already has a value asks first. The question names the existing value
+by a short keyprint and its length, never by the value itself.*
 
 ## What it does
 
