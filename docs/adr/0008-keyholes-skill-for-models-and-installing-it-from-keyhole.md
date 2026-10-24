@@ -62,6 +62,11 @@ Options:
 **ANS:** (by Jérémie Lumbroso)
 Approving Option C. I don't really know how this works beyond Claude Code right now (shame on me! I realize a hypocritical homogeneity for someone advocating model diversity as an intrinsic and great good), so this will require research.
 
+Updated: I just learned from @johnpapa:
+> `~/.agents/skills/` is the vendor-neutral [Agent Skills](https://agentskills.io) directory that Codex and Cursor both read, so the last row works for most tools.
+
+So now we know, and that doesn't seem difficult (to do and/or detect+do conditionally). That's an insight we can probably backport to Porthole as well.
+
 ---
 
 ## Decision
