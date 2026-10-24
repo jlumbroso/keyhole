@@ -7,6 +7,13 @@ Subject: Product page and four-chapter manual are live; Git-detection limitation
 
 Both sites are deployed and browser-checked:
 
+**Follow-up, 24 October, ~4:42 PM ET:** Glazier closed the Git detection gap
+in `001eb33` with a failing-first regression. Website/chapter copy now
+describes that refusal (`a3dd6a4`); the publisher imports it in `1018cb4`.
+The initial finding and recommendation below are retained as history, not an
+open release blocker. See the subsequent completion brief for final live
+verification of the icon/copy update.
+
 - Product: https://jlumbroso.github.io/keyhole/
 - Manual: https://jlumbroso.github.io/keyhole-docs/
 - Machine-readable index: https://jlumbroso.github.io/keyhole-docs/llms.txt
@@ -17,8 +24,14 @@ Product/manual sources landed in Keyhole at `9811c97`; private publisher
 generated from ADRs4AI/human-ai-collaboration-template-A; both repos remain
 private. Their homepage fields now point to the respective sites.
 
-The accent is provisional indigo, not an answer to ADR-0006. The favicon is a
-provisional lettermark. The sites say the first release is in preparation;
+Jérémie's ADR-0006 answers landed during final verification (commit
+`5a318f0`). The sites now use the approved A2 mark and indigo. I adapted
+Purser's SVG by translating only its central keyhole up 15 viewBox units;
+the original candidate remains unchanged.
+This interim 15-unit adaptation has since been replaced byte-for-byte by
+Purser's final `vec-a2-final-keyhole-up-20.svg`; the completion brief records
+the final state. The sites
+say the first release is in preparation;
 there is no install button or marketplace-availability claim. GitHub
 edit/correction links disclose that repository access currently requires an
 invitation. Extension code, version and publishing remain unchanged.
@@ -72,19 +85,25 @@ Live Chromium check: five pages, 40 viewport/theme cases; Berkeley Mono loaded
 and used; four exact page copies; configuration code copy; four denied-clipboard
 fallbacks; Markdown and llms exports; both keyboard skip links; theme
 persistence; all five pages readable without JavaScript. No browser errors,
-failed requests or HTTP errors. Desktop/narrow captures and report are saved
+failed requests or HTTP errors. All 21 fetched public content/assets files
+also matched the local build byte for byte (excluding .nojekyll and the 404
+page). Desktop/narrow captures and report are saved
 locally under the ignored `scripts/ephemeral/output/keyhole-sites-live/`.
 This is not installed-extension, screen-reader, contrast or cross-browser
 conformance evidence. The preexisting harness recipes retain their 20 October
 documentation/source check and unexercised-runtime limits.
 
 Successful deployments:
-- Product run 40127649083
-- Manual run 40127651212
-- Keyhole tests run 40127648987
+- [Product run 40127649083](https://github.com/jlumbroso/keyhole/actions/runs/40127649083)
+- [Manual run 40127651212](https://github.com/jlumbroso/keyhole-docs/actions/runs/40127651212)
+- [Keyhole tests run 40127648987](https://github.com/jlumbroso/keyhole/actions/runs/40127648987)
+
+RFC pass: the chapter-review subagent checked this brief against current
+source and approved dispatch. Deployment results above are Sounder's own
+Actions/live-browser observations, not a second independent deployment run.
 
 At actual release: replace preparation notices in both surfaces, add verified
-marketplace links, settle the provisional favicon/accent under ADR-0006, and
-re-import the manual snapshot. When source access becomes public, remove the
+marketplace links and re-import the manual snapshot. Purser can use the revised
+SVG's centre position for the package icon. When source access becomes public, remove the
 invitation notice. Provider-specific Render/Neon guides are later authored
 work, not empty placeholders in this first manual.
