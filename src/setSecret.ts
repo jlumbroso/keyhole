@@ -161,7 +161,7 @@ export async function setNamed(git: GitFacts, folder: vscode.WorkspaceFolder, na
     log(`stopped: ${place} exists but could not be read (${before.unreadable})`);
     refuse(`Keyhole could not read ${place}, so it wrote nothing.`,
       `The file exists, but reading it failed (${before.unreadable}). Keyhole adds a line to .env and never rewrites it, so it must read the file first. Check its permissions (ls -l ${DOTENV} in that folder), then run the command again.`);
-    return;
+    return false;
   }
   log(before.lines.length === 0
     ? `probe: ${name} is not set in ${place}`

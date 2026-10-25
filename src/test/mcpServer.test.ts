@@ -31,6 +31,8 @@ beforeEach(() => {
   writeFileSync(join(project, STATUS_FILE), JSON.stringify({ format: 1, variables: {
     GITHUB_TOKEN: { set: true, length: 40, keyprint: '<keyprint:ghp_…1234#0a1b2c3d/>', checked: '2026-10-22T20:00:00Z' },
     NEON_API_KEY: { set: false, checked: '2026-10-22T20:00:00Z' },
+    MAILGUN_API_KEY: { set: false, empty: true, checked: '2026-10-22T20:00:00Z' },
+    SMTP_PASSWORD: { set: false, unreadable: 'EACCES', checked: '2026-10-22T20:00:00Z' },
   } }));
   writeFileSync(join(project, '.env'), `GITHUB_TOKEN=${FAKE}\n`); // there, and never opened
 });
@@ -45,6 +47,16 @@ describe('the tool', () => {
     expect(text(reply)).toBe(`GITHUB_TOKEN is set in ${project}/.env (40 characters, <keyprint:ghp_…1234#0a1b2c3d/>); checked 2026-10-22T20:00:00Z.`);
     expect(reply).toMatchObject({ result: { structuredContent: { name: 'GITHUB_TOKEN', set: true, length: 40 }, isError: false } });
     expect(JSON.stringify(reply)).not.toContain(FAKE.slice(4, 12));
+  });
+
+  it('tells apart a name assigned no value, and an .env Keyhole could not read, from one not set', async () => {
+    // Sounder's read of the preview: "set" covered NAME= and "not set" covered an unreadable file.
+    const empty = await call({ name: 'MAILGUN_API_KEY', project });
+    expect(text(empty)).toMatch(/assigned no value .* not usable yet/);
+    expect(empty).toMatchObject({ result: { structuredContent: { set: false, empty: true } } });
+    const unreadable = await call({ name: 'SMTP_PASSWORD', project });
+    expect(text(unreadable)).toMatch(/could not read .* \(EACCES\), so whether SMTP_PASSWORD is set is unknown/);
+    expect(unreadable).toMatchObject({ result: { structuredContent: { set: false, unreadable: 'EACCES' } } });
   });
 
   it('says a requested name is not set yet, and how the person sets it', async () => {

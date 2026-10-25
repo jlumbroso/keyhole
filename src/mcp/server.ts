@@ -47,7 +47,7 @@ async function check(args: { [key: string]: unknown }, deps: Deps): Promise<{ te
   const given = args.project;
   if (given !== undefined && (typeof given !== 'string' || !isAbsolute(given))) { return { text: 'project must be the project folder\'s absolute path.', isError: true }; }
   const project = given ?? deps.env.CLAUDE_PROJECT_DIR ?? deps.cwd;
-  let variables: { [name: string]: { set?: unknown; length?: unknown; keyprint?: unknown; checked?: unknown } } = {};
+  let variables: { [name: string]: { set?: unknown; empty?: unknown; unreadable?: unknown; length?: unknown; keyprint?: unknown; checked?: unknown } } = {};
   try {
     const parsed = JSON.parse(await deps.readFile(join(project, STATUS_FILE))) as { format?: unknown; variables?: typeof variables };
     if (parsed.format === 1 && parsed.variables && typeof parsed.variables === 'object') { variables = parsed.variables; }
@@ -58,12 +58,18 @@ async function check(args: { [key: string]: unknown }, deps: Deps): Promise<{ te
     return { text: `Keyhole has not looked at ${name} in ${project}. Ask the person for it with vscode://jlumbroso.keyhole/v1/request?name=${name} (they type the value in Keyhole's masked box, never in the conversation), then check again.`, isError: false, structured };
   }
   // Only these fields cross, whatever else the cache may hold one day.
+  const unreadable = typeof known.unreadable === 'string' ? known.unreadable : undefined;
+  const empty = known.empty === true;
   const structured = known.set === true
     ? { name, project, known: true, set: true, length: known.length, keyprint: known.keyprint, checked: known.checked }
-    : { name, project, known: true, set: false, checked: known.checked };
+    : { name, project, known: true, set: false, ...(empty ? { empty: true } : {}), ...(unreadable ? { unreadable } : {}), checked: known.checked };
   const text = known.set === true
     ? `${name} is set in ${project}/.env (${String(known.length)} characters, ${String(known.keyprint)}); checked ${String(known.checked)}.`
-    : `${name} is not set in ${project}/.env yet; checked ${String(known.checked)}. The person sets it with Keyhole: Show Inbox.`;
+    : unreadable
+      ? `Keyhole could not read ${project}/.env (${unreadable}), so whether ${name} is set is unknown; checked ${String(known.checked)}. Ask the person to check the file's permissions.`
+      : empty
+        ? `${name} is assigned no value in ${project}/.env (an empty line), so it is not usable yet; checked ${String(known.checked)}. The person sets it with Keyhole: Show Inbox.`
+        : `${name} is not set in ${project}/.env yet; checked ${String(known.checked)}. The person sets it with Keyhole: Show Inbox.`;
   return { text, isError: false, structured };
 }
 

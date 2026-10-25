@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -156,6 +156,49 @@ describe('the cache behind the API (ADR-0005)', () => {
     await fileChanged(join(folder, '.env'));
 
     expect(JSON.parse(read(STATUS_FILE)).variables.GITHUB_TOKEN).toMatchObject({ set: true, length: 40 });
+    watching.dispose();
+  });
+});
+
+describe('Regression tests', () => {
+  // Sounder's read of the preview (2026-10-25): the status said "set" for a
+  // name assigned no value, said "not set" for an .env it could not read, and
+  // requests already in the inbox at startup were never looked at again.
+
+  it('does not call a name set when it is assigned no value, and keeps its request waiting', async () => {
+    writeFileSync(join(folder, '.env'), 'GITHUB_TOKEN=\n');
+    await link('name=GITHUB_TOKEN');
+
+    expect(JSON.parse(read(STATUS_FILE)).variables.GITHUB_TOKEN).toMatchObject({ set: false, empty: true });
+    typeIntoNextInputBox(undefined);
+    await showInbox(git);
+    expect((shownQuickPicks()[0]?.items[0] as { label: string } | undefined)?.label).toBe('GITHUB_TOKEN');
+  });
+
+  it.skipIf(process.getuid?.() === 0)('says an .env it cannot read is unreadable, not that the name is not set', async () => {
+    writeFileSync(join(folder, '.env'), `GITHUB_TOKEN=${FAKE}\n`);
+    chmodSync(join(folder, '.env'), 0o000);
+    try {
+      await link('name=GITHUB_TOKEN');
+    } finally {
+      chmodSync(join(folder, '.env'), 0o600);
+    }
+
+    const status = JSON.parse(read(STATUS_FILE)).variables.GITHUB_TOKEN;
+    expect(status).toMatchObject({ set: false, unreadable: expect.any(String) });
+    expect(status.empty).toBeUndefined();
+  });
+
+  it('looks again at the requests already in the inbox when Keyhole starts, without ringing for them', async () => {
+    mkdirSync(join(folder, '.keyhole'), { recursive: true });
+    writeFileSync(join(folder, INBOX_FILE), JSON.stringify({ format: 1, requests: [{ kind: 'request', names: ['GITHUB_TOKEN'], asked: '2026-10-22T19:00:00Z' }] }));
+    writeFileSync(join(folder, '.env'), `GITHUB_TOKEN=${FAKE}\n`);
+
+    const watching = watchInbox(git);
+    for (let tries = 0; !existsSync(join(folder, STATUS_FILE)) && tries < 50; tries++) { await new Promise(resolve => setTimeout(resolve, 5)); }
+
+    expect(JSON.parse(read(STATUS_FILE)).variables.GITHUB_TOKEN).toMatchObject({ set: true, length: 40 });
+    expect(shownMessages()).toEqual([]);
     watching.dispose();
   });
 });

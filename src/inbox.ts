@@ -91,7 +91,9 @@ async function waitingRequests(): Promise<Waiting[]> {
     for (const request of record.requests) {
       const pending: string[] = [];
       for (const name of request.names) {
-        if ((await probe(folder.uri.fsPath, name)).lines.length === 0) { pending.push(name); }
+        // Waiting until it holds a value: absent, assigned nothing (NAME=), or in an .env Keyhole cannot read.
+        const presence = await probe(folder.uri.fsPath, name);
+        if (presence.unreadable !== undefined || presence.lines.length === 0 || presence.length === 0) { pending.push(name); }
       }
       if (pending.length === 0) { continue; }
       waiting.push({
@@ -155,7 +157,16 @@ export function watchInbox(git: GitFacts): vscode.Disposable {
   const seen = new Set<string>();
   const key = (folder: vscode.WorkspaceFolder, request: KeyholeRequest) => `${folder.uri.fsPath}\n${request.names.join('\n')}`;
   const folders = () => (vscode.workspace.workspaceFolders ?? []).filter(folder => folder.uri.scheme === 'file');
-  void (async () => { for (const folder of folders()) { (await readRequests(folder.uri.fsPath)).requests.forEach(request => seen.add(key(folder, request))); } })();
+  // At startup: requests already in the inbox do not ring, but their status is
+  // looked at again, since .env may have changed while VS Code was closed.
+  void (async () => {
+    for (const folder of folders()) {
+      const requests = (await readRequests(folder.uri.fsPath)).requests;
+      requests.forEach(request => seen.add(key(folder, request)));
+      const names = [...new Set([...requests.flatMap(request => request.names), ...await knownNames(folder.uri.fsPath)])];
+      if (names.length > 0) { await refresh(git, folder, names); }
+    }
+  })();
 
   const onEnv = async (uri: vscode.Uri) => {
     const folder = vscode.workspace.getWorkspaceFolder(uri);

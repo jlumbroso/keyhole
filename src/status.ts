@@ -21,7 +21,12 @@ const FORMAT = 1;
 const IGNORE_LINE = '*.local.json';
 
 export interface VariableStatus {
+  /** True only when `.env` assigns the name a value with at least one character. */
   set: boolean;
+  /** The name is assigned, but with no value (`NAME=`): present, and not usable. */
+  empty?: true;
+  /** `.env` exists but could not be read: nothing is known about the name; the error's code. */
+  unreadable?: string;
   length?: number;
   keyprint?: string;
   /** When Keyhole last looked, ISO 8601. */
@@ -53,7 +58,18 @@ export type Refreshed = { written: true; statuses: { [name: string]: VariableSta
  * Looks at `.env` for each name and records what it finds in the cache.
  * Returns the reason, and writes nothing, when git does not ignore the cache.
  */
-export async function refreshStatus(git: GitFacts, folderPath: string, names: string[]): Promise<Refreshed> {
+export function refreshStatus(git: GitFacts, folderPath: string, names: string[]): Promise<Refreshed> {
+  // One refresh at a time per folder: two at once (startup, and a change to
+  // .env a moment later) each read, then write, the cache, and the slower one
+  // would put back what the faster one had just corrected.
+  const previous = queues.get(folderPath) ?? Promise.resolve();
+  const next = previous.catch(() => undefined).then(() => refreshNow(git, folderPath, names));
+  queues.set(folderPath, next.catch(() => undefined));
+  return next;
+}
+const queues = new Map<string, Promise<unknown>>();
+
+async function refreshNow(git: GitFacts, folderPath: string, names: string[]): Promise<Refreshed> {
   await ignoreLocalFiles(folderPath);
   const protection = await git.protection(folderPath, STATUS_FILE);
   if (protection !== 'protected' && protection !== 'no-repository') {
@@ -64,9 +80,10 @@ export async function refreshStatus(git: GitFacts, folderPath: string, names: st
   const checked = new Date().toISOString();
   for (const name of names) {
     const presence = await probe(folderPath, name);
-    statuses[name] = presence.lines.length > 0
-      ? { set: true, length: presence.length, keyprint: presence.keyprint, checked }
-      : { set: false, checked };
+    statuses[name] = presence.unreadable !== undefined ? { set: false, unreadable: presence.unreadable, checked }
+      : presence.lines.length === 0 ? { set: false, checked }
+      : presence.length === 0 ? { set: false, empty: true, checked }
+      : { set: true, length: presence.length, keyprint: presence.keyprint, checked };
   }
   await writeJsonAtomic(join(folderPath, STATUS_FILE), { format: FORMAT, variables: statuses });
   return { written: true, statuses };
