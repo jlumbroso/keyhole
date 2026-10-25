@@ -22,3 +22,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   can recognize it: `<keyprint:ghp_…f9c2#06c47309/>`. A shorter value shows none of its characters.
 - The masked box has an eye button to show what you typed; the value is hidden again when you switch
   to another app. Both boxes are named for screen readers.
+- Keyhole refuses, and says why, rather than write where it cannot check: in a git repository that
+  VS Code's Git extension did not open (git refuses some, for example a folder owned by another user),
+  and when `.env` exists but cannot be read, which it leaves untouched.
