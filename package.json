@@ -1,7 +1,7 @@
 {
   "name": "keyhole",
   "displayName": "Keyhole",
-  "description": "A secret reaches your project's files without ever entering a conversation with a model.",
+  "description": "Set a secret in your project's .env — it never passes through a model or a chat.",
   "version": "0.0.1",
   "publisher": "jlumbroso",
   "private": true,
