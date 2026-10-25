@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
-    <meta name="description" content="Put an API key or token into your project's .env through a masked box in VS Code. Keep the value out of the conversation with your AI assistant.">
+    <meta name="description" content="Your assistant requests a setting; you supply the value outside chat. Explore Keyhole's assistant preview, Porthole instructions, and Render and Neon MCP guides.">
     <title>Keyhole — put the secret in your project</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="https://jlumbroso.github.io/berkeley-mono/v2.004/berkeley-mono.css">
@@ -22,18 +22,18 @@
     </header>
 
     <main id="main" tabindex="-1">
-      <!-- Current command flow only. README.md and src/setSecret.ts are the
-           claim sources; assistant request links and vendor guides come later. -->
+      <!-- Manual entry is on main. Request, inbox and status behavior is an
+           implemented preview at 50d6803; see the manual's model reference. -->
       <section class="hero wrap" aria-labelledby="title">
         <div class="hero-copy">
-          <p class="eyebrow">API keys &amp; tokens · VS Code</p>
+          <p class="eyebrow"><strong>Assistant preview</strong> · API keys &amp; tokens · VS Code</p>
           <h1 id="title">Put the secret<br>in your project<span class="brand-period" aria-hidden="true">.</span></h1>
-          <p class="intro">Your AI assistant can help you find an API key and explain where it belongs. Enter the value in Keyhole’s masked box: it writes to your project’s <code>.env</code> file and keeps the full value out of its own messages and logs.</p>
+          <p class="intro">Your assistant builds the integration. When it needs a credential, it can display instructions in <a href="https://jlumbroso.github.io/porthole/">Porthole</a> and request a setting by name through Keyhole’s preview. You enter the value in a masked box; the assistant checks the recorded status without asking you to paste the value into chat.</p>
+          <p class="release-note"><strong>First release in preparation.</strong> The current build supports manual entry. Assistant requests, inbox and status checks are implemented in a separate preview.</p>
           <div class="hero-actions">
             <a class="button" href="https://jlumbroso.github.io/keyhole-docs/">Read the manual <span aria-hidden="true">↗</span></a>
-            <a class="text-link" href="#how-it-works">See how it works <span aria-hidden="true">↓</span></a>
+            <a class="text-link" href="https://jlumbroso.github.io/keyhole-docs/for-assistants.html">For your assistant <span aria-hidden="true">↗</span></a>
           </div>
-          <p class="release-note">First release in preparation. The manual is available now.</p>
         </div>
 
         <figure class="entry-illustration" aria-labelledby="illustration-caption">
@@ -45,14 +45,14 @@
             <li class="entry-step">
               <span class="step-number" aria-hidden="true">01</span>
               <div class="step-body">
-                <span class="field-label">Name the setting</span>
+                <span class="field-label">The assistant requests a setting</span>
                 <div class="illustrated-field"><code>KEYHOLE_PRACTICE</code></div>
               </div>
             </li>
             <li class="entry-step">
               <span class="step-number" aria-hidden="true">02</span>
               <div class="step-body">
-                <span class="field-label">Enter the value</span>
+                <span class="field-label">You enter the value</span>
                 <div class="illustrated-field masked-value"><span aria-hidden="true">••••••••••••••••</span><span class="sr-only">The value is masked.</span></div>
               </div>
             </li>
@@ -64,14 +64,43 @@
               </div>
             </li>
           </ol>
-          <figcaption id="illustration-caption"><span class="caption-label">Illustration</span> A practice setting, shown as a sequence. This is not a live form or a screenshot.</figcaption>
+          <figcaption id="illustration-caption"><span class="caption-label">Preview illustration</span> A practice request, shown as a sequence. This is not a live form or a screenshot.</figcaption>
         </figure>
+      </section>
+
+      <section class="features wrap" aria-labelledby="guides-title">
+        <div class="section-heading">
+          <h2 id="guides-title">Connect your assistant to a service.</h2>
+          <p>Start with Render or Neon. The guides explain what access is needed, how to authorize it, and how to check the connection. Browser sign-in may avoid the need to copy a token.</p>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <span class="feature-number" aria-hidden="true">Render /</span>
+            <h3><a href="https://jlumbroso.github.io/keyhole-docs/render-mcp.html">Connect Render MCP</a></h3>
+            <p>Follow the authorization and setup steps for using Render’s tools from your assistant.</p>
+          </article>
+          <article>
+            <span class="feature-number" aria-hidden="true">Neon /</span>
+            <h3><a href="https://jlumbroso.github.io/keyhole-docs/neon-mcp.html">Connect Neon MCP</a></h3>
+            <p>Connect your assistant to Neon’s database tools, starting with browser authorization when your client supports it.</p>
+          </article>
+          <article>
+            <span class="feature-number" aria-hidden="true">Assistant preview /</span>
+            <h3><a href="https://jlumbroso.github.io/keyhole-docs/for-assistants.html">Initiate the handoff</a></h3>
+            <p>Open a local guide with Porthole, register a request by name, and check the recorded status. The reference separates released and preview interfaces.</p>
+          </article>
+          <article>
+            <span class="feature-number" aria-hidden="true">Configuration /</span>
+            <h3><a href="https://jlumbroso.github.io/keyhole-docs/assistant-settings.html">Choose the destination</a></h3>
+            <p>A project’s <code>.env</code> is not automatically available to an MCP server. Find the configuration your assistant needs; Keyhole’s settings-file writers are still to come.</p>
+          </article>
+        </div>
       </section>
 
       <section class="features wrap" id="how-it-works" aria-labelledby="features-title">
         <div class="section-heading">
           <h2 id="features-title">From the box to the file.</h2>
-          <p>Run <strong>Keyhole: Set a Secret in .env…</strong> from VS Code’s Command Palette. Give the setting’s name, then enter its value.</p>
+          <p>In the current command flow, run <strong>Keyhole: Set a Secret in .env…</strong> from VS Code’s Command Palette. Give the setting’s name, then enter its value.</p>
         </div>
         <div class="feature-grid">
           <article>
@@ -126,7 +155,7 @@
           </div>
           <div>
             <h3>Written locally</h3>
-            <p>Keyhole writes to the selected project’s <code>.env</code>. The extension makes no network requests and opens no listening port.</p>
+            <p>Keyhole writes to the selected project’s <code>.env</code> and keeps the full value out of its own messages and logs. The extension makes no network requests and opens no listening port.</p>
           </div>
         </div>
         <div class="next-step">

@@ -23,7 +23,9 @@ DATE = '24 October 2026'
 PRODUCT = 'https://jlumbroso.github.io/keyhole/'
 REPOSITORY = 'https://github.com/jlumbroso/keyhole'
 SOURCE_NOTICE = 'Source access currently requires a repository invitation.'
-CHAPTER_SLUGS = ('overview', 'first-secret', 'keeping-secrets-out-of-the-conversation', 'troubleshooting')
+CHAPTER_SLUGS = ('overview', 'first-secret', 'for-assistants', 'render-mcp',
+                 'neon-mcp', 'assistant-settings',
+                 'keeping-secrets-out-of-the-conversation', 'troubleshooting')
 ASSETS = ('manual.css', 'manual.js', 'favicon.svg', 'LICENSE.keyhole', 'NOTICE.third-party')
 VOID = {'img', 'br', 'hr', 'meta', 'link', 'input', 'source', 'wbr'}
 
@@ -359,19 +361,21 @@ def build():
     (SITE / 'manual.md').write_text('# Keyhole manual\n\n' + '\n\n---\n\n'.join(exports), encoding='utf-8')
     llms = f'''# Keyhole manual
 
-> Instructions and reference for Keyhole, a VS Code extension for entering secrets outside a conversation.
+> Help an assistant initiate a credential handoff: display a guide with Porthole, request names through Keyhole, and keep secret values out of the conversation. Includes Render and Neon MCP setup guides.
 
 {STATUS}. Updated {DATE}. This manual does not announce a published release.
 
 {SOURCE_NOTICE}
 
-Each chapter includes its notes, release status, and source reference. The complete manual contains the same four chapters. Keep real credentials out of conversations, screenshots, copied settings, and documentation reports.
+The current main build supports manual entry into .env. Request links, inbox records and secret_status are an implemented next-release preview; consult the model reference before calling them. Harness-specific writers are not yet implemented. OAuth may avoid the need to copy a service token at all.
+
+Each chapter includes its notes, release status, and source reference. The complete manual contains the same {len(chapters)} chapters. Keep real credentials out of conversations, screenshots, copied settings, and documentation reports.
 
 ## Chapters
 
 '''
     llms += '\n'.join(f'- [{c["nav"]}]({BASE}{c["slug"]}.md): {c["dek"]}' for c in chapters)
-    llms += f'\n\n## Complete manual\n\n- [Full manual]({BASE}manual.md): All four chapters in one Markdown file.\n'
+    llms += f'\n\n## Complete manual\n\n- [Full manual]({BASE}manual.md): All {len(chapters)} chapters in one Markdown file.\n'
     (SITE / 'llms.txt').write_text(llms, encoding='utf-8')
     (SITE / '.nojekyll').write_text('', encoding='utf-8')
     (SITE / 'robots.txt').write_text('User-agent: *\nAllow: /\nSitemap: ' + BASE + 'sitemap.xml\n', encoding='utf-8')

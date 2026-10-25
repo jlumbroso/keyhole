@@ -1,0 +1,86 @@
+<div class="note"><p><strong>Request interface: implemented preview.</strong> The request link, inbox and status MCP described here belong to Keyhole's next-release branch, checked at <code>50d6803</code>. They are not in the current main-branch build or a verified public release. The current build provides <code>Keyhole: Set a Secret in .env…</code>. Porthole's local-file opening interface is released in 0.4.1.</p></div>
+
+<p>Initiate the step that needs the person. Prepare the instructions, display them through Porthole, and submit a Keyhole request containing the setting's name and purpose. The person obtains the credential and supplies its value in Keyhole. Continue from the recorded status without asking for the value in chat.</p>
+
+<h2 id="choose-the-handoff">Choose the handoff before requesting a token</h2>
+<ol>
+  <li>Identify the service, task and credential type. For MCP access, start with the <a href="render-mcp.html">Render</a> or <a href="neon-mcp.html">Neon</a> guide. If browser authorization is sufficient, use that route instead of requesting an API key.</li>
+  <li>Identify the receiving process and destination. A project's <code>.env</code> is not automatically available to every MCP server. Check <a href="assistant-settings.html">assistant settings</a> before promising a complete setup.</li>
+  <li>Explain what access the credential grants. Ask only for the names the chosen setup needs; never request a value through a tool argument, URL or conversation.</li>
+  <li>Confirm the person has a build with the interface below. If not, display the guide and explain the current Command Palette entry flow.</li>
+</ol>
+
+<h2 id="display-the-guide">1. Display a local guide with Porthole</h2>
+<p>Porthole opens an existing local Markdown or HTML file. It does not open the manual's remote URL directly. Run the download from the selected workspace folder's root, so the shell and Porthole resolve the same relative path:</p>
+<pre><code>mkdir -p docs/keyhole &amp;&amp; curl --fail --location 'https://jlumbroso.github.io/keyhole-docs/render-mcp.md' --output docs/keyhole/render-mcp.md</code></pre>
+<p>After the download succeeds, read the local guide before presenting it. Then, on macOS, open it with this credential-free command. Replace <code>my-project</code> with the receiving VS Code workspace folder's display name:</p>
+<pre><code>open 'vscode://jlumbroso.porthole/v1/open?file=docs/keyhole/render-mcp.md&amp;repo=my-project&amp;width=480&amp;height=720'</code></pre>
+<p>For Neon, use <code>neon-mcp.md</code> in both the download and local path. Keep credentials out of the file. The OS sends the link to the last-used VS Code window; <code>repo</code> disambiguates a folder in that window, not a different window.</p>
+<p>Executing <code>open</code> is a GUI action subject to your harness permissions. Printing a command or link is not executing it. Porthole gives no completion receipt to the caller, and opening a guide does not establish that the person has read it. See <a href="https://jlumbroso.github.io/porthole-docs/terminal-and-agents.html">Porthole's terminal and agents reference</a>.</p>
+
+<h2 id="request-link">2. Register a request by opening its URI</h2>
+<p>With the Keyhole preview installed, this harmless practice request records the name and announces it in VS Code:</p>
+<pre><code>open 'vscode://jlumbroso.keyhole/v1/request?name=KEYHOLE_PRACTICE&amp;why=Try%20the%20request%20flow&amp;repo=my-project'</code></pre>
+<p>The person chooses <strong>Keyhole: Show Inbox</strong> and selects the request when ready. The link does not immediately open a value box. For the current main build, the person instead runs <strong>Keyhole: Set a Secret in .env…</strong>, enters the agreed name, and follows <a href="first-secret.html">the practice walkthrough</a>.</p>
+<table>
+  <caption>Preview URI: <code>vscode://jlumbroso.keyhole/v1/request</code></caption>
+  <thead><tr><th>Parameter</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>name</code></td><td>Required variable name. Repeat for multiple names, in the order requested. A request accepts 1–10 distinct names.</td></tr>
+    <tr><td><code>why</code></td><td>Optional short explanation of the task that needs the credential.</td></tr>
+    <tr><td><code>where</code></td><td>Optional description of where the person obtains it. This is not the output file or a configurable destination.</td></tr>
+    <tr><td><code>repo</code></td><td>Optional exact display name of an open local workspace folder. Without it, exactly one local folder must be open.</td></tr>
+  </tbody>
+</table>
+<p>Encode query values. Names must match <code>[A-Z][A-Z0-9_]*</code>; names that alter command execution or sensitive runtime behavior are refused. Keep <code>why</code> and <code>where</code> to 500 characters each, without line breaks or control characters. Do not repeat these fields or <code>repo</code>. Avoid text containing an ampersand followed by a parameter-like name and equals sign; VS Code's pre-decoding makes that ambiguous in this preview.</p>
+<p>There is no <code>value</code>, <code>token</code> or <code>target</code> parameter. Unknown fields are rejected. Allowed prose is not a secret detector: never hide a value inside <code>why</code> or <code>where</code>. The destination remains the chosen folder's <code>.env</code>.</p>
+
+<h2 id="request-file">Alternative: write the request record</h2>
+<p>An assistant that can edit project files can add the same request to <code>.keyhole/inbox.json</code>. Preserve existing rows. Use the current UTC time for <code>asked</code>; the date below is illustrative.</p>
+<pre><code>{
+  "format": 1,
+  "requests": [
+    {
+      "kind": "request",
+      "names": ["KEYHOLE_PRACTICE"],
+      "why": "Try the request flow",
+      "asked": "2026-10-24T23:00:00Z"
+    }
+  ]
+}</code></pre>
+<p>The file belongs to that project, so it has no <code>repo</code> field. Each row permits only <code>kind</code>, <code>names</code>, <code>why</code>, <code>where</code> and <code>asked</code>. The active extension watches the file. Requests already present at startup are not announced or initially refreshed; the URI is preferable for an active handoff. The record contains names and instructions, never values; it is intended to be shareable with the project.</p>
+<p>The URI route and file route reach the same request checks. A repeated URI with the same ordered names does not add another row or update its description. Neither route returns a request ID or proves that the person submitted a value.</p>
+
+<h2 id="connect-status">3. Connect the status MCP</h2>
+<p>In the preview, run <strong>Keyhole: Connect an Assistant…</strong>. It copies the registration command for the chosen harness, with the installed server's actual stable path. The person runs that command once. These are the source-derived command shapes; <code>&lt;server-path&gt;</code> is a placeholder, not a file to create:</p>
+<pre><code>claude mcp add --scope user --transport stdio keyhole -- node "&lt;server-path&gt;"
+codex mcp add keyhole -- node "&lt;server-path&gt;"
+gemini mcp add -s user keyhole node "&lt;server-path&gt;"
+grok mcp add keyhole -- node "&lt;server-path&gt;"</code></pre>
+<p>These commands require <code>node</code> on the harness's PATH. VS Code's own chat is offered a Keyhole MCP provider separately. Connecting the server exposes a status tool; it does not create requests or display guides.</p>
+
+<h2 id="secret-status">4. Call <code>secret_status</code></h2>
+<p>The preview MCP has one tool, <code>secret_status</code>. Pass a required name and, preferably, the project's absolute path. Here are its arguments:</p>
+<pre><code>{
+  "name": "KEYHOLE_PRACTICE",
+  "project": "/absolute/path/my-project"
+}</code></pre>
+<p>For an MCP client implementing the protocol directly, the corresponding tool-call message is:</p>
+<pre><code>{"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"secret_status","arguments":{"name":"KEYHOLE_PRACTICE","project":"/absolute/path/my-project"}}}</code></pre>
+<p>Only <code>name</code> and <code>project</code> are accepted. If <code>project</code> is omitted, the server uses <code>CLAUDE_PROJECT_DIR</code>, then its working directory. Unlike the URI's <code>repo</code>, this is a filesystem path; it is not limited to currently open workspace folders.</p>
+<table>
+  <caption>Interpreting the structured result</caption>
+  <thead><tr><th>Result</th><th>What it establishes</th></tr></thead>
+  <tbody>
+    <tr><td><code>known: false</code></td><td>No readable cached entry. This is not proof that the variable is absent.</td></tr>
+    <tr><td><code>known: true, set: false</code></td><td>The cache records no matching assignment at <code>checked</code>. A missing or unreadable <code>.env</code> can also produce this result.</td></tr>
+    <tr><td><code>known: true, set: true</code></td><td>The extension found an assignment at <code>checked</code>, which may be empty. The result includes its length and keyprint; it does not establish a usable credential.</td></tr>
+  </tbody>
+</table>
+<p>The MCP process reads <code>.keyhole/status.local.json</code>, not <code>.env</code>. The extension maintains that cache. Check the timestamp; do not turn a cached observation into a claim about a fresh write, a particular request, or service authentication. A keyprint can include a recognized public prefix and the last four characters of a long value.</p>
+
+<h2 id="continue-without-the-value">Continue without the value</h2>
+<p>Distinguish these outcomes in your reply: guide displayed, request registered, setting observed, process configured, and service accepted a permitted operation. Resume only the work supported by the observed step. Do not print environment variables, read a secret-bearing file, or ask the person to paste it to diagnose a failure. Use the service guide's verification step and <a href="keeping-secrets-out-of-the-conversation.html">file protections</a>.</p>
+
+<h2 id="reference-status">Reference status</h2>
+<p>Checked against <a href="https://github.com/jlumbroso/keyhole/tree/50d68037f398797643a4da39f59da4eb545c98e5/src">Keyhole preview source at 50d6803</a> and <a href="https://github.com/jlumbroso/porthole/releases/tag/v0.4.1">Porthole 0.4.1</a> on 24 October 2026. The Keyhole source link currently requires repository access. These examples are documentation/source checked, not a fresh end-to-end test in a running assistant or a provider account.</p>

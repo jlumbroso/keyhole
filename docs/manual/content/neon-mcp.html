@@ -1,0 +1,69 @@
+<p>Use Neon's MCP server when you want your coding assistant to inspect or work on a Neon project. For the API-key route, the credential is a Neon management API key. A database password, a <code>postgresql://</code> connection string, and an application's end-user login token are different credentials.</p>
+<div class="note"><p>Guide preview. Steps checked against official documentation on 24 October 2026; sign-in and connection checks have not yet been tested here.</p></div>
+
+<h2 id="choose-authentication">1. Choose how to connect</h2>
+<p>Start with browser authorization, also called OAuth. Your client opens Neon in your browser, where you review and approve access. You do not need to create an API key or pass a value through Keyhole.</p>
+<p>Use a development or test project containing no personal or production data. Neon recommends its MCP server for development and testing. Depending on configuration, its tools can read database contents and make changes. See <a href="https://neon.com/docs/ai/neon-mcp-server#mcp-security-guidance">Neon's security guidance</a>.</p>
+
+<h2 id="authorize-in-browser">2. Authorize in your browser</h2>
+<ol>
+  <li>In your terminal, run <code>npx neon@latest mcp --oauth --read-only</code>. It uses Neon's installer and requires Node.js and <code>npx</code>.</li>
+  <li>Choose the configuration location and only the client you intend to use. For a personal setup, choose the per-user location. Review the destination displayed before the installer writes.</li>
+  <li>Restart the client if needed. On the first Neon tool request, complete the browser sign-in and review the requested access.</li>
+  <li>Continue to the <a href="#verify-connection">connection check</a>.</li>
+</ol>
+<p>The explicit <code>--oauth</code> option avoids minting an API key. Without it, the installer can create a key and write it into client configuration. The <code>--read-only</code> option restricts MCP operations; it does not change an API key's scope. See <a href="https://neon.com/docs/cli/mcp">Neon's installer reference</a>.</p>
+<p>The installer selects a file for the chosen client. This is a client configuration step, not a write to your project's <code>.env</code>. See <a href="assistant-settings.html">Assistant settings</a> before choosing another destination.</p>
+<p>For Claude Desktop, Neon also offers a browser-authorized connector under <strong>Customize → Connectors</strong>. See <a href="https://neon.com/docs/ai/neon-mcp-server#claude-connector">Neon's connector instructions</a>.</p>
+
+<h2 id="limit-access">Keep the first connection narrow</h2>
+<p>Neon's server supports <code>readonly=true</code> and an optional <code>projectId</code> in its URL. A project restriction limits this MCP connection, separately from the credential's scope. A database role can further limit SQL access, but creating and granting that role is a separate task. Consult <a href="https://neon.com/docs/ai/neon-mcp-server#access-control">Neon's access-control reference</a> before enabling writes or connecting another project.</p>
+
+<h2 id="obtain-api-key">Alternative: obtain a management API key</h2>
+<ol>
+  <li>Prepare the receiving configuration first. Sign in to the <a href="https://console.neon.tech">Neon Console</a>.</li>
+  <li>For a personal key, open your profile menu, then <strong>Settings → API keys</strong>, and create a key for this client.</li>
+  <li>If you administer an organization and need only one project, use its <strong>Settings → API keys → Create new → Project-scoped</strong> route and select the project.</li>
+  <li>Copy the new value directly to the receiving field. It is shown once; a lost value must be replaced.</li>
+</ol>
+<p>Personal keys follow your account's access. Organization-wide keys grant broad access. A project-scoped key still permits changes within its project; it is not read-only. Only organization administrators can create organization and project-scoped keys. See <a href="https://neon.com/docs/manage/api-keys">Neon's key types and creation instructions</a>.</p>
+
+<h2 id="api-key-destination">Put the key in the client's configuration</h2>
+<p>Have your assistant prepare a placeholder configuration before you enter the value. Apply the <a href="keeping-secrets-out-of-the-conversation.html">file-access protections</a>. Keep the key out of assistant-run commands, chat, and shared files. Do not ask the assistant to open the receiving file after you enter it.</p>
+
+<h3 id="claude-code-api-key">Claude Code: reference the key by name</h3>
+<p>Prepare this project-root <code>.mcp.json</code> configuration. Merge the <code>neon</code> entry with existing servers rather than replacing them.</p>
+<pre><code>{
+  "mcpServers": {
+    "neon": {
+      "type": "http",
+      "url": "https://mcp.neon.tech/mcp?readonly=true",
+      "headers": {"Authorization": "Bearer ${NEON_API_KEY}"}
+    }
+  }
+}</code></pre>
+<ol>
+  <li>Leave <code>${NEON_API_KEY}</code> unchanged. Privately set <code>env.NEON_API_KEY</code> in the project's <code>.claude/settings.local.json</code>, following <a href="assistant-settings.html">the protected settings walkthrough</a>. Enter the raw key, without a <code>Bearer </code> prefix.</li>
+  <li>Restart Claude Code in this project. Review its MCP approval request and approve the intended Neon server. Then check the connection below.</li>
+</ol>
+<p>This combines <a href="https://neon.com/docs/ai/connect-mcp-clients-to-neon#claude-code">Neon's bearer authentication</a> with <a href="https://code.claude.com/docs/en/mcp#environment-variable-expansion-in-mcpjson">Claude Code's variable references</a> and Neon's read-only option. It is documentation-derived, not account-tested. For another client, follow <a href="https://neon.com/docs/ai/connect-mcp-clients-to-neon">Neon's client-specific instructions</a>.</p>
+<div class="note"><p>Keyhole currently writes the project's <code>.env</code>, not <code>.claude/settings.local.json</code>. Saving <code>NEON_API_KEY</code> through Keyhole does not complete the settings step above. For now, that step is a private human edit. See <a href="assistant-settings.html">the destination distinction</a>.</p></div>
+<p>This configuration stores the key locally and connects to Neon's hosted server. Use the <code>/mcp</code> endpoint. The old <code>/sse</code> endpoint and <code>@neondatabase/mcp-server-neon</code> local package are deprecated; see <a href="https://neon.com/docs/ai/neon-mcp-server#troubleshooting">Neon's migration notes</a>.</p>
+
+<h2 id="verify-connection">3. Check the connection without reading a secret</h2>
+<p>For a connection without a single-project restriction, ask:</p>
+<pre><code>Use Neon's MCP tools to list only my project names and IDs.
+Do not run SQL, retrieve a connection string, or change anything.</code></pre>
+<p>If you restricted the connection to one project, ask for that project's name and ID instead. Do not widen access merely to make a cross-project listing work. These inspection tasks are supported by <a href="https://github.com/neondatabase/mcp-server-neon">Neon's server</a>.</p>
+<p>Success means Neon accepted that lookup. It does not prove database-query access or permission to make changes. If it fails, share the client name and error category without the key, settings file, connection string, request headers, or raw debug log.</p>
+
+<h2 id="remove-access">4. Remove or replace access</h2>
+<p>For an API key, return to its API keys page and use <strong>Revoke</strong>. Revocation is immediate and permanent. For planned rotation, create a replacement, update each client, verify, then revoke the old key. If exposed, revoke it first. See <a href="https://neon.com/docs/manage/api-keys#revoke-api-keys">Neon's revocation and rotation instructions</a>.</p>
+<p>For Claude Code OAuth, open <code>/mcp</code>, select Neon, and use <strong>Clear authentication</strong>; disable the server if it is no longer needed. See <a href="https://code.claude.com/docs/en/mcp#authenticate-with-remote-mcp-servers">Claude Code's authentication controls</a>. Deleting local settings is not evidence that every issued OAuth token was revoked. This review did not establish Neon Console clicks for provider-side OAuth revocation; contact Neon support if an OAuth credential may have been exposed.</p>
+
+<h2 id="for-the-assistant">For the assistant guiding this step</h2>
+<p>Use <a href="for-assistants.html">the assistant handoff reference</a> to present this guide through Porthole. OAuth needs no Keyhole request. For an API key, establish the receiving client, exact setting name, value format, destination, and loading step first. Report the observed result without asking to see the value.</p>
+
+<h2 id="source-notes">Source notes</h2>
+<p>The linked Neon and client documentation was reviewed on 24 October 2026. Commands, configuration, and account flows are documentation-checked, not verified in a running MCP client or Neon account.</p>
+

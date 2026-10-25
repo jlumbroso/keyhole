@@ -2,9 +2,19 @@
   <p>Keyhole's first release is being prepared. It is not yet available from the extension registries. The walkthrough in this manual applies once Keyhole is installed.</p>
 </div>
 
-<p>Your project may need an API key, token, password, or database connection string to use another service. Keyhole lets you paste that value into a masked box in VS Code and save it in the project's <code>.env</code> file.</p>
-<p>Your assistant can explain which setting the project needs and where to obtain it. You do not need to paste the secret into the conversation.</p>
-<p>Start with a harmless example: <a href="first-secret.html">Set your first secret</a>.</p>
+<p>Your assistant can build the integration, but a step may still need you: signing in to a service, authorizing access or supplying a token. Keyhole gives the assistant a way to initiate that handoff. Its companion <a href="https://jlumbroso.github.io/porthole/">Porthole</a> can display the instructions beside your work.</p>
+<p>The assistant requests a setting by name. You obtain its value and enter it in Keyhole's masked box. The value goes into the project without passing through the conversation.</p>
+<div class="note"><p><strong>Available behavior matters.</strong> The current Keyhole main build supports manual entry into <code>.env</code>. Assistant-triggered requests and a status MCP are implemented in the next-release preview. Harness-specific settings writers are still to come. The <a href="for-assistants.html">model reference</a> separates these interfaces.</p></div>
+
+<h2 id="choose-your-start">Choose your starting point</h2>
+<ul>
+  <li><a href="first-secret.html">Try Keyhole with a harmless value</a> before introducing a real credential.</li>
+  <li><a href="render-mcp.html">Connect a Render MCP server</a> to help your assistant work with Render services.</li>
+  <li><a href="neon-mcp.html">Connect a Neon MCP server</a> to help your assistant work with Neon projects and databases.</li>
+  <li><a href="for-assistants.html">Give your assistant the exact trigger commands</a>, request format and status contract.</li>
+  <li><a href="assistant-settings.html">Find the right assistant configuration</a> for Claude Code, Codex, Gemini CLI or Grok Build.</li>
+</ul>
+<p>The service guides start with the task and authorization method. If the MCP offers browser sign-in, you may not need to copy a token at all.</p>
 
 <h2 id="name-and-value">A name and a value</h2>
 <p>A setting has two parts. Its name, such as <code>DATABASE_URL</code>, tells the program which setting it is. Its value is the connection string, key, or other information supplied by the service.</p>
@@ -13,7 +23,7 @@
 
 <h2 id="what-keyhole-does">What Keyhole does</h2>
 <p>Run <code>Keyhole: Set a Secret in .env…</code> from VS Code's Command Palette. Keyhole asks for the variable's name, checks Git's tracking and ignore rules when a repository is present, and takes the value in a masked input box. It appends the setting to the selected folder's <code>.env</code>. If it finds a repository VS Code cannot open, it refuses the write. <a href="troubleshooting.html#no-git-repository">A folder without a detected repository can receive a value</a>.</p>
-<p>You start the command yourself. The first release writes to <code>.env</code> only; it does not provide an inbox of requests or write to an assistant's settings file.</p>
+<p>In this first command flow, you start the command yourself. The preview adds <a href="for-assistants.html#request-link">requests an assistant can trigger</a>; it still writes to <code>.env</code>. Neither build writes directly to an assistant's settings file yet.</p>
 <p><code>.env</code> is an ordinary text file. Your program must be configured to read it. Writing this local file does not update the settings of a deployed service.</p>
 
 <h2 id="saved-loaded-accepted">Saved, loaded, and accepted are different</h2>
