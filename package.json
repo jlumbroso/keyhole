@@ -5,6 +5,11 @@
   "version": "0.0.1",
   "publisher": "jlumbroso",
   "private": true,
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#2E2A72",
+    "theme": "dark"
+  },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -77,8 +82,14 @@
     "@types/vscode": "~1.134.0",
     "@vitest/coverage-v8": "5.0.5",
     "@vscode/vsce": "^4.0.0",
+    "ovsx": "1.2.0",
     "typescript": "^6.0.3",
     "vite": "^8.3.4",
     "vitest": "^5.0.5"
+  },
+  "overrides": {
+    "ovsx": {
+      "@vscode/vsce": "$@vscode/vsce"
+    }
   }
 }

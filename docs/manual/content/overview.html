@@ -1,0 +1,38 @@
+<div class="note">
+  <p>Keyhole's first release is being prepared. It is not yet available from the extension registries. The walkthrough in this manual applies once Keyhole is installed.</p>
+</div>
+
+<p>Your project may need an API key, token, password, or database connection string to use another service. Keyhole lets you paste that value into a masked box in VS Code and save it in the project's <code>.env</code> file.</p>
+<p>Your assistant can explain which setting the project needs and where to obtain it. You do not need to paste the secret into the conversation.</p>
+<p>Start with a harmless example: <a href="first-secret.html">Set your first secret</a>.</p>
+
+<h2 id="name-and-value">A name and a value</h2>
+<p>A setting has two parts. Its name, such as <code>DATABASE_URL</code>, tells the program which setting it is. Its value is the connection string, key, or other information supplied by the service.</p>
+<p>Discuss the name with your assistant. Enter the value in Keyhole.</p>
+<p>Before obtaining a credential, ask which service and credential type the project needs, what it will use it for, and the exact variable name it expects. A database connection string and an account-management API key serve different purposes, even when both come from the same provider.</p>
+
+<h2 id="what-keyhole-does">What Keyhole does</h2>
+<p>Run <code>Keyhole: Set a Secret in .env…</code> from VS Code's Command Palette. Keyhole asks for the variable's name, checks Git's tracking and ignore rules when a repository is present, and takes the value in a masked input box. It appends the setting to the selected folder's <code>.env</code>. If it finds a repository VS Code cannot open, it refuses the write. <a href="troubleshooting.html#no-git-repository">A folder without a detected repository can receive a value</a>.</p>
+<p>You start the command yourself. The first release writes to <code>.env</code> only; it does not provide an inbox of requests or write to an assistant's settings file.</p>
+<p><code>.env</code> is an ordinary text file. Your program must be configured to read it. Writing this local file does not update the settings of a deployed service.</p>
+
+<h2 id="saved-loaded-accepted">Saved, loaded, and accepted are different</h2>
+<ol>
+  <li>Saved: Keyhole wrote the setting to <code>.env</code> and checked the result.</li>
+  <li>Loaded: the program read that file and received the setting. A program that reads settings at startup needs to restart.</li>
+  <li>Accepted: the service accepted the credential for the operation you tried.</li>
+</ol>
+<p>Keyhole's success message confirms the first step. Check the program's behavior to establish the other two, without printing the value.</p>
+
+<h2 id="before-a-real-secret">Before using a real secret</h2>
+<p>Follow <a href="keeping-secrets-out-of-the-conversation.html">Keep secrets out of the conversation</a> for the application running your assistant. Keyhole omits the full value from its own messages and logs, but another tool with file access may still read <code>.env</code>. The file is not encrypted.</p>
+<p>Git ignore rules help prevent future commits. They do not prevent reads, and they do not remove a secret from an earlier commit.</p>
+
+<h2 id="requirements">What you need</h2>
+<ul>
+  <li>VS Code desktop 1.134.0 or later.</li>
+  <li>Your project open as a local folder.</li>
+  <li>Git installed and VS Code's built-in Git extension enabled.</li>
+</ul>
+<p>Hand checks recorded so far cover macOS with VS Code 1.141.0. Windows and Linux have not been checked.</p>
+<p>If a step does not work, start with <a href="troubleshooting.html">Troubleshooting</a>. Share the variable's name and the message you saw, without the value or a copy of <code>.env</code>.</p>

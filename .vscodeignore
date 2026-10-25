@@ -11,5 +11,6 @@
 !LICENSE
 !NOTICE
 !dist/extension.js
+!media/icon.png
 # Keyhole's API for models, started by their harness (ADR-0005).
 !dist/mcp-server.js

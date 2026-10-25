@@ -1,3 +1,6 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { gitThroughVsCode, READY_TIMEOUT_MS } from '../gitApi';
 import { resetExtensions, setExtension } from './helpers/vscodeMock';
@@ -104,5 +107,34 @@ describe('when there is no repository, or git cannot be asked', () => {
     await vi.advanceTimersByTimeAsync(READY_TIMEOUT_MS + 1);
     expect(await stuck).toEqual({ unavailable: expect.stringMatching(/did not finish starting/) });
     vi.useRealTimers();
+  });
+});
+
+describe('Regression tests', () => {
+  it('refuses, rather than writes unchecked, when a repository is there but VS Code did not open it', async () => {
+    // Bug: getRepositoryRoot() returns null both when the folder is in no
+    // repository and when git refuses a repository it calls unsafe ("dubious
+    // ownership", NotASafeGitRepository; Surveyor's git-route review, section
+    // 4). Keyhole read both as 'no-repository' and wrote .env with no tracked
+    // or ignored check, though the repository might track .env. Caught by
+    // Sounder's cold read of the website's claim (2026-10-24), from source.
+    const root = mkdtempSync(join(tmpdir(), 'keyhole-unsafe-'));
+    try {
+      mkdirSync(join(root, '.git'));
+      mkdirSync(join(root, 'app'));
+      installGit({ repository: 'none' });
+
+      expect(await gitThroughVsCode.protection(root, '.env')).toEqual({ unavailable: expect.stringMatching(/git repository that VS Code's Git extension did not open/) });
+      // A parent's .git counts too, and so does a .git file (a worktree or a submodule).
+      expect(await gitThroughVsCode.protection(join(root, 'app'), '.env')).toEqual({ unavailable: expect.any(String) });
+      rmSync(join(root, '.git'), { recursive: true });
+      writeFileSync(join(root, '.git'), 'gitdir: /elsewhere/.git/worktrees/app\n');
+      expect(await gitThroughVsCode.protection(root, '.env')).toEqual({ unavailable: expect.any(String) });
+      // And with no .git anywhere, it is a folder in no repository after all.
+      rmSync(join(root, '.git'));
+      expect(await gitThroughVsCode.protection(root, '.env')).toBe('no-repository');
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });

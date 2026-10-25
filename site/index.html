@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="description" content="Put an API key or token into your project's .env through a masked box in VS Code. Keep the value out of the conversation with your AI assistant.">
+    <title>Keyhole — put the secret in your project</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://jlumbroso.github.io/berkeley-mono/v2.004/berkeley-mono.css">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header wrap">
+      <a class="wordmark" href="#main" aria-label="Keyhole home"><img class="brand-icon" src="favicon.svg" width="32" height="32" alt=""><span>Keyhole<span class="brand-period" aria-hidden="true">.</span></span></a>
+      <nav aria-label="Main navigation">
+        <a href="#how-it-works">How it works</a>
+        <a href="https://jlumbroso.github.io/keyhole-docs/">Manual <span aria-hidden="true">↗</span></a>
+        <a href="https://jlumbroso.github.io/porthole/">Porthole <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <!-- Current command flow only. README.md and src/setSecret.ts are the
+           claim sources; assistant request links and vendor guides come later. -->
+      <section class="hero wrap" aria-labelledby="title">
+        <div class="hero-copy">
+          <p class="eyebrow">API keys &amp; tokens · VS Code</p>
+          <h1 id="title">Put the secret<br>in your project<span class="brand-period" aria-hidden="true">.</span></h1>
+          <p class="intro">Your AI assistant can help you find an API key and explain where it belongs. Enter the value in Keyhole’s masked box: it writes to your project’s <code>.env</code> file and keeps the full value out of its own messages and logs.</p>
+          <div class="hero-actions">
+            <a class="button" href="https://jlumbroso.github.io/keyhole-docs/">Read the manual <span aria-hidden="true">↗</span></a>
+            <a class="text-link" href="#how-it-works">See how it works <span aria-hidden="true">↓</span></a>
+          </div>
+          <p class="release-note">First release in preparation. The manual is available now.</p>
+        </div>
+
+        <figure class="entry-illustration" aria-labelledby="illustration-caption">
+          <div class="illustration-head">
+            <span>Keyhole</span>
+            <span class="illustration-context">Your project / <code>.env</code></span>
+          </div>
+          <ol class="entry-steps">
+            <li class="entry-step">
+              <span class="step-number" aria-hidden="true">01</span>
+              <div class="step-body">
+                <span class="field-label">Name the setting</span>
+                <div class="illustrated-field"><code>KEYHOLE_PRACTICE</code></div>
+              </div>
+            </li>
+            <li class="entry-step">
+              <span class="step-number" aria-hidden="true">02</span>
+              <div class="step-body">
+                <span class="field-label">Enter the value</span>
+                <div class="illustrated-field masked-value"><span aria-hidden="true">••••••••••••••••</span><span class="sr-only">The value is masked.</span></div>
+              </div>
+            </li>
+            <li class="entry-step">
+              <span class="step-number" aria-hidden="true">03</span>
+              <div class="step-body saved-receipt">
+                <span class="field-label">Saved to <code>.env</code></span>
+                <p><code>KEYHOLE_PRACTICE</code><br>The name and destination, without the value.</p>
+              </div>
+            </li>
+          </ol>
+          <figcaption id="illustration-caption"><span class="caption-label">Illustration</span> A practice setting, shown as a sequence. This is not a live form or a screenshot.</figcaption>
+        </figure>
+      </section>
+
+      <section class="features wrap" id="how-it-works" aria-labelledby="features-title">
+        <div class="section-heading">
+          <h2 id="features-title">From the box to the file.</h2>
+          <p>Run <strong>Keyhole: Set a Secret in .env…</strong> from VS Code’s Command Palette. Give the setting’s name, then enter its value.</p>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <span class="feature-number" aria-hidden="true">01 /</span>
+            <h3>Checks Git first.</h3>
+            <p>Keyhole checks that <code>.env</code> is ignored and untracked. It offers to add an ignore rule and checks again. A tracked file, a reported Git error, or a repository VS Code cannot open stops the write. <a href="https://jlumbroso.github.io/keyhole-docs/troubleshooting.html#no-git-repository">Folders without Git</a>.</p>
+          </article>
+          <article>
+            <span class="feature-number" aria-hidden="true">02 /</span>
+            <h3>Keeps entry masked.</h3>
+            <p>The value appears as dots. You can show it to check what you entered; Keyhole hides it again when you switch to another app.</p>
+          </article>
+          <article>
+            <span class="feature-number" aria-hidden="true">03 /</span>
+            <h3>Asks before an update.</h3>
+            <p>If the name is already set, Keyhole asks before appending a new value. The old line stays in the file, with a comment identifying which line the new setting supersedes.</p>
+          </article>
+          <article>
+            <span class="feature-number" aria-hidden="true">04 /</span>
+            <h3>Confirms the destination.</h3>
+            <p>After writing, Keyhole checks the saved value and tells you the setting’s name and file. The confirmation does not print the full value.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="protection wrap" aria-labelledby="protection-title">
+        <div class="protection-copy">
+          <p class="eyebrow">Keep the next step out of chat, too</p>
+          <h2 id="protection-title">Your assistant can still read files.</h2>
+          <p>Keyhole handles entry into <code>.env</code>. It does not prevent an assistant with file or shell access from opening that file afterward. Configure your assistant’s protections before adding a real credential.</p>
+          <a class="text-link" href="https://jlumbroso.github.io/keyhole-docs/keeping-secrets-out-of-the-conversation.html">Set up your assistant’s file protections <span aria-hidden="true">↗</span></a>
+        </div>
+        <aside class="protection-detail" aria-label="What the checks mean">
+          <p><strong>Ignored does not mean unreadable.</strong> Git ignore rules help keep a file out of future commits. They do not remove secrets from past commits or stop programs from opening it.</p>
+          <p><strong>A marker can identify a value.</strong> Keyhole’s log uses a short hash and any recognized public prefix. For values of 32 characters or more, it also includes the last four characters.</p>
+        </aside>
+      </section>
+
+      <section class="requirements wrap" aria-labelledby="requirements-title">
+        <div class="section-heading">
+          <h2 id="requirements-title">Before you start.</h2>
+          <p>A local project, opened as a folder in VS Code.</p>
+        </div>
+        <div class="requirement-grid">
+          <div>
+            <h3>VS Code desktop</h3>
+            <p>Version <strong>1.134.0 or later</strong>, with its built-in Git extension enabled. When no repository is detected, Keyhole permits a write without the tracking and ignore checks. Protect <code>.env</code> before later adding that folder to Git.</p>
+          </div>
+          <div>
+            <h3>Checked on macOS</h3>
+            <p>The command flow has been checked by hand on macOS with VS Code <strong>1.141.0</strong>. Windows and Linux have not been tested.</p>
+          </div>
+          <div>
+            <h3>Written locally</h3>
+            <p>Keyhole writes to the selected project’s <code>.env</code>. The extension makes no network requests and opens no listening port.</p>
+          </div>
+        </div>
+        <div class="next-step">
+          <h3>After saving.</h3>
+          <p>A saved setting does not establish that your app has loaded it or connected to the service. Your app needs a way to read <code>.env</code>, and may need restarting. Hosted services have their own settings; this local write does not configure them.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer wrap">
+      <a class="wordmark" href="#main">Keyhole<span class="brand-period" aria-hidden="true">.</span></a>
+      <div class="footer-content">
+        <nav aria-label="Footer navigation">
+          <a href="https://jlumbroso.github.io/keyhole-docs/">Manual</a>
+          <a href="https://jlumbroso.github.io/porthole/">Porthole</a>
+          <a href="https://github.com/jlumbroso/keyhole" aria-describedby="repository-access">GitHub</a>
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>
+        </nav>
+        <p class="access-note" id="repository-access">The source repository is private for now; its GitHub link requires access.</p>
+      </div>
+    </footer>
+  </body>
+</html>

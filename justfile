@@ -520,6 +520,8 @@ gate:
     # against a mocked VS Code, the bundle, and what the package would ship.
     node scripts/scan-secrets.mjs
     npm run check
+    python3 docs/manual/scripts/build.py
+    python3 scripts/check-site.py
     echo "✅ gate green"
 
 # `release` asserts a destination: "X.Y.Z is released everywhere". Every step reads its own result from the world

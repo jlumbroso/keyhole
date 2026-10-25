@@ -33,9 +33,15 @@ Three different controls matter:
 | Command environment settings | Control values handed directly to programs the assistant runs, even without opening a file. |
 
 Git also keeps tracking a file that was already added, despite a later ignore
-rule. For a destination in a Git repository, Keyhole checks both whether
+rule. When VS Code recognizes the destination's Git repository, Keyhole checks both whether
 the file is ignored and whether it is already tracked. Neither check removes a value
 from existing history. [Git's ignore documentation](https://git-scm.com/docs/gitignore)
+
+If VS Code returns no repository, Keyhole also looks for a `.git` marker in
+the project folder and its parent folders. Finding one stops the write,
+because the repository's tracking and ignore rules could not be checked.
+If no marker is found, Keyhole treats the folder as having no repository and
+permits the write without those checks.
 
 For the examples below:
 

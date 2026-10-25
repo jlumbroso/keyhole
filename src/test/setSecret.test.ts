@@ -126,6 +126,16 @@ describe('seeing what you typed (ADR-0003, QST-SHOW-VALUE, A)', () => {
     return { box, run };
   }
 
+  it('says, in the prompt, that a button can show what was typed, since VS Code\'s boxes do not usually have one', async () => {
+    // Jérémie, QST-CHECK-EYE: the prompt named only Enter and Escape. The
+    // naming review's sentence (№116) describes the function, not the icon,
+    // so it serves a screen reader's user the same.
+    const { box, run } = await openValueBox();
+    expect(box.prompt).toBe(`Paste the value of GITHUB_TOKEN. It is written to ${folder.split('/').at(-1)}/.env and nowhere else. Tab reaches a button that shows what you typed.`);
+    box.finish(undefined);
+    await run;
+  });
+
   it('shows the value with the eye button and hides it again with the same button', async () => {
     const { box, run } = await openValueBox();
     expect(box.password).toBe(true);
