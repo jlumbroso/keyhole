@@ -41,7 +41,7 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 ## Questions
 
 ### QST-TARGET-ORDER: When does Keyhole start writing to Claude Code's `.claude/settings.local.json`?
-- Status: unanswered
+- Status: answered
 - Why asking: A model asking for a Render or Neon key for an MCP server needs the value in Claude Code's `.claude/settings.local.json` under `env`, because the MCP server reads its environment from Claude Code, not from `.env`. How the target behaves is decided (ADR-0001: per variable on request, and a setting off by default with an allow- or blocklist). What is open is where it goes among the releases already ordered (ADR-0004, D): 0.1.0, the person's path (waiting on one naming check); then the skill for models (ADR-0008); then the inbox and the link (ADR-0005, built on a branch); then the entry tab; then the instruction pages.
 - Need: pick a letter (or override — any shape answers)
 
@@ -54,7 +54,7 @@ Options:
 **C — before the inbox, right after the skill.** *Rationale*: it is the smallest stable form that makes Sounder's MCP guides true: the person's path is built and checked by hand, the target is one module behind an interface designed for it, and the guides can say "run Keyhole: Set a Secret, choose Claude Code" without waiting for the link; the inbox then arrives with its destination key already meaningful. A couples two new surfaces (a link from a model, and the most exposed file) in one release, against the watchmaker's test. *Confidence*: 0.6 — because the skill release and this one could merge into one if both are small. *If wrong*: A, if a destination without a model's request is rarely what a newcomer needs; B, if the inbox should ship first because it is built.
 
 **ANS:** (by Jérémie Lumbroso)
-[Fill this in]   <!-- literal placeholder — parser-significant, do not paraphrase -->
+OK, I agree with Option C, your recommendation on scheduling seem sound.
 
 ---
 
