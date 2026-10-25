@@ -9,11 +9,11 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # Destinations beyond .env: Claude Code's settings.local.json first
 
 - **Date**: 2026-10-25
-- **Iteration**: 1
-- **Status**: Draft
+- **Iteration**: 2
+- **Status**: Accepted
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5, the implementation); Sounder 6 (the guides and the destination matrix); Surveyor 5.1 (each harness's environment, read)
 
-**TL;DR**: A model asking for a Render or Neon key for an MCP server needs the value where the MCP server reads it, Claude Code's `.claude/settings.local.json` under `env`, not `.env`; ADR-0001 already decided how that target behaves (per variable on request, and a setting off by default with an allow- or blocklist); one question decides when it ships.
+**TL;DR**: Right after the skill release (Jérémie: C), Keyhole can write a value where a Claude Code MCP server reads it: the literal in `.claude/settings.local.json` under `env`, checked by git like `.env`, while the server's entry in `.mcp.json` stays name-only (`${NAME}`); the person then trusts the folder and reconnects the server; OAuth-based MCP servers need no key at all; the other three harnesses each need their own design.
 
 ---
 
@@ -60,15 +60,24 @@ OK, I agree with Option C, your recommendation on scheduling seem sound.
 
 ## Decision
 
-Not yet: QST-TARGET-ORDER. How the target behaves is ADR-0001's.
+### Chosen: Claude Code's `settings.local.json` `env`, literal there and name-only in `.mcp.json`; right after the skill release
+
+**When (QST-TARGET-ORDER, C; Jérémie, 2026-10-25)**: *"OK, I agree with Option C, your recommendation on scheduling seem sound."* After 0.1.0 and the skill release (ADR-0008), before the inbox (ADR-0005): the person's command gains the destination first.
+
+**A correction to this ADR's first framing, from Sounder's matrix and Surveyor's reading** (`docs/reviews/2026-10-24-mcp-destination-matrix-pinned-reading.md`, Claude Code 2.1.304 run; probe `scripts/ephemeral/2026-10-24-claude-mcp-env-probe.sh`): not every Render or Neon MCP connection needs a key (both document hosted MCP with OAuth, which needs none, and Sounder's guides offer it first), and `settings.local.json` alone does not complete a connection: the server's own entry must use the value. What is now known:
+
+- **The target**: `.claude/settings.local.json`, project scope, key `env.<NAME>`, **the literal value**. Observed: a settings `env` value is in a stdio MCP server's environment, and it is what `${NAME}` in `.mcp.json` expands to. **The server's entry stays name-only and committable**: nothing, if the server reads that name; `"env": { "SERVER_VAR": "${NAME}" }` if it wants another; `"headers": { "Authorization": "Bearer ${NAME}" }` for an HTTP server (Claude Code blanks an unlisted set of "credential variables" in remote `url` and `headers`; `RENDER_API_KEY` and `NEON_API_KEY` are not named, and the first real header will show it).
+- **Its checks**: the same two git checks as `.env` (Claude Code ignores the file only when it creates it, through the global excludes; a tracked copy is treated as repository-supplied and held until trust), and a JSON merge of one key into `env` that keeps every other key.
+- **What the person does next**, which Keyhole's notice must say: the folder must be trusted (project and local `env`, and the `.mcp.json` approvals, apply only after trust); then **`/mcp` → Reconnect** on the server (or `/mcp reconnect all`), because a running server keeps the environment it started with. Keyhole can say *written*; *loaded* is the reconnect; *accepted* is the service's.
+- **The other three, not built, each different** (the reading's one line each): Codex rebuilds a stdio server's environment from an allowlist, its only private literal place is the home file, restart after a change; Gemini CLI empties a name-only `$VAR` for any `*KEY*`/`*TOKEN*` name unless allow-listed, restart after a change; Grok Build reads `bearer_token_file` on every request, so a 0600 file Keyhole writes is the cleanest split there, with no restart. Each needs its own consent and protection design before a writer exists.
 
 ---
 
 ## Action Items
 
-- [ ] Answer QST-TARGET-ORDER — Owner: Jérémie
-- [ ] Send the destination matrix (each harness's file for MCP servers' environment, project versus user scope, official sources) — Owner: Sounder 6 (under way)
-- [ ] Read, at pinned releases, how each harness hands environment to MCP servers versus shell commands, and what Claude Code does with `settings.local.json`'s `env` (merge order with `settings.json`, whether it is gitignored by Claude Code itself) — Owner: Surveyor 5.1, after the matrix
+- [x] Answer QST-TARGET-ORDER — Owner: Jérémie (2026-10-25: C)
+- [x] Send the destination matrix (each harness's file for MCP servers' environment, project versus user scope, official sources) — Owner: Sounder 6 (2026-10-25)
+- [x] Read, at pinned releases, how each harness hands environment to MCP servers versus shell commands, and what Claude Code does with `settings.local.json`'s `env` (merge order with `settings.json`, whether it is gitignored by Claude Code itself) — Owner: Surveyor 5.1 (2026-10-25, with a Claude Code probe)
 - [ ] Build the Claude Code target behind the target interface, per variable and by setting, with its git check and the masked box's line saying where the value goes; tests that every other key survives the merge and that a tracked or unignored file is refused — Owner: Glazier
 - [ ] Name the destination's word in the link and in the box, and the setting — Owner: the naming review
 
@@ -81,6 +90,12 @@ Not yet: QST-TARGET-ORDER. How the target behaves is ADR-0001's.
 - Contributors: Glazier 5.5 (Claude Opus 5.5)
 - Changes: the target's why for MCPs, its checks, the other harnesses deferred to a reading; one question on order
 - Outcome: `Draft`
+
+### Iteration 2 (2026-10-25)
+- Trigger: Jérémie's answer (C); Sounder's matrix; Surveyor's pinned reading and Claude Code probe
+- Contributors: Jérémie Lumbroso, Sounder 6, Surveyor 5.1, Glazier 5.5 (Claude Opus 5.5)
+- Changes: the decision: the literal in `settings.local.json` `env`, the server's entry name-only, trust then Reconnect; this ADR's first framing corrected (OAuth needs no key; the settings file alone does not complete a connection)
+- Outcome: `Draft → Accepted`
 
 ---
 
