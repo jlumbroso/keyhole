@@ -2,9 +2,8 @@
   "name": "keyhole",
   "displayName": "Keyhole",
   "description": "Set a secret in your project's .env — it never passes through a model or a chat.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "jlumbroso",
-  "private": true,
   "icon": "media/icon.png",
   "galleryBanner": {
     "color": "#2E2A72",

@@ -10,6 +10,11 @@ conversation with an AI assistant.
 Start with the manual's harmless walkthrough and its assistant-specific file
 protections.
 
+*Searching for "keyhole"?* This extension has nothing to do with Keyhole Markup Language
+(KML, the file format of Google Earth), nor with a 2024 flaw in Windows licensing that was
+also nicknamed "Keyhole" and has since been fixed. It writes your own secrets to your own
+`.env`.
+
 When you need to give a project a token for GitHub, Neon, Render or another
 service, you run **Keyhole: Set a Secret in .env…**. Keyhole asks for the
 variable's name, checks with git that `.env` is ignored and not tracked, takes

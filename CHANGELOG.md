@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-25
+
+First release.
+
 - Founded: the design and its decisions (ADR-0001); the build, the tests and the gate; the `Secret`
   type, which prints as `[redacted]` by every route a string is made and refuses to serialize, so the
   first law (a secret never enters the conversation) is a checked fact.
