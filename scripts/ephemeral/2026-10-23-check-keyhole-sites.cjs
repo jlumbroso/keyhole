@@ -7,6 +7,10 @@
 // Used 2026-10-24 against local previews and both GitHub Pages sites: all five
 // pages and 40 layout cases passed; exact page/code copies, clipboard fallbacks,
 // hosted font, no-JavaScript reading, and exports passed with no browser errors.
+// Expanded 2026-10-24 for the model reference, Render/Neon MCP and settings:
+// local run passed 9 pages, 72 layouts and every configuration copy. The first
+// expanded check incorrectly assumed per-block status nodes; each copy button's
+// completed label now establishes readiness before checking clipboard bytes.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -30,7 +34,8 @@ const output = path.resolve(args[3]);
 const publishedProduct = 'https://jlumbroso.github.io/keyhole/';
 const publishedManual = 'https://jlumbroso.github.io/keyhole-docs/';
 const chapterNames = [
-  'index.html', 'first-secret.html',
+  'index.html', 'first-secret.html', 'for-assistants.html',
+  'render-mcp.html', 'neon-mcp.html', 'assistant-settings.html',
   'keeping-secrets-out-of-the-conversation.html', 'troubleshooting.html',
 ];
 const errors = { javascript: [], console: [], requests: [], http: [] };
@@ -155,7 +160,7 @@ async function exportText(context, url) {
 
     await visit(page, new URL('index.html', manualBase).href);
     const chapters = await page.locator('nav[aria-label="Chapters"] a').evaluateAll(elements => elements.map(element => element.getAttribute('href')));
-    assert.deepEqual(chapters, chapterNames, 'The manual navigation covers all four chapters');
+    assert.deepEqual(chapters, chapterNames, 'The manual navigation covers every chapter');
     const exports = new Map();
     for (const name of chapters) {
       const url = new URL(name, manualBase).href;
@@ -199,14 +204,25 @@ async function exportText(context, url) {
       await page.evaluate(() => { document.activeElement?.blur(); scrollTo(0, 0); });
       await page.screenshot({ path: path.join(output, `manual-${label}.png`), fullPage: true, animations: 'disabled' });
     }
-    // The protection chapter contains settings readers must copy accurately.
-    // A missing block or copy control is a failure, not a skipped check.
-    await visit(page, new URL('keeping-secrets-out-of-the-conversation.html', manualBase).href);
-    assert(await page.locator('pre').count() > 0, 'Protection chapter has a configuration block');
-    const expectedCode = await page.locator('pre').first().textContent();
-    await page.getByRole('button', { name: 'Copy code example', exact: true }).first().click();
-    await page.waitForFunction(() => document.querySelector('.copy-status')?.textContent === 'Code example copied.');
-    assert.equal(await page.evaluate(() => navigator.clipboard.readText()), expectedCode, 'Exact configuration copy');
+    // Every new setup/reference chapter contains executable or configuration
+    // examples. Check every block, including JSON quotes and literal ${...}.
+    for (const name of ['for-assistants.html', 'render-mcp.html', 'neon-mcp.html',
+      'assistant-settings.html', 'keeping-secrets-out-of-the-conversation.html']) {
+      await visit(page, new URL(name, manualBase).href);
+      const blocks = page.locator('pre');
+      assert(await blocks.count() > 0, `Configuration blocks exist: ${name}`);
+      for (let index = 0; index < await blocks.count(); index++) {
+        const expectedCode = await blocks.nth(index).textContent();
+        await page.getByRole('button', { name: 'Copy code example', exact: true }).nth(index).click();
+        await page.waitForFunction(i => document.querySelectorAll('.copy')[i]?.textContent === 'Copied', index);
+        assert.equal(await page.evaluate(() => navigator.clipboard.readText()), expectedCode, `Exact code copy: ${name}/${index}`);
+      }
+      if (['render-mcp.html', 'neon-mcp.html'].includes(name)) {
+        await page.setViewportSize({ width: 1440, height: 1050 });
+        await page.evaluate(() => { document.activeElement?.blur(); scrollTo(0, 0); });
+        await page.screenshot({ path: path.join(output, name.replace('.html', '.png')), animations: 'disabled' });
+      }
+    }
     const codeCopy = true;
 
     const completeManual = await exportText(context, new URL('manual.md', manualBase).href);
@@ -215,8 +231,8 @@ async function exportText(context, url) {
     const llms = await exportText(context, new URL('llms.txt', manualBase).href);
     assert(llms.startsWith('# Keyhole manual\n\n> '), 'llms.txt title and summary');
     const indexed = [...llms.matchAll(/^- \[[^\]]+\]\(([^)]+)\)/gm)].map(match => match[1]);
-    assert.equal(indexed.length, 5, 'Four chapters and the complete manual in llms.txt');
-    assert.equal(new Set(indexed).size, 5, 'No duplicate llms.txt destinations');
+    assert.equal(indexed.length, chapters.length + 1, 'Every chapter and the complete manual in llms.txt');
+    assert.equal(new Set(indexed).size, chapters.length + 1, 'No duplicate llms.txt destinations');
     const indexedTexts = [];
     for (const href of indexed) {
       assert(href.startsWith(publishedManual) && href.endsWith('.md'), `Canonical Markdown destination: ${href}`);
@@ -254,7 +270,7 @@ async function exportText(context, url) {
     for (const name of chapters) {
       await visit(plain, new URL(name, manualBase).href);
       assert(await plain.locator('.prose').isVisible(), `Readable chapter without JavaScript: ${name}`);
-      assert.equal(await plain.locator('nav[aria-label="Chapters"] a').count(), 4);
+      assert.equal(await plain.locator('nav[aria-label="Chapters"] a').count(), chapters.length);
       assert.equal(await plain.locator('.copy-page').count(), 1, 'Page-copy control is present for enhancement');
       assert(!(await plain.locator('.copy-page').isVisible()), 'No dead copy control without JavaScript');
       const markdownLink = plain.getByRole('link', { name: 'View Markdown', exact: true });
@@ -265,10 +281,10 @@ async function exportText(context, url) {
     for (const [kind, entries] of Object.entries(errors)) assert.deepEqual(entries, [], `No ${kind} errors`);
     const report = {
       productBase, manualBase, productCanonical: publishedProduct, manualCanonical: publishedManual,
-      pages: 5, layoutCases, hostedFontLoadedAndUsed: true,
+      pages: chapters.length + 1, layoutCases, hostedFontLoadedAndUsed: true,
       exactPageCopies: exports.size, codeCopy, clipboardDeniedFallbacks: chapters.length,
       markdownExports: true, llmsIndex: true, contributionLinks,
-      keyboardSkipLinks: 2, themePersistence: true, noJavaScriptPages: 5,
+      keyboardSkipLinks: 2, themePersistence: true, noJavaScriptPages: chapters.length + 1,
       browserErrors: errors, screenshots: output,
       limits: 'Chromium automation only; no installed-extension, screen-reader, contrast, or cross-browser conformance claim. External GitHub destinations inspected, not visited.',
     };

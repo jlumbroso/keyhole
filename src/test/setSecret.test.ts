@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -264,5 +264,24 @@ describe('Regression tests', () => {
     await setSecret(git);
 
     expect(shownInputBoxes().map(box => box.title)).toEqual(['Keyhole: Set a Secret in .env', 'Keyhole: Set a Secret in .env']);
+  });
+
+  it.skipIf(process.getuid?.() === 0)('refuses, and leaves the file alone, when .env exists but cannot be read', async () => {
+    // Bug: every read error was taken for "no .env yet", so append() built a
+    // new file and renamed it over the existing one: an unreadable .env (a
+    // permissions mistake) lost every value in it. Renaming needs only the
+    // folder's permission, not the file's. Found reading the probe for
+    // Sounder's status catch, 2026-10-25. (Root ignores file modes, hence the skip.)
+    writeFileSync(join(folder, '.env'), 'OTHER_TOKEN=keep-me\n');
+    chmodSync(join(folder, '.env'), 0o000);
+    typeIntoNextInputBox('GITHUB_TOKEN');
+    typeIntoNextInputBox(FAKE);
+
+    await setSecret(git);
+
+    chmodSync(join(folder, '.env'), 0o600);
+    expect(env()).toBe('OTHER_TOKEN=keep-me\n');
+    expect(shownInputBoxes()).toHaveLength(1); // never asked for the value
+    expect(shownMessages().at(-1)?.text).toMatch(/could not read .*\.env/);
   });
 });

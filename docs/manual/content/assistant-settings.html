@@ -1,0 +1,48 @@
+<div class="note">
+  <p><strong>Current writer: project <code>.env</code> only.</strong> Keyhole does not yet write the assistant configuration files below. Support for additional destinations is planned. These examples explain the receiving applications; they are not new Keyhole commands or request parameters.</p>
+</div>
+
+<p>First identify what needs the credential: your application, a command your assistant runs, or one MCP server. Those can be separate processes with separate settings. Saving a value in the project's <code>.env</code> does not automatically configure an assistant or its MCP servers.</p>
+<p>For service-specific choices, see <a href="render-mcp.html">Render MCP</a> and <a href="neon-mcp.html">Neon MCP</a>. If the service offers browser authorization, that may avoid a copied API key. The <a href="for-assistants.html">assistant reference</a> explains how to display the guide and initiate the supported handoff.</p>
+
+<h2 id="claude-code">Claude Code</h2>
+<p>Claude Code supports this shape in the project's <code>.claude/settings.local.json</code>. Both <code>TOKEN_NAME</code> and <code>not-a-secret</code> are placeholders; the latter is a harmless practice value:</p>
+<pre><code>{
+  "env": {
+    "TOKEN_NAME": "not-a-secret"
+  }
+}</code></pre>
+<p>This personal, project-local file supplies variables to Claude Code's environment. Its subprocesses, including Bash, hooks and stdio MCP servers, normally inherit them, subject to Claude's environment filtering. That is broader access than giving a credential to one server. Values under this top-level <code>env</code> are literal: <code>$HOME</code> is not shell-expanded. <a href="https://code.claude.com/docs/en/settings-reference#env">Claude Code's env reference</a> describes precedence and trust exceptions.</p>
+<p>Use strict JSON and preserve existing settings. When another program creates this file, verify that Git ignores it; the filename alone is not protection. Saved additions and changes can update Claude's environment, but removing a variable does not unset it in an already-running session. Restart Claude and reconnect the affected server after changing credentials. <a href="https://code.claude.com/docs/en/env-vars#set-variables-in-settings-files">Environment and reload behavior</a>.</p>
+<p>A server's own <code>mcpServers.&lt;server&gt;.env</code> is different from the settings file's top-level <code>env</code>. Project server definitions live in <code>.mcp.json</code>; personal and MCP-local definitions live in <code>~/.claude.json</code>. Shared definitions can reference a privately supplied variable:</p>
+<pre><code>"env": {
+  "TOKEN_NAME": "${TOKEN_NAME}"
+}</code></pre>
+<p>For an HTTP MCP server, use its <code>headers</code> configuration or supported browser authorization. Once the settings <code>env</code> value has applied, a header such as <code>Authorization: Bearer ${TOKEN_NAME}</code> can reference it. An environment variable does not become a header automatically. Claude blocks certain provider-credential names in remote URLs and headers; use the intended service's variable name. <a href="https://code.claude.com/docs/en/mcp#environment-variable-expansion-in-mcpjson">MCP environment references and credential restrictions</a>.</p>
+
+<h2 id="codex">Codex</h2>
+<p>For commands Codex runs, its TOML configuration supports:</p>
+<pre><code>[shell_environment_policy]
+set = { TOKEN_NAME = "not-a-secret" }</code></pre>
+<p>This can live in personal <code>~/.codex/config.toml</code> or a trusted project's <code>.codex/config.toml</code>. Project settings may be shared, so never put a real credential in a tracked copy. The environment policy can filter names; saving a setting does not establish that a running command received it. <a href="https://learn.chatgpt.com/docs/config-file/config-advanced#environment-policy">Codex environment policy</a>.</p>
+<p>MCP settings are separate. Under <code>[mcp_servers.&lt;server&gt;]</code>, <code>env</code> supplies explicit stdio-process values; <code>env_vars</code> names variables to forward from Codex's environment. The shell policy's <code>set</code> table is not a substitute for either. For HTTP servers, <code>http_headers</code> holds literal headers, <code>env_http_headers</code> maps header names to environment-variable names, and <code>bearer_token_env_var</code> names the variable supplying the bearer token. A reference stores a name, not the credential itself. <a href="https://learn.chatgpt.com/docs/extend/mcp?surface=cli">Codex MCP configuration</a>.</p>
+
+<h2 id="gemini-cli">Gemini CLI</h2>
+<p>Gemini CLI does not provide Claude's top-level <code>env</code> setting. Its general environment comes from the launching process and its <code>.env</code> loader, which also recognizes <code>.gemini/.env</code>. Loading depends on folder trust, exclusions and existing process values; it is not a promise that every secret reaches every tool. <a href="https://geminicli.com/docs/reference/configuration/#environment-variables-and-env-files">Gemini environment configuration</a>.</p>
+<p>For a particular stdio MCP server, use <code>mcpServers.&lt;server&gt;.env</code> in the project's <code>.gemini/settings.json</code> or personal <code>~/.gemini/settings.json</code>. Its shape can reference an existing variable:</p>
+<pre><code>"env": {
+  "TOKEN_NAME": "${TOKEN_NAME}"
+}</code></pre>
+<p>Gemini sanitizes the inherited MCP environment, so an exported token may be removed; configure the intended server explicitly. HTTP and SSE server entries use <code>headers</code> instead. Settings strings support environment references. Keep credentials out of shared settings and check the client's documented redaction behavior. <a href="https://geminicli.com/docs/tools/mcp-server/">Gemini MCP configuration</a>.</p>
+
+<h2 id="grok-build">Grok Build</h2>
+<p>This section concerns the official <a href="https://github.com/xai-org/grok-build">Grok Build</a> CLI, <code>grok</code>. Other tools with that executable name may use different files.</p>
+<p>Grok Build's published source supports <code>[shell_environment_policy]</code> with a <code>set</code> map for commands it runs. Put that general policy in personal <code>~/.grok/config.toml</code> (or the configured Grok home), not the project's file. Project <code>.grok/config.toml</code> accepts only selected sections, including MCP servers. <a href="https://docs.x.ai/build/settings">Grok settings scopes</a>; <a href="https://github.com/xai-org/grok-build/blob/2bdd1d6a6369de0e8c68132ea4539e9abd9e14a8/crates/codegen/xai-grok-tools/src/util/shell_env_policy.rs#L37-L53">published shell-policy source</a>.</p>
+<p>For stdio MCP, use <code>[mcp_servers.&lt;server&gt;]</code> with <code>env</code>. For remote MCP, use <code>headers</code> or <code>bearer_token_env_var</code>. MCP strings support <code>${VAR}</code> references. These per-server settings can be project-local or personal; real credentials still need a private destination. <a href="https://docs.x.ai/build/settings/reference">Grok MCP settings reference</a>.</p>
+
+<h2 id="check-without-disclosing">Check the destination without disclosing the value</h2>
+<p>Keep real values out of commands pasted into chat, terminal arguments and shared configuration examples. A person can edit the appropriate private file locally while Keyhole's additional writers are pending. Preserve unrelated fields and verify Git protection for project files; a home-directory configuration has a different scope and may affect every project.</p>
+<p>Restart or reconnect the receiving process as its documentation requires. Check a permitted operation or a presence-only result. A saved file, a loaded setting and a successful service operation are separate observations. Follow <a href="keeping-secrets-out-of-the-conversation.html">file protections</a> before introducing a real credential: making a value available to an assistant's subprocesses does not prevent those subprocesses from printing it.</p>
+
+<h2 id="reference-status">Reference status</h2>
+<p>Documentation and source checked on 24 October 2026. Source checks included <a href="https://github.com/openai/codex/blob/rust-v0.164.0/codex-rs/rmcp-client/src/utils.rs#L16-L58">Codex 0.164.0's MCP environment</a> and <a href="https://github.com/google-gemini/gemini-cli/blob/v0.65.0/schemas/settings.schema.json">Gemini CLI 0.65.0's settings schema</a>. Grok's source reference is a periodically published snapshot, not verification of every installed binary. These configuration examples have not been exercised here in running assistants or signed-in service accounts.</p>

@@ -1,0 +1,66 @@
+<p>Use Render's MCP server when you want your coding assistant to inspect or manage services hosted on Render. This connects the assistant to your Render account; it does not supply a credential to the application you are building.</p>
+<div class="note"><p>Guide preview. Steps checked against official documentation on 24 October 2026; sign-in and connection checks have not yet been tested here.</p></div>
+
+<h2 id="choose-authentication">1. Choose how to connect</h2>
+<p>Start with browser authorization, also called OAuth. You sign in to Render and review access in your browser, without copying a token into Keyhole or the conversation. Use an API key only when your client or unattended setup needs one.</p>
+<p>Agree on the workspace and task first. Render's tools can change services and start deployments. For an initial check, request only a service list. See <a href="https://render.com/docs/mcp-server">Render's MCP instructions</a>.</p>
+
+<h2 id="authorize-in-browser">2. Authorize in your browser</h2>
+<h3 id="claude-code-oauth">Claude Code</h3>
+<ol>
+  <li>In Claude Code, enter <code>/plugin install render@claude-plugins-official</code>.</li>
+  <li>Choose the plugin's installation scope, then run <code>/reload-plugins</code>. This choice concerns installation, not the Render resources you authorize.</li>
+  <li>Ask for the <a href="#verify-connection">connection check below</a>. On first use, complete Render's browser authorization. Check the account and requested access before approving.</li>
+</ol>
+<p>For Codex, Cursor or Claude Desktop, follow <a href="https://render.com/docs/mcp-server#1-connect-to-the-mcp-server">Render's instructions for that client</a>, then continue to the connection check.</p>
+
+<h2 id="obtain-api-key">Alternative: obtain an API key</h2>
+<ol>
+  <li>Prepare the receiving configuration first.</li>
+  <li>Open <a href="https://dashboard.render.com/u/settings?add-api-key=">Render's account settings</a>, find the API keys area, and choose <strong>Create API Key</strong>.</li>
+  <li>Name the key for its use, such as <code>assistant-on-my-laptop</code>.</li>
+  <li>Copy the new value directly to the receiving field. The full key is displayed only when created.</li>
+</ol>
+<p>See <a href="https://render.com/tutorials/render-with-ai-agents/install-the-plugin">Render's key-creation walkthrough</a> and <a href="https://render.com/docs/api#1-create-an-api-key">API key documentation</a>.</p>
+<div class="note"><p>Treat this key as access to every Render workspace you belong to, as specified by <a href="https://api-docs.render.com/reference/authentication">Render's API authentication reference</a>. Choosing a workspace for an MCP operation does not restrict the credential itself. Do not describe the key as read-only or limited to one service.</p></div>
+
+<h2 id="api-key-destination">Put the key in the client's configuration</h2>
+<p>For a coding client, identify its exact credential destination using <a href="assistant-settings.html">Assistant settings</a> and Render's client instructions. Have your assistant prepare a placeholder configuration. Apply the <a href="keeping-secrets-out-of-the-conversation.html">file-access protections</a>, then enter the value yourself.</p>
+<p>Keep the real key out of assistant-run commands, chat, and shared files. Once the receiving file contains it, do not ask the assistant to open that file to check the edit.</p>
+
+<h3 id="claude-code-api-key">Claude Code: reference the key by name</h3>
+<p>Prepare this project-root <code>.mcp.json</code> configuration while it contains only references. Merge the <code>render</code> entry with existing servers; do not replace the whole file if it already has settings.</p>
+<pre><code>{
+  "mcpServers": {
+    "render": {
+      "type": "http",
+      "url": "https://mcp.render.com/mcp",
+      "headers": {"Authorization": "Bearer ${RENDER_API_KEY}"}
+    }
+  }
+}</code></pre>
+<ol>
+  <li>Leave <code>${RENDER_API_KEY}</code> unchanged. Privately set <code>env.RENDER_API_KEY</code> in the project's <code>.claude/settings.local.json</code>, following <a href="assistant-settings.html">the protected settings walkthrough</a>. Enter the raw key, without a <code>Bearer </code> prefix.</li>
+  <li>Restart Claude Code in this project. Review its MCP approval request and approve the intended Render server. Then run the connection check below.</li>
+</ol>
+<p>This combines <a href="https://render.com/docs/mcp-server">Render's bearer-header authentication</a> with <a href="https://code.claude.com/docs/en/mcp#environment-variable-expansion-in-mcpjson">Claude Code's documented variable references</a>. The reference belongs in <code>.mcp.json</code>; the value belongs in private settings. It is a documentation-derived configuration, not an account-tested recipe.</p>
+<div class="note"><p>Keyhole currently writes the project's <code>.env</code>, not <code>.claude/settings.local.json</code>. Saving <code>RENDER_API_KEY</code> through Keyhole does not complete the settings step above. For now, that step is a private human edit. See <a href="assistant-settings.html">the destination distinction</a>.</p></div>
+
+<h2 id="verify-connection">3. Check the connection without exposing the key</h2>
+<p>Ask your assistant:</p>
+<pre><code>Use Render's MCP tools to list the workspaces I can access.
+Let me choose the workspace, then list only its service names.
+Do not deploy, change settings, read logs, or retrieve credentials.</code></pre>
+<p>Confirm the workspace before the service lookup. The assistant should use that workspace explicitly for the request, as described in the <a href="https://github.com/render-oss/render-mcp-server#workspaces">server's workspace reference</a>. An empty list can be a successful result for a new workspace.</p>
+<p>Success establishes access for that lookup, not permission for every later task. If it fails, share the client name and error category, without the key, configuration file, request headers, or raw debug log.</p>
+
+<h2 id="remove-access">4. Remove or replace access</h2>
+<p>For an API key, revoke it in Render's account settings. Deleting its local copy does not revoke it. For a planned replacement, create a new key, update each client, verify, then revoke the old key. If exposed, revoke it first. See <a href="https://render.com/docs/api#1-create-an-api-key">Render's key revocation instructions</a>.</p>
+<p>For Claude Code OAuth, open <code>/mcp</code>, select Render, and use <strong>Clear authentication</strong>; disable the server if you no longer want it available. See <a href="https://code.claude.com/docs/en/mcp#authenticate-with-remote-mcp-servers">Claude Code's authentication controls</a>. This review did not establish Render Dashboard clicks for revoking every issued OAuth token. Contact Render support if an OAuth credential may have been exposed.</p>
+
+<h2 id="for-the-assistant">For the assistant guiding this step</h2>
+<p>Present this guide through Porthole using <a href="for-assistants.html">the assistant handoff reference</a>. Resolve authentication and destination before submitting a Keyhole request. OAuth needs no API-key request. For a key route, distinguish “saved locally,” “loaded by the client,” and “accepted by Render.”</p>
+
+<h2 id="source-notes">Source notes</h2>
+<p>The <a href="https://render.com/tutorials/render-cli-power-user/auth-and-workspaces">Render CLI tutorial</a> describes workspace-specific keys, while the API reference says keys access all of the user's workspaces. This guide uses the broader boundary and makes no promise of a workspace-restricted key. Sources were documentation-reviewed on 24 October 2026; account screens and connection flows still need a hands-on check.</p>
+

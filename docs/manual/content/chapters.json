@@ -2,8 +2,8 @@
   {
     "slug": "overview",
     "nav": "Start here",
-    "title": "A secret your project needs.",
-    "dek": "What goes in the conversation, what goes in the file, and what to do first.",
+    "title": "Let your assistant start the handoff.",
+    "dek": "Your assistant prepares the instructions and requests the setting. You supply the value outside the conversation.",
     "margin": [
       {
         "title": "Name, not value",
@@ -29,6 +29,46 @@
         "title": "After saving",
         "text": "A saved file does not establish that your program has loaded it."
       }
+    ]
+  },
+  {
+    "slug": "for-assistants",
+    "nav": "For assistants",
+    "title": "Trigger the next step.",
+    "dek": "Exact commands for displaying a guide, registering a request and checking status, with their availability made explicit.",
+    "margin": [
+      {"title": "Preview contract", "text": "Keyhole requests and secret_status are implemented on the next-release branch. Main currently supports manual entry only."},
+      {"title": "Names cross", "text": "Requests carry names and instructions. The person supplies the value in VS Code."}
+    ]
+  },
+  {
+    "slug": "render-mcp",
+    "nav": "Render MCP",
+    "title": "Connect your assistant to Render.",
+    "dek": "Choose browser authorization or an API key, then give the Render MCP server the access it needs.",
+    "margin": [
+      {"title": "Before granting access", "text": "An MCP server can act on your services. Review its permissions and approve only the task you intend."},
+      {"title": "Documentation checked", "text": "Official sources reviewed on 24 October 2026. This guide has not been tested against a signed-in account."}
+    ]
+  },
+  {
+    "slug": "neon-mcp",
+    "nav": "Neon MCP",
+    "title": "Connect your assistant to Neon.",
+    "dek": "Authorize the hosted MCP server, or choose an API key when your client needs one. A database connection string is a separate setting.",
+    "margin": [
+      {"title": "Two credentials", "text": "A Neon API key manages Neon resources. DATABASE_URL connects an application to a database."},
+      {"title": "Documentation checked", "text": "Official sources reviewed on 24 October 2026. This guide has not been tested against a signed-in account."}
+    ]
+  },
+  {
+    "slug": "assistant-settings",
+    "nav": "Assistant settings",
+    "title": "Put it where the server reads it.",
+    "dek": "Claude Code, Codex, Gemini CLI and Grok Build have different environment and MCP configuration paths.",
+    "margin": [
+      {"title": "Writer status", "text": "Keyhole currently writes .env. The harness-specific destinations here are configuration references, not supported Keyhole writers yet."},
+      {"title": "No universal loader", "text": "A shell setting and an MCP setting can affect different processes. Saved does not mean loaded."}
     ]
   },
   {

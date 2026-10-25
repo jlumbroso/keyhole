@@ -20,6 +20,8 @@ export interface Presence {
   keyprint?: string;
   /** The winning value's length. */
   length?: number;
+  /** Set when `.env` exists but cannot be read: the error's code. Nothing else is known then. */
+  unreadable?: string;
 }
 
 const assignment = (name: string) => new RegExp(`^\\s*(?:export\\s+)?${name}\\s*=(.*)$`);
@@ -36,13 +38,33 @@ function valueOf(rest: string): string {
   return comment >= 0 ? text.slice(0, comment).trimEnd() : text;
 }
 
+/** `.env` exists but cannot be read: Keyhole must not take it for a new file (regression test, 2026-10-25). */
+export class UnreadableFile extends Error {}
+
+/**
+ * The file's text, or undefined when there is no file. Only "no such file"
+ * means absent: any other error (permissions, a folder in its place) is
+ * thrown, because a file taken for absent would be replaced by append() and
+ * lose every value in it.
+ */
 async function readIfPresent(path: string): Promise<string | undefined> {
-  try { return await readFile(path, 'utf8'); } catch { return undefined; }
+  try {
+    return await readFile(path, 'utf8');
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') { return undefined; }
+    throw new UnreadableFile((err as NodeJS.ErrnoException).code ?? String(err));
+  }
 }
 
 /** Where the variable is set in this folder's `.env`, without showing its value. */
 export async function probe(folderPath: string, name: string): Promise<Presence> {
-  const text = await readIfPresent(join(folderPath, DOTENV));
+  let text: string | undefined;
+  try {
+    text = await readIfPresent(join(folderPath, DOTENV));
+  } catch (err) {
+    if (err instanceof UnreadableFile) { return { lines: [], unreadable: err.message }; }
+    throw err;
+  }
   if (text === undefined) { return { lines: [] }; }
   const pattern = assignment(name);
   const lines: number[] = [];
