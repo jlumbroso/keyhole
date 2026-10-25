@@ -9,17 +9,19 @@ import { checkName } from './names';
 // at the record, whichever route wrote it. The file's name is provisional
 // until the naming review rules.
 
-import { KEYHOLE_FOLDER, REQUESTS_FILE } from './paths';
+import { KEYHOLE_FOLDER, INBOX_FILE } from './paths';
 
-export { KEYHOLE_FOLDER, REQUESTS_FILE };
+export { KEYHOLE_FOLDER, INBOX_FILE };
 const FORMAT = 1;
 /** The longest the assistant's words may be, per field: a sentence or two, not a page. */
 export const TEXT_LIMIT = 500;
 /** The most names one request may carry (a sequence: an SMTP host, user and password). */
 export const NAMES_LIMIT = 10;
-const FIELDS = ['names', 'why', 'where', 'asked'];
+const FIELDS = ['kind', 'names', 'why', 'where', 'asked'];
 
 export interface KeyholeRequest {
+  /** What the row is (the naming review, №116): the inbox will also hold the person's own drafts. */
+  kind: 'request';
   names: string[];
   /** The assistant's words: why the project needs it. Shown labeled as the assistant's, never as a link. */
   why?: string;
@@ -48,6 +50,7 @@ export function checkRequest(raw: unknown): CheckedRequest {
   if (unknown.length > 0) {
     return { ok: false, reason: `a request has ${unknown.join(', ')}, which Keyhole does not know; a request holds names and the assistant's words, never a value` };
   }
+  if (entry.kind !== 'request') { return { ok: false, reason: 'a row must say kind "request"; this Keyhole reads no other kind yet' }; }
   const names = entry.names;
   if (!Array.isArray(names) || names.length === 0) { return { ok: false, reason: 'a request must name at least one variable' }; }
   if (names.length > NAMES_LIMIT) { return { ok: false, reason: `a request names more than ${NAMES_LIMIT} variables` }; }
@@ -60,7 +63,7 @@ export function checkRequest(raw: unknown): CheckedRequest {
   const problem = checkText('why', entry.why) ?? checkText('where', entry.where);
   if (problem) { return { ok: false, reason: problem }; }
   if (typeof entry.asked !== 'string' || Number.isNaN(Date.parse(entry.asked))) { return { ok: false, reason: 'a request must say when it was asked (asked, a date and time)' }; }
-  return { ok: true, request: { names: names as string[], why: entry.why as string | undefined, where: entry.where as string | undefined, asked: entry.asked } };
+  return { ok: true, request: { kind: 'request', names: names as string[], why: entry.why as string | undefined, where: entry.where as string | undefined, asked: entry.asked } };
 }
 
 export interface RequestRecord {
@@ -72,12 +75,12 @@ export interface RequestRecord {
 /** The folder's requests; a missing file is an empty record, an unreadable one a refusal. */
 export async function readRequests(folderPath: string): Promise<RequestRecord> {
   let text: string;
-  try { text = await readFile(join(folderPath, REQUESTS_FILE), 'utf8'); } catch { return { requests: [], refused: [] }; }
+  try { text = await readFile(join(folderPath, INBOX_FILE), 'utf8'); } catch { return { requests: [], refused: [] }; }
   let parsed: unknown;
-  try { parsed = JSON.parse(text); } catch { return { requests: [], refused: [`${REQUESTS_FILE} is not valid JSON`] }; }
+  try { parsed = JSON.parse(text); } catch { return { requests: [], refused: [`${INBOX_FILE} is not valid JSON`] }; }
   const file = parsed as { format?: unknown; requests?: unknown };
   if (file.format !== FORMAT || !Array.isArray(file.requests)) {
-    return { requests: [], refused: [`${REQUESTS_FILE} is not in a format this Keyhole reads (format ${FORMAT}, a list of requests)`] };
+    return { requests: [], refused: [`${INBOX_FILE} is not in a format this Keyhole reads (format ${FORMAT}, a list of requests)`] };
   }
   const record: RequestRecord = { requests: [], refused: [] };
   file.requests.forEach((raw, index) => {
@@ -111,23 +114,23 @@ export type Added = { added: true } | { added: false; reason: string };
 export async function addRequest(folderPath: string, request: KeyholeRequest): Promise<Added> {
   const checked = checkRequest(request);
   if (!checked.ok) { return { added: false, reason: checked.reason }; }
-  const path = join(folderPath, REQUESTS_FILE);
+  const path = join(folderPath, INBOX_FILE);
   let entries: unknown[] = [];
   try {
     const parsed = JSON.parse(await readFile(path, 'utf8')) as { format?: unknown; requests?: unknown };
     if (parsed.format !== FORMAT || !Array.isArray(parsed.requests)) {
-      return { added: false, reason: `${REQUESTS_FILE} is not in a format this Keyhole reads; it was left as it is` };
+      return { added: false, reason: `${INBOX_FILE} is not in a format this Keyhole reads; it was left as it is` };
     }
     entries = parsed.requests;
   } catch (err) {
-    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') { return { added: false, reason: `${REQUESTS_FILE} could not be read as JSON; it was left as it is` }; }
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') { return { added: false, reason: `${INBOX_FILE} could not be read as JSON; it was left as it is` }; }
   }
   const same = (raw: unknown) => {
     const names = (raw as { names?: unknown })?.names;
     return Array.isArray(names) && names.join('\n') === checked.request.names.join('\n');
   };
   if (entries.some(same)) { return { added: false, reason: 'already requested' }; }
-  const clean: { [field: string]: unknown } = { names: checked.request.names };
+  const clean: { [field: string]: unknown } = { kind: 'request', names: checked.request.names };
   if (checked.request.why !== undefined) { clean.why = checked.request.why; }
   if (checked.request.where !== undefined) { clean.where = checked.request.where; }
   clean.asked = checked.request.asked;

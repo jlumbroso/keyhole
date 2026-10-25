@@ -5,6 +5,6 @@
 
 export const KEYHOLE_FOLDER = '.keyhole';
 /** The project's requests, committed: names and the assistant's words, never a value. */
-export const REQUESTS_FILE = `${KEYHOLE_FOLDER}/requests.json`;
+export const INBOX_FILE = `${KEYHOLE_FOLDER}/inbox.json`;
 /** Keyhole's cache, ignored by git: whether each name is set, its length and keyprint, never a value. */
-export const OUTCOMES_FILE = `${KEYHOLE_FOLDER}/outcomes.local.json`;
+export const STATUS_FILE = `${KEYHOLE_FOLDER}/status.local.json`;

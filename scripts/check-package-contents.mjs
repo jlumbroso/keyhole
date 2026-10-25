@@ -58,7 +58,7 @@ const serverNetworked = serverRequired.filter(name => NETWORK_MODULES.includes(n
 if (serverNetworked.length) { problems.push(`dist/mcp-server.js requires network or process modules: ${serverNetworked.join(', ')}`); }
 if (/\bfetch\s*\(|XMLHttpRequest|WebSocket/.test(server)) { problems.push('dist/mcp-server.js calls fetch, XMLHttpRequest or WebSocket'); }
 if (/require\(["']vscode["']\)/.test(server)) { problems.push('dist/mcp-server.js requires vscode: it runs outside VS Code'); }
-const valueSide = [...server.matchAll(/\/\/#region (src\/(?:secret|setSecret|outcomes|inbox|targets\/[^\s]+)\.ts)/g)].map(match => match[1]);
+const valueSide = [...server.matchAll(/\/\/#region (src\/(?:secret|setSecret|status|inbox|targets\/[^\s]+)\.ts)/g)].map(match => match[1]);
 if (valueSide.length) { problems.push(`dist/mcp-server.js contains code that reads .env or holds a value: ${valueSide.join(', ')}`); }
 if (!server.includes('//#region src/names.ts')) { problems.push('dist/mcp-server.js has no //#region markers: the wall above cannot be checked; adjust the check to the bundler'); }
 

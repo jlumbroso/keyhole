@@ -3,11 +3,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { GitFacts, Protection } from '../git';
-import { handleRequestLink, showRequests, watchInbox } from '../inbox';
+import { handleRequestLink, showInbox, watchInbox } from '../inbox';
 import { readQuery } from '../link';
 import { initLog } from '../log';
-import { OUTCOMES_FILE } from '../outcomes';
-import { REQUESTS_FILE } from '../requests';
+import { STATUS_FILE } from '../status';
+import { INBOX_FILE } from '../requests';
 import {
   answerNextNotice, fileChanged, loggedLines, pickNext, resetVscodeMock, setWorkspaceFolders, shownInputBoxes, shownMessages, shownQuickPicks, typeIntoNextInputBox,
 } from './helpers/vscodeMock';
@@ -43,7 +43,7 @@ describe('a model asks for a secret by name, with a link', () => {
   it('records the request with the assistant\'s words, says it is waiting, and opens no box', async () => {
     await link('name=NEON_API_KEY&why=The app reads its database from Neon');
 
-    expect(JSON.parse(read(REQUESTS_FILE)).requests).toEqual([
+    expect(JSON.parse(read(INBOX_FILE)).requests).toEqual([
       expect.objectContaining({ names: ['NEON_API_KEY'], why: 'The app reads its database from Neon' }),
     ]);
     expect(shownMessages().at(-1)).toMatchObject({ kind: 'info', text: 'Your assistant asked for NEON_API_KEY.' });
@@ -54,7 +54,7 @@ describe('a model asks for a secret by name, with a link', () => {
     await link(`name=GITHUB_TOKEN&value=${FAKE}`);
 
     expect(shownMessages().at(-1)?.text).toMatch(/never carries a value/);
-    expect(existsSync(join(folder, REQUESTS_FILE))).toBe(false);
+    expect(existsSync(join(folder, INBOX_FILE))).toBe(false);
     expect(loggedLines().join('\n')).not.toContain(FAKE.slice(4, 12));
   });
 
@@ -62,14 +62,14 @@ describe('a model asks for a secret by name, with a link', () => {
     await link('name=NODE_OPTIONS');
 
     expect(shownMessages().at(-1)?.text).toMatch(/NODE_OPTIONS changes how programs run/);
-    expect(existsSync(join(folder, REQUESTS_FILE))).toBe(false);
+    expect(existsSync(join(folder, INBOX_FILE))).toBe(false);
   });
 
   it('records the same request once, however often it is asked', async () => {
     await link('name=NEON_API_KEY');
     await link('name=NEON_API_KEY');
 
-    expect(JSON.parse(read(REQUESTS_FILE)).requests).toHaveLength(1);
+    expect(JSON.parse(read(INBOX_FILE)).requests).toHaveLength(1);
   });
 
   it('keeps a + and a % in the assistant\'s words, which VS Code has already decoded', () => {
@@ -82,7 +82,7 @@ describe('the list', () => {
     await link('name=GITHUB_TOKEN&why=To open pull requests&where=github.com/settings/tokens');
     typeIntoNextInputBox(FAKE);
 
-    await showRequests(git);
+    await showInbox(git);
 
     const item = shownQuickPicks()[0].items[0] as { label: string; detail?: string };
     expect(item.label).toBe('GITHUB_TOKEN');
@@ -97,20 +97,20 @@ describe('the list', () => {
     typeIntoNextInputBox('smtp.example.com');
     typeIntoNextInputBox(undefined); // Escape at the second
 
-    await showRequests(git);
+    await showInbox(git);
 
     expect(read('.env')).toContain('SMTP_HOST=smtp.example.com');
     expect(read('.env')).not.toContain('SMTP_USER');
     pickNext(0);
     typeIntoNextInputBox('mailer');
     typeIntoNextInputBox(SMTP_PASSWORD);
-    await showRequests(git);
+    await showInbox(git);
     expect((shownQuickPicks()[1].items[0] as { label: string }).label).toBe('SMTP_USER, SMTP_PASSWORD');
     expect(read('.env').match(/^SMTP_\w+/gm)).toEqual(['SMTP_HOST', 'SMTP_USER', 'SMTP_PASSWORD']);
   });
 
   it('says so when nothing is waiting, instead of an empty list', async () => {
-    await showRequests(git);
+    await showInbox(git);
 
     expect(shownQuickPicks()).toHaveLength(0);
     expect(shownMessages().at(-1)?.text).toBe('Keyhole: no requests are waiting.');
@@ -122,7 +122,7 @@ describe('the list', () => {
     answerNextNotice(undefined); // the "Keyhole set …" notice
     answerNextNotice('Add to .env.example');
 
-    await showRequests(git);
+    await showInbox(git);
 
     expect(read('.env.example')).toBe('# Needed by this project (recorded by Keyhole)\nGITHUB_TOKEN=\n');
   });
@@ -133,18 +133,18 @@ describe('the cache behind the API (ADR-0005)', () => {
     await link('name=GITHUB_TOKEN');
     typeIntoNextInputBox(FAKE);
 
-    await showRequests(git);
+    await showInbox(git);
 
-    expect(JSON.parse(read(OUTCOMES_FILE)).variables.GITHUB_TOKEN).toMatchObject({ set: true, length: 40, keyprint: expect.stringMatching(/^<keyprint:ghp_…1234#[0-9a-f]{8}\/>$/) });
+    expect(JSON.parse(read(STATUS_FILE)).variables.GITHUB_TOKEN).toMatchObject({ set: true, length: 40, keyprint: expect.stringMatching(/^<keyprint:ghp_…1234#[0-9a-f]{8}\/>$/) });
     expect(read('.keyhole/.gitignore')).toContain('*.local.json');
   });
 
   it('writes nothing when git would not ignore it, since a keyprint can show a value\'s last four', async () => {
-    protections[OUTCOMES_FILE] = 'not-ignored';
+    protections[STATUS_FILE] = 'not-ignored';
 
     await link('name=GITHUB_TOKEN');
 
-    expect(existsSync(join(folder, OUTCOMES_FILE))).toBe(false);
+    expect(existsSync(join(folder, STATUS_FILE))).toBe(false);
     expect(loggedLines().join('\n')).toMatch(/cache was not written: git says .* is not-ignored/);
   });
 
@@ -155,7 +155,7 @@ describe('the cache behind the API (ADR-0005)', () => {
 
     await fileChanged(join(folder, '.env'));
 
-    expect(JSON.parse(read(OUTCOMES_FILE)).variables.GITHUB_TOKEN).toMatchObject({ set: true, length: 40 });
+    expect(JSON.parse(read(STATUS_FILE)).variables.GITHUB_TOKEN).toMatchObject({ set: true, length: 40 });
     watching.dispose();
   });
 });
@@ -165,15 +165,17 @@ describe('a model writes the record directly (QST-REQUEST-ROUTE, C)', () => {
     const watching = watchInbox(git);
     await new Promise(resolve => setTimeout(resolve, 0)); // the watcher has read the record as it was
     mkdirSync(join(folder, '.keyhole'), { recursive: true });
-    writeFileSync(join(folder, REQUESTS_FILE), JSON.stringify({ format: 1, requests: [
-      { names: ['RENDER_API_KEY'], why: 'To deploy', asked: '2026-10-22T19:00:00Z' },
-      { names: ['GITHUB_TOKEN'], value: FAKE, asked: '2026-10-22T19:00:00Z' },
+    writeFileSync(join(folder, INBOX_FILE), JSON.stringify({ format: 1, requests: [
+      { kind: 'request', names: ['RENDER_API_KEY'], why: 'To deploy', asked: '2026-10-22T19:00:00Z' },
+      { kind: 'request', names: ['GITHUB_TOKEN'], value: FAKE, asked: '2026-10-22T19:00:00Z' },
+      { names: ['NEON_API_KEY'], asked: '2026-10-22T19:00:00Z' }, // no kind: an older or a foreign row
     ] }));
 
-    await fileChanged(join(folder, REQUESTS_FILE));
+    await fileChanged(join(folder, INBOX_FILE));
 
     expect(shownMessages().map(message => message.text)).toEqual(['Your assistant asked for RENDER_API_KEY.']);
     expect(loggedLines().join('\n')).toMatch(/request 2: a request has value, which Keyhole does not know; a request holds names and the assistant's words, never a value/);
+    expect(loggedLines().join('\n')).toMatch(/request 3: a row must say kind "request"/);
     // The test wrote the value into the record itself; Keyhole must not carry it anywhere else.
     expect([...loggedLines(), ...shownMessages().map(message => message.text)].join('\n')).not.toContain(FAKE.slice(4, 12));
     watching.dispose();
@@ -186,7 +188,7 @@ describe('the first law, across the inbox', () => {
     typeIntoNextInputBox('smtp.example.com');
     typeIntoNextInputBox(SMTP_PASSWORD);
 
-    await showRequests(git);
+    await showInbox(git);
 
     expect(read('.env')).toContain(`SMTP_PASSWORD=${SMTP_PASSWORD}`); // it was written
     const hidden = SMTP_PASSWORD.slice(0, -4);
@@ -200,7 +202,7 @@ describe('the first law, across the inbox', () => {
 function everything(): string {
   const file = (relative: string) => existsSync(join(folder, relative)) ? read(relative) : '';
   return [
-    file(REQUESTS_FILE), file(OUTCOMES_FILE), ...loggedLines(),
+    file(INBOX_FILE), file(STATUS_FILE), ...loggedLines(),
     ...shownMessages().map(message => `${message.text} ${message.detail ?? ''}`),
     ...shownQuickPicks().flatMap(pick => pick.items.map(item => JSON.stringify(item, (key, value) => (key === 'folder' ? undefined : value)))),
   ].join('\n');

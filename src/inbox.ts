@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import type { GitFacts } from './git';
 import { parseRequestLink } from './link';
 import { log } from './log';
-import { knownNames, refreshOutcomes } from './outcomes';
+import { knownNames, refreshStatus } from './status';
 import { addRequest, type KeyholeRequest, readRequests } from './requests';
 import { setNamed } from './setSecret';
 import { probe } from './targets/dotenv';
@@ -16,7 +16,7 @@ import { probe } from './targets/dotenv';
 // the value is typed in the masked box (src/setSecret.ts) and goes straight to
 // `.env`. Every word is provisional until the naming review rules.
 
-export const SHOW_REQUESTS = 'Show Requests';
+export const SHOW_INBOX = 'Show Inbox';
 export const ADD_TO_ENV_EXAMPLE = 'Add to .env.example';
 const ENV_EXAMPLE = '.env.example';
 
@@ -53,7 +53,7 @@ export async function handleRequestLink(git: GitFacts, uri: { path: string; quer
     return;
   }
   const { names, why, where } = parsed.request;
-  const added = await addRequest(folder.uri.fsPath, { names, why, where, asked: new Date().toISOString() });
+  const added = await addRequest(folder.uri.fsPath, { kind: 'request', names, why, where, asked: new Date().toISOString() });
   if (!added.added && added.reason !== 'already requested') {
     log(`link refused: ${added.reason}`);
     void vscode.window.showWarningMessage(`Keyhole did not record the request: ${added.reason}.`);
@@ -66,12 +66,12 @@ export async function handleRequestLink(git: GitFacts, uri: { path: string; quer
 
 /** The doorbell: says a request is waiting, and opens the list only if the person asks. */
 async function ring(git: GitFacts, names: string[]): Promise<void> {
-  const answer = await vscode.window.showInformationMessage(`Your assistant asked for ${names.join(', ')}.`, SHOW_REQUESTS);
-  if (answer === SHOW_REQUESTS) { await showRequests(git); }
+  const answer = await vscode.window.showInformationMessage(`Your assistant asked for ${names.join(', ')}.`, SHOW_INBOX);
+  if (answer === SHOW_INBOX) { await showInbox(git); }
 }
 
 async function refresh(git: GitFacts, folder: vscode.WorkspaceFolder, names: string[]): Promise<void> {
-  const refreshed = await refreshOutcomes(git, folder.uri.fsPath, names);
+  const refreshed = await refreshStatus(git, folder.uri.fsPath, names);
   if (!refreshed.written) { log(`note: Keyhole's cache was not written: ${refreshed.reason}`); }
 }
 
@@ -106,13 +106,13 @@ async function waitingRequests(): Promise<Waiting[]> {
 }
 
 /** The command: lists the requests still waiting, and runs the person's path for the one chosen. */
-export async function showRequests(git: GitFacts): Promise<void> {
+export async function showInbox(git: GitFacts): Promise<void> {
   const waiting = await waitingRequests();
   if (waiting.length === 0) {
     void vscode.window.showInformationMessage('Keyhole: no requests are waiting.');
     return;
   }
-  const chosen = await vscode.window.showQuickPick(waiting, { title: 'Keyhole: Show Requests', placeHolder: 'Choose a request to set its value', matchOnDetail: true, ignoreFocusOut: true });
+  const chosen = await vscode.window.showQuickPick(waiting, { title: 'Keyhole: Show Inbox', placeHolder: 'Choose a request to set its value', matchOnDetail: true, ignoreFocusOut: true });
   if (!chosen) { return; }
   const done: string[] = [];
   for (const name of chosen.pending) {
@@ -177,7 +177,7 @@ export function watchInbox(git: GitFacts): vscode.Disposable {
     }
   };
   const env = vscode.workspace.createFileSystemWatcher('**/.env');
-  const record = vscode.workspace.createFileSystemWatcher('**/.keyhole/requests.json');
+  const record = vscode.workspace.createFileSystemWatcher('**/.keyhole/inbox.json');
   return vscode.Disposable.from(
     env, record,
     env.onDidChange(onEnv), env.onDidCreate(onEnv), env.onDidDelete(onEnv),

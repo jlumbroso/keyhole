@@ -5,7 +5,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { PassThrough } from 'node:stream';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { answer, type Deps, serve, TOOL } from '../mcp/server';
-import { OUTCOMES_FILE } from '../paths';
+import { STATUS_FILE } from '../paths';
 
 // Keyhole's API for models (ADR-0005, QST-OUTCOME-ROUTE, D): an MCP server a
 // model's harness starts. It says whether a name is set, never a value, and it
@@ -28,7 +28,7 @@ beforeEach(() => {
   project = mkdtempSync(join(tmpdir(), 'keyhole-mcp-'));
   opened = [];
   mkdirSync(join(project, '.keyhole'));
-  writeFileSync(join(project, OUTCOMES_FILE), JSON.stringify({ format: 1, variables: {
+  writeFileSync(join(project, STATUS_FILE), JSON.stringify({ format: 1, variables: {
     GITHUB_TOKEN: { set: true, length: 40, keyprint: '<keyprint:ghp_…1234#0a1b2c3d/>', checked: '2026-10-22T20:00:00Z' },
     NEON_API_KEY: { set: false, checked: '2026-10-22T20:00:00Z' },
   } }));
@@ -48,7 +48,7 @@ describe('the tool', () => {
   });
 
   it('says a requested name is not set yet, and how the person sets it', async () => {
-    expect(text(await call({ name: 'NEON_API_KEY', project }))).toMatch(/NEON_API_KEY is not set in .* yet; .* Keyhole: Show Requests/);
+    expect(text(await call({ name: 'NEON_API_KEY', project }))).toMatch(/NEON_API_KEY is not set in .* yet; .* Keyhole: Show Inbox/);
   });
 
   it('says Keyhole has not looked at a name, and gives the link to ask for it', async () => {
@@ -60,7 +60,7 @@ describe('the tool', () => {
     await call({ name: 'NEON_API_KEY', project });
 
     expect(opened.length).toBeGreaterThan(0);
-    expect(opened.every(path => path === join(project, OUTCOMES_FILE))).toBe(true);
+    expect(opened.every(path => path === join(project, STATUS_FILE))).toBe(true);
   });
 
   it('refuses an argument that could carry a value, and a name Keyhole would not write', async () => {
@@ -114,7 +114,7 @@ describe('the wall', () => {
     // The process a model's harness starts must not be able to read a secret
     // even by mistake: walk every import from its entry point.
     const src = resolve(import.meta.dirname, '..');
-    const forbidden = /^(secret|setSecret|outcomes|inbox|requests|gitApi|extension)\.ts$|^targets\//;
+    const forbidden = /^(secret|setSecret|status|inbox|requests|gitApi|extension)\.ts$|^targets\//;
     const seen = new Set<string>();
     const walk = (file: string) => {
       if (seen.has(file)) { return; }

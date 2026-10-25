@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 import { connectAssistant, installServerCopy, offerToVsCodeChat } from './assistants';
 import { gitThroughVsCode } from './gitApi';
 import { describeError, initLog, log } from './log';
-import { handleRequestLink, showRequests, watchInbox } from './inbox';
-import { refreshOutcomes } from './outcomes';
+import { handleRequestLink, showInbox, watchInbox } from './inbox';
+import { refreshStatus } from './status';
 import { initSetSecret, setSecret } from './setSecret';
 
 // keyhole: a secret reaches a project's files without entering the
@@ -32,9 +32,9 @@ export function activate(context: vscode.ExtensionContext): void {
   register(context, 'keyhole.setSecret', async () => {
     const outcome = await setSecret(gitThroughVsCode);
     // Every write refreshes Keyhole's cache for that name, the API's source (ADR-0005).
-    if (outcome?.set) { await refreshOutcomes(gitThroughVsCode, outcome.folder.uri.fsPath, [outcome.name]); }
+    if (outcome?.set) { await refreshStatus(gitThroughVsCode, outcome.folder.uri.fsPath, [outcome.name]); }
   });
-  register(context, 'keyhole.showRequests', () => showRequests(gitThroughVsCode));
+  register(context, 'keyhole.showInbox', () => showInbox(gitThroughVsCode));
   context.subscriptions.push(
     vscode.window.registerUriHandler({
       handleUri: async uri => {

@@ -38,7 +38,7 @@
   "main": "./dist/extension.js",
   "activationEvents": [
     "onUri",
-    "workspaceContains:.keyhole/requests.json"
+    "workspaceContains:.keyhole/inbox.json"
   ],
   "contributes": {
     "commands": [
@@ -48,8 +48,8 @@
         "category": "Keyhole"
       },
       {
-        "command": "keyhole.showRequests",
-        "title": "Show Requests",
+        "command": "keyhole.showInbox",
+        "title": "Show Inbox",
         "category": "Keyhole"
       },
       {

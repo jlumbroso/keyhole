@@ -1,6 +1,6 @@
 import { isAbsolute, join } from 'node:path';
 import { checkName } from '../names';
-import { OUTCOMES_FILE } from '../paths';
+import { STATUS_FILE } from '../paths';
 
 // Keyhole's API for models (ADR-0005, QST-OUTCOME-ROUTE, D): a small MCP
 // server, started by the model's harness over stdio, that says whether a
@@ -18,7 +18,7 @@ import { OUTCOMES_FILE } from '../paths';
 // code nobody here has read. The tool's name is provisional until the naming
 // review rules.
 
-export const TOOL = 'check_secret';
+export const TOOL = 'secret_status';
 const SERVER = { name: 'keyhole', version: '0.0.0' };
 const PROTOCOLS = ['2026-07-28', '2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05'];
 
@@ -36,7 +36,7 @@ type Reply = { jsonrpc: '2.0'; id: Id | null; result?: unknown; error?: { code: 
 const result = (id: Id, value: unknown): Reply => ({ jsonrpc: '2.0', id, result: value });
 const failure = (id: Id | null, code: number, message: string): Reply => ({ jsonrpc: '2.0', id, error: { code, message } });
 
-const TOOL_DESCRIPTION = 'Says whether an environment variable is set in a project\'s .env, with its length and keyprint (a fingerprint that never shows the secret part of the value). Never returns a value. Use it after asking the person for a secret through Keyhole (the link vscode://jlumbroso.keyhole/v1/request?name=NAME, or Keyhole: Show Requests), to learn when they have set it.';
+const TOOL_DESCRIPTION = 'Says whether an environment variable is set in a project\'s .env, with its length and keyprint (a fingerprint that never shows the secret part of the value). Never returns a value. Use it after asking the person for a secret through Keyhole (the link vscode://jlumbroso.keyhole/v1/request?name=NAME, or Keyhole: Show Inbox), to learn when they have set it.';
 
 /** What Keyhole's cache says about one name in one project, as the tool's text. */
 async function check(args: { [key: string]: unknown }, deps: Deps): Promise<{ text: string; isError: boolean; structured?: unknown }> {
@@ -49,7 +49,7 @@ async function check(args: { [key: string]: unknown }, deps: Deps): Promise<{ te
   const project = given ?? deps.env.CLAUDE_PROJECT_DIR ?? deps.cwd;
   let variables: { [name: string]: { set?: unknown; length?: unknown; keyprint?: unknown; checked?: unknown } } = {};
   try {
-    const parsed = JSON.parse(await deps.readFile(join(project, OUTCOMES_FILE))) as { format?: unknown; variables?: typeof variables };
+    const parsed = JSON.parse(await deps.readFile(join(project, STATUS_FILE))) as { format?: unknown; variables?: typeof variables };
     if (parsed.format === 1 && parsed.variables && typeof parsed.variables === 'object') { variables = parsed.variables; }
   } catch { /* no cache yet: Keyhole has not looked at anything in this project */ }
   const known = variables[name];
@@ -63,7 +63,7 @@ async function check(args: { [key: string]: unknown }, deps: Deps): Promise<{ te
     : { name, project, known: true, set: false, checked: known.checked };
   const text = known.set === true
     ? `${name} is set in ${project}/.env (${String(known.length)} characters, ${String(known.keyprint)}); checked ${String(known.checked)}.`
-    : `${name} is not set in ${project}/.env yet; checked ${String(known.checked)}. The person sets it with Keyhole: Show Requests.`;
+    : `${name} is not set in ${project}/.env yet; checked ${String(known.checked)}. The person sets it with Keyhole: Show Inbox.`;
   return { text, isError: false, structured };
 }
 
@@ -76,7 +76,7 @@ export async function answer(message: Message, deps: Deps): Promise<Reply | unde
     case 'initialize': {
       const asked = message.params?.protocolVersion;
       const protocolVersion = typeof asked === 'string' && PROTOCOLS.includes(asked) ? asked : PROTOCOLS[0];
-      return result(id, { protocolVersion, capabilities: { tools: {} }, serverInfo: SERVER, instructions: 'Keyhole never returns a secret. Ask for one by name with its link; check whether it is set with check_secret.' });
+      return result(id, { protocolVersion, capabilities: { tools: {} }, serverInfo: SERVER, instructions: 'Keyhole never returns a secret. Ask for one by name with its link; check whether it is set with secret_status.' });
     }
     case 'ping':
       return result(id, {});
