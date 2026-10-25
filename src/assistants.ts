@@ -10,8 +10,8 @@ import { log } from './log';
 // this extension. Each harness is told about it once, at user scope, by a
 // command the person runs; Keyhole runs nothing itself (no child_process).
 // VS Code's own chat needs no copy: VS Code starts the server from the
-// extension folder, with its own Node. Words are provisional until the naming
-// review rules.
+// extension folder, with its own Node. Words ruled by the naming review
+// (№117: the command, and "The line needs Node.js on your PATH.").
 
 const SERVER = 'mcp-server.js';
 const STAMP = 'mcp-server.version';
@@ -53,7 +53,7 @@ export async function connectAssistant(server: string): Promise<void> {
   await vscode.env.clipboard.writeText(line);
   log(`connect: copied the line for ${chosen.label}`);
   void vscode.window.showInformationMessage(
-    `Copied the line that connects ${chosen.label} to Keyhole. Run it once in a terminal: ${chosen.label} can then ask whether a secret is set, never for its value. It needs Node.js on your PATH.`,
+    `Copied the line that connects ${chosen.label} to Keyhole. Run it once in a terminal: ${chosen.label} can then ask whether a secret is set, never for its value. The line needs Node.js on your PATH.`,
   );
 }
 

@@ -1,7 +1,7 @@
 // Where Keyhole keeps its files in a project (ADR-0005). A leaf: it imports
 // nothing, so the MCP server can know the cache's path without importing the
 // code that reads `.env` (src/test/mcpServer.test.ts checks that wall). The
-// names are provisional until the naming review rules.
+// names are the naming review's (№116).
 
 export const KEYHOLE_FOLDER = '.keyhole';
 /** The project's requests, committed: names and the assistant's words, never a value. */

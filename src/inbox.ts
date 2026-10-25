@@ -14,7 +14,7 @@ import { probe } from './targets/dotenv';
 // opening a box; the person opens the list when ready, and each request runs
 // the person's path with the name already given. Nothing here holds a value:
 // the value is typed in the masked box (src/setSecret.ts) and goes straight to
-// `.env`. Every word is provisional until the naming review rules.
+// `.env`. Words ruled by the naming review (№116: the inbox; №117: the .env.example line).
 
 export const SHOW_INBOX = 'Show Inbox';
 export const ADD_TO_ENV_EXAMPLE = 'Add to .env.example';
@@ -138,7 +138,7 @@ export async function offerEnvExample(folder: vscode.WorkspaceFolder, names: str
   const missing = names.filter(name => !has(name));
   if (missing.length === 0) { return; }
   const answer = await vscode.window.showInformationMessage(
-    `Add ${missing.join(', ')} to ${ENV_EXAMPLE} (recommended): it tells the next person who clones this project which secrets it needs, without any value.`,
+    `Add ${missing.join(', ')} to ${ENV_EXAMPLE} (recommended): the next person who clones this project will see which secrets it needs — names only, never values.`,
     ADD_TO_ENV_EXAMPLE,
   );
   if (answer !== ADD_TO_ENV_EXAMPLE) { return; }

@@ -14,7 +14,8 @@ import { probe } from './targets/dotenv';
 // A keyprint shows the last four characters of a long value, so the cache
 // must never be committed: Keyhole writes it only once git says it is ignored
 // (a `.gitignore` inside Keyhole's own folder), and says so in the log when
-// it cannot. The file's name is provisional until the naming review rules.
+// it cannot. The file's name is the naming review's (№116); the record's `empty` and
+// `unreadable` fields came after, and are provisional until it rules.
 
 export { STATUS_FILE };
 const FORMAT = 1;

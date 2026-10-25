@@ -4,7 +4,7 @@
 // the list is refused, and the refusal says why. Copied from Porthole's
 // `src/outsideLinks.ts`, not shared (ADR-0001); one change: `name` may repeat,
 // in order, for a sequence (an SMTP host, user and password). The verb and the
-// keys are provisional until the naming review rules.
+// keys are the naming review's (№116: `request` confirmed).
 
 export const REQUEST_PATHS = ['/v1/request'];
 export const LINK_KEYS = ['name', 'why', 'where', 'repo'];
