@@ -140,6 +140,12 @@ export async function setSecret(git: GitFacts): Promise<void> {
 
   const place = `${folder.name}/${DOTENV}`;
   const before = await probe(folder.uri.fsPath, name);
+  if (before.unreadable) {
+    log(`stopped: ${place} exists but could not be read (${before.unreadable})`);
+    refuse(`Keyhole could not read ${place}, so it wrote nothing.`,
+      `The file exists, but reading it failed (${before.unreadable}). Keyhole adds a line to .env and never rewrites it, so it must read the file first. Check its permissions (ls -l ${DOTENV} in that folder), then run the command again.`);
+    return;
+  }
   log(before.lines.length === 0
     ? `probe: ${name} is not set in ${place}`
     : `probe: ${name} is set in ${place} (line ${before.lines.join(', ')}; ${before.keyprint}, ${before.length} characters)`);
