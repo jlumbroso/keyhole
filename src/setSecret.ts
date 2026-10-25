@@ -20,7 +20,7 @@ export const ADD_TO_GITIGNORE = 'Add to .gitignore';
 export const SET_NEW_VALUE = 'Set New Value';
 /** Both boxes' title: VS Code names the field from it, so a screen reader says more than "input" (ADR-0003). */
 const BOX_TITLE = 'Keyhole: Set a Secret in .env';
-/** The masked box's eye button, both ways (ADR-0003, QST-SHOW-VALUE, A; tooltips provisional until the naming review). */
+/** The masked box's eye button, both ways (ADR-0003, QST-SHOW-VALUE, A; tooltips confirmed by the naming review, №116). */
 const SHOW_VALUE = { iconPath: new vscode.ThemeIcon('eye'), tooltip: 'Show the value' };
 const HIDE_VALUE = { iconPath: new vscode.ThemeIcon('eye-closed'), tooltip: 'Hide the value' };
 
@@ -153,7 +153,7 @@ export async function setSecret(git: GitFacts): Promise<void> {
   }
 
   // The value goes from the person to the file, and nowhere else.
-  const typed = await askForValue(`Paste the value of ${name}. It is written to ${place} and nowhere else.`);
+  const typed = await askForValue(`Paste the value of ${name}. It is written to ${place} and nowhere else. Tab reaches a button that shows what you typed.`);
   if (!typed) { log(`stopped: no value given for ${name}`); return; }
   const secret = new Secret(typed);
 
