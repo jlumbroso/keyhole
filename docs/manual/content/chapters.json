@@ -37,7 +37,7 @@
     "title": "Trigger the next step.",
     "dek": "Exact commands for displaying a guide, registering a request and checking status, with their availability made explicit.",
     "margin": [
-      {"title": "Preview contract", "text": "Keyhole requests and secret_status are implemented on the next-release branch. Main currently supports manual entry only."},
+      {"title": "Preview contract", "text": "Keyhole requests and secret_status are implemented on an unreleased branch. Version 0.1.0 supports manual entry only."},
       {"title": "Names cross", "text": "Requests carry names and instructions. The person supplies the value in VS Code."}
     ]
   },

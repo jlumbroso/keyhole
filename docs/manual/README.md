@@ -1,6 +1,6 @@
 # Keyhole manual
 
-Read the [manual site](https://jlumbroso.github.io/keyhole-docs/) or visit the [product page](https://jlumbroso.github.io/keyhole/). The extension's first release is in preparation.
+Read the [manual site](https://jlumbroso.github.io/keyhole-docs/) or visit the [product page](https://jlumbroso.github.io/keyhole/). Keyhole 0.1.0 is available on the VS Code Marketplace and Open VSX; request/status interfaces remain an unreleased preview.
 
 These are the canonical sources. Introductory, model-reference and service chapters are authored as HTML fragments under `content/`. [Keeping secrets out of the conversation](keeping-secrets-out-of-the-conversation.md) remains Markdown; run `node docs/manual/scripts/render-protections.mjs` from the Keyhole root after changing it. Its checked date concerns vendor documentation/source, not exercised assistant sessions.
 

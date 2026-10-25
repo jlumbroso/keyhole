@@ -1,4 +1,4 @@
-<div class="note"><p><strong>Request interface: implemented preview.</strong> The request link, inbox and status MCP described here belong to Keyhole's next-release branch, checked at <code>50d6803</code>. They are not in the current main-branch build or a verified public release. The current build provides <code>Keyhole: Set a Secret in .env…</code>. Porthole's local-file opening interface is released in 0.4.1.</p></div>
+<div class="note"><p><strong>Request interface: implemented preview.</strong> The request link, inbox and status MCP described here belong to Keyhole's preview branch, checked at <code>50d6803</code>. They are not included in the released 0.1.0, which provides <code>Keyhole: Set a Secret in .env…</code>. Porthole's local-file opening interface is released in 0.4.1.</p></div>
 
 <p>Initiate the step that needs the person. Prepare the instructions, display them through Porthole, and submit a Keyhole request containing the setting's name and purpose. The person obtains the credential and supplies its value in Keyhole. Continue from the recorded status without asking for the value in chat.</p>
 
@@ -21,7 +21,7 @@
 <h2 id="request-link">2. Register a request by opening its URI</h2>
 <p>With the Keyhole preview installed, this harmless practice request records the name and announces it in VS Code:</p>
 <pre><code>open 'vscode://jlumbroso.keyhole/v1/request?name=KEYHOLE_PRACTICE&amp;why=Try%20the%20request%20flow&amp;repo=my-project'</code></pre>
-<p>The person chooses <strong>Keyhole: Show Inbox</strong> and selects the request when ready. The link does not immediately open a value box. For the current main build, the person instead runs <strong>Keyhole: Set a Secret in .env…</strong>, enters the agreed name, and follows <a href="first-secret.html">the practice walkthrough</a>.</p>
+<p>The person chooses <strong>Keyhole: Show Inbox</strong> and selects the request when ready. The link does not immediately open a value box. With 0.1.0, the person instead runs <strong>Keyhole: Set a Secret in .env…</strong>, enters the agreed name, and follows <a href="first-secret.html">the practice walkthrough</a>.</p>
 <table>
   <caption>Preview URI: <code>vscode://jlumbroso.keyhole/v1/request</code></caption>
   <thead><tr><th>Parameter</th><th>Meaning</th></tr></thead>

@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / '_site'
 BASE = 'https://jlumbroso.github.io/keyhole-docs/'
 FONT_CSS = 'https://jlumbroso.github.io/berkeley-mono/v2.004/berkeley-mono.css'
-STATUS = 'First release in preparation'
+STATUS = 'Keyhole 0.1.0 · previews labeled separately'
 DATE = '24 October 2026'
 PRODUCT = 'https://jlumbroso.github.io/keyhole/'
 REPOSITORY = 'https://github.com/jlumbroso/keyhole'
@@ -363,11 +363,11 @@ def build():
 
 > Help an assistant initiate a credential handoff: display a guide with Porthole, request names through Keyhole, and keep secret values out of the conversation. Includes Render and Neon MCP setup guides.
 
-{STATUS}. Updated {DATE}. This manual does not announce a published release.
+{STATUS}. Updated {DATE}. Install the released extension from the overview chapter; preview contracts are not included in 0.1.0.
 
 {SOURCE_NOTICE}
 
-The current main build supports manual entry into .env. Request links, inbox records and secret_status are an implemented next-release preview; consult the model reference before calling them. Harness-specific writers are not yet implemented. OAuth may avoid the need to copy a service token at all.
+The released 0.1.0 supports manual entry into .env. Request links, inbox records and secret_status are an implemented, unreleased preview; consult the model reference before calling them. Harness-specific writers are not yet implemented. OAuth may avoid the need to copy a service token at all.
 
 Each chapter includes its notes, release status, and source reference. The complete manual contains the same {len(chapters)} chapters. Keep real credentials out of conversations, screenshots, copied settings, and documentation reports.
 
