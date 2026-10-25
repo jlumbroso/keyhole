@@ -37,6 +37,7 @@ jobs:
     environment: open-vsx
     permissions:
       contents: read
+      actions: read     # the "green tests run" guard lists workflow runs; a PRIVATE repository answers 403 without it (met at keyhole 0.1.0)
       id-token: write   # lets the job request the OIDC token the registry verifies
     steps:
       - name: The tag looks like a version tag
