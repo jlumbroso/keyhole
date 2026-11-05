@@ -1,8 +1,8 @@
 # kintsugi.lock — tool-written state; do not hand-edit.
 # What this repo HAS, per artifact (base version + exact canonical blob).
 kintsugi_schema: 1
-canonical_version: 3.12.3
-synced: '2026-10-24T02:03:50Z'
+canonical_version: 3.12.4
+synced: '2026-11-05T09:48:44Z'
 artifacts:
   .claude/agent.env:
     base_version: 3.11.6
@@ -35,9 +35,8 @@ artifacts:
     base_blob: 310cd93f7b97d07a03445925a397ce408dca732d
     state_at_adopt: unmodified+current
   .vscode/vscode-optimization-guide.md:
-    base_version: 3.11.6
+    base_version: 3.12.4
     base_blob: c530ec32ed082c3649c967556ba7ac541e3f39bb
-    state_at_adopt: unmodified+current
   CHANGELOG.md:
     base_version: 0+git.5a8590e
     base_blob: 4a367b8385cf00e401e9b556c6ae8731ccb239cb
