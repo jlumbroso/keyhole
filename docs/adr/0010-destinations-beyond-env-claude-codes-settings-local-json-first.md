@@ -9,7 +9,7 @@ adr teaching map: the example is not the teaching — these are the up-links fro
 # Destinations beyond .env: Claude Code's settings.local.json first
 
 - **Date**: 2026-10-25
-- **Iteration**: 2
+- **Iteration**: 3
 - **Status**: Accepted
 - **Deciders**: Jérémie Lumbroso; Glazier 5.5 (Claude Opus 5.5, the implementation); Sounder 6 (the guides and the destination matrix); Surveyor 5.1 (each harness's environment, read)
 
@@ -82,7 +82,8 @@ OK, I agree with Option C, your recommendation on scheduling seem sound.
 - [x] Answer QST-TARGET-ORDER — Owner: Jérémie (2026-10-25: C)
 - [x] Send the destination matrix (each harness's file for MCP servers' environment, project versus user scope, official sources) — Owner: Sounder 6 (2026-10-25)
 - [x] Read, at pinned releases, how each harness hands environment to MCP servers versus shell commands, and what Claude Code does with `settings.local.json`'s `env` (merge order with `settings.json`, whether it is gitignored by Claude Code itself) — Owner: Surveyor 5.1 (2026-10-25, with a Claude Code probe)
-- [ ] Build the Claude Code target behind the target interface, per variable and by setting, with its git check and the masked box's line saying where the value goes; tests that every other key survives the merge and that a tracked or unignored file is refused — Owner: Glazier
+- [ ] Build the Claude Code target behind the target interface, per variable and by setting, with its git check and the masked box's line saying where the value goes; tests that every other key survives the merge and that a tracked or unignored file is refused — Owner: Glazier. **Built as the second implementation of one provider pipeline** (detectors, parsers, writers, an offer shaped by what was detected), not as a special case, and the JSON edit byte-preserving (`json-source-edit` as the model): Jérémie's updated answer, `docs/TECHNICAL-DEBT.md` entry 2
+- [ ] Read the other harnesses' equivalents at pinned releases, **Antigravity first** (unread), then design each one's destination and consent — Owner: Surveyor 5.1 (the reading), Glazier (the design); `docs/TECHNICAL-DEBT.md` entry 1
 - [ ] Name the destination's word in the link and in the box, and the setting — Owner: the naming review
 
 ---
@@ -100,6 +101,12 @@ OK, I agree with Option C, your recommendation on scheduling seem sound.
 - Contributors: Jérémie Lumbroso, Sounder 6, Surveyor 5.1, Glazier 5.5 (Claude Opus 5.5)
 - Changes: the decision: the literal in `settings.local.json` `env`, the server's entry name-only, trust then Reconnect; this ADR's first framing corrected (OAuth needs no key; the settings file alone does not complete a connection)
 - Outcome: `Draft → Accepted`
+
+### Iteration 3 (2026-11-19)
+- Trigger: Jérémie's updated answer to QST-TARGET-ORDER (C, with two debts named)
+- Contributors: Jérémie Lumbroso, Glazier 5.5 (Claude Opus 5.5)
+- Changes: `docs/TECHNICAL-DEBT.md` founded with both (the other harnesses' equivalents, Antigravity first; the Claude Code destination built as one provider of many, with a byte-preserving JSON edit); the build item and a reading item carry them
+- Outcome: `Accepted` (unchanged)
 
 ---
 
