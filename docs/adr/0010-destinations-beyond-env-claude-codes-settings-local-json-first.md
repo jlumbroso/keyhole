@@ -56,6 +56,10 @@ Options:
 **ANS:** (by Jérémie Lumbroso)
 OK, I agree with Option C, your recommendation on scheduling seem sound.
 
+*Updated answer:* OK, agreed with Option C. One of the things we should also add to the "technical debt" is:
+- we need to research the equivalent mechanisms to `.claude/settings.local.json`'s `env` key in other harnesses (Codex, Gemini/Antigravity, Grok, etc.);
+- we need to abstract the "Claude Code" version of the functionality so we can easily add more providers/vendors — we need to think about how to detect the toolset in a project, and offer to make the setting changes according to the toolset; this sort of implies a scaffolding with a multithread pipeline with detectors, parsers, writers, etc. — given some of these are in JSON, I wonder if we would benefit from a project like created in Python, `json-source-edit`, see https://github.com/lumbroso-commons/json-source-edit, in TypeScript — perhaps not at first, but we could go there).
+
 ---
 
 ## Decision
